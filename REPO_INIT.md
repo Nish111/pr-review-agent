@@ -9,7 +9,7 @@ the one decision below. Everything else is fixed commands with a check after eac
 ## Decision (the only one): where the repo lives
 
 <!-- UPDATE: write A or B on the line below. Direction if unsure: A. -->
-**Choice:**
+**Choice:** A (done 19 Oct: repo initialised here, 2 commits, pushed to github.com/Nish111/pr-review-agent)
 
 | Option | If chosen | If not chosen |
 |---|---|---|

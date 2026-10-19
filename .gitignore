@@ -7,7 +7,10 @@ __pycache__/
 *.pyc
 .venv/
 node_modules/
-# local scratch: paste terminal output here, never committed
+# Temporary.md is the memory project's scratch file; ignored here only in case it is created by mistake
 Temporary.md
 # binary notes (video notes stay on disk; their text goes into .md files when used)
 *.docx
+
+# local scratch for this project: paste terminal output here, never committed
+Temp10.md
