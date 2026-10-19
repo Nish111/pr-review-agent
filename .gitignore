@@ -1,0 +1,13 @@
+# secrets and local env
+.env
+.env.*
+*.key
+# python / node build noise (stack not chosen yet; harmless if unused)
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+# local scratch: paste terminal output here, never committed
+Temporary.md
+# binary notes (video notes stay on disk; their text goes into .md files when used)
+*.docx
