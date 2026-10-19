@@ -1,11 +1,48 @@
 {
-  "$comment": "nodes=modules, edges=[cause,effect] where cause is imported-by effect. ADD invariants by hand.",
-  "project": ".",
-  "generated": "2026-10-19T11:01:55.725Z",
-  "nodes": [],
-  "edges": [],
+  "$comment": "Per-project dependency graph. nodes=modules, edges=[cause,effect] (cause is imported-by effect). Seeded by hand at G2 (19 Oct 2026) from the architecture chosen in G0.5 (approach A, with C as rung 1); no code exists yet. Regenerate the skeleton with tools/graphizer.mjs once src/ has modules; KEEP the invariants, they are hand-written.",
+  "project": "pr-review-agent",
+  "generated": "2026-10-19",
+  "nodes": [
+    "contracts",
+    "config",
+    "llm_client",
+    "embedder",
+    "github_client",
+    "store",
+    "trace",
+    "webhook_receiver",
+    "job_queue",
+    "ingestion",
+    "retrieval",
+    "static_checks",
+    "specialists",
+    "orchestrator",
+    "aggregator",
+    "hitl",
+    "evaluation",
+    "cli"
+  ],
+  "$edge_note": "contracts (Finding, Review, Job) and config are the centre: they import nothing from the project. Adapters (llm_client, embedder, github_client, store) sit behind interfaces so a paid tier can replace a free one by config (kickoff Q1). trace is cross-cutting: everything may import it, it imports only contracts.",
+  "edges": [
+    ["contracts", "store"], ["contracts", "trace"], ["contracts", "webhook_receiver"], ["contracts", "job_queue"],
+    ["contracts", "static_checks"], ["contracts", "specialists"], ["contracts", "aggregator"], ["contracts", "hitl"], ["contracts", "evaluation"],
+    ["config", "llm_client"], ["config", "embedder"], ["config", "github_client"], ["config", "store"], ["config", "webhook_receiver"],
+    ["trace", "llm_client"], ["trace", "webhook_receiver"], ["trace", "orchestrator"], ["trace", "retrieval"], ["trace", "hitl"],
+    ["store", "job_queue"], ["store", "ingestion"], ["store", "retrieval"], ["store", "hitl"], ["store", "evaluation"],
+    ["job_queue", "webhook_receiver"], ["job_queue", "orchestrator"],
+    ["embedder", "ingestion"], ["embedder", "retrieval"],
+    ["github_client", "ingestion"], ["github_client", "orchestrator"], ["github_client", "hitl"],
+    ["llm_client", "specialists"],
+    ["retrieval", "specialists"],
+    ["static_checks", "orchestrator"], ["specialists", "orchestrator"], ["aggregator", "orchestrator"], ["hitl", "orchestrator"],
+    ["orchestrator", "evaluation"], ["orchestrator", "cli"], ["evaluation", "cli"], ["webhook_receiver", "cli"]
+  ],
   "invariants": {
-    "$TODO": "Add 2-3 health rules, e.g. \"API latency < 200ms\", \"domain imports no framework\"."
+    "every_posted_finding_is_grounded": "A finding reaches GitHub or the approval queue only if its file_path and line range exist in the PR head AND were in the context the specialist actually received. Otherwise it is dropped and the drop is traced. VERIFIER TEST: feed a specialist a stubbed LLM response citing a file/line that was never retrieved; the review must contain zero findings for it and the trace must show one 'finding.dropped{reason=ungrounded}'. (Guards kickoff Q11: the confident, wrong finding.)",
+    "one_live_job_per_work_key": "For one (repo, pr_number, head_sha) there is at most one live review job, under concurrency. VERIFIER TEST: ingress matrix T8, the same delivery fired 50x concurrently, gives exactly 1 job; T7, opened + ready_for_review on the same SHA, gives 1 job.",
+    "bot_never_approves_or_merges": "No code path calls a GitHub API that approves a PR, requests changes as a blocking review, or merges. Reviews are posted as COMMENT only. Until a confidence threshold calibrated on the golden set is recorded in config, nothing auto-posts: every review goes to the approval queue. VERIFIER TEST: grep the github_client for approve/merge endpoints (must be absent); with no threshold configured, run a review end-to-end and assert zero direct posts and one approval-queue entry.",
+    "every_outbound_call_is_bounded": "Every call to an LLM, the embedder, GitHub or the store has an explicit timeout and a defined failure path (retry budget, then dead-letter or degrade). VERIFIER TEST: inject a hanging stub for each adapter; the job must finish (failed or degraded) within its timeout and never hang.",
+    "dependencies_point_inward": "contracts and config import nothing from the project; adapters never import orchestrator/specialists/hitl; no cycles. VERIFIER TEST: run graphizer and check every edge against this file's edge list."
   },
   "freeze_boundary": [
     "src/**"

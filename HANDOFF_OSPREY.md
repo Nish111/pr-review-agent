@@ -4,6 +4,13 @@
 OSPREY chat: **the PR Review Agent only** (W8 deliverable). The memory project continues under
 KESTREL; LinkedIn, SBL and outreach are separate chats.
 
+> **STATUS 19 Oct 2026 (read this first in a new OSPREY chat).** Genesis setup G0–G5 is complete in this repo
+> (github.com/Nish111/pr-review-agent). Decisions: approach A (lecture architecture) with C (rule-based checks)
+> as rung 1; no confidence threshold until the golden set exists; milestone order = evaluation first (M0 spikes →
+> M1 golden set → M2 rung 1 → … → M9 live demo). The ingress failure matrix is at v3. `.genesis/checkpoints/CURRENT.md`
+> points at M0. Scratch file: `Temp10.md`. Decision records: G0_DRAFT.md, G5_DRAFT.md, KICKOFF_ANSWERS_DRAFT.md.
+> The sections below are the original 18 Oct handoff, kept for history; §1 and §2 are superseded by the above.
+
 **Read in this order:** this file → `../KICKOFF_PR_AGENT.md` (your 18 Sep kickoff; still right on
 scope, method and DoD) → `../LMS_Archive/docs/week-8-pr-review-agent-build.md` (the brief, complete)
 → `../PLAN_FROM_HERE.md` §4 (when this fits).

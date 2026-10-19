@@ -50,13 +50,26 @@
   <!-- ───────────── DEFINITION OF DONE ───────────── -->
   <h2>2 · Definition of Done (binary gates — checked by the VERIFIER, not the maker)</h2>
   <div class="card">
-    <div class="gate"><span class="box"></span><span class="label">Dependency direction inward, zero cycles <span class="note">(modular-architecture gate)</span></span></div>
-    <div class="gate"><span class="box"></span><span class="label">Every outbound call has a timeout / circuit-breaker <span class="note">(production-readiness gate)</span></span></div>
-    <div class="gate"><span class="box"></span><span class="label">All LLM/structured outputs validated against a schema <span class="note">(llmops gate)</span></span></div>
-    <div class="gate"><span class="box"></span><span class="label">Threat model written; prompt-injection / untrusted-input considered <span class="note">(security gate)</span></span></div>
-    <div class="gate"><span class="box"></span><span class="label"><code>{{TYPECHECK_CMD}}</code> clean AND <code>{{TEST_CMD}}</code> green in CI</span></div>
-    <div class="gate"><span class="box"></span><span class="label">One <code>verify</code> pass by a <b>separate</b> agent/model (L4)</span></div>
-    <div class="gate"><span class="box"></span><span class="label">No <code>context-graph.json</code> invariant violated by the change</span></div>
+    <p class="note">G4, 19 Oct 2026: gates lifted from the <code>agentic-swe-master</code> phase gates for the phases this project passes through, plus project-specific criteria from <code>decisions/decisions-manifest.md</code>.</p>
+    <h3>2a · Universal (every milestone)</h3>
+    <div class="gate"><span class="box"></span><span class="label">Dependency direction inward, zero cycles; matches <code>context-graph.json</code> edges <span class="note">(Phase 1, modular-architecture)</span></span></div>
+    <div class="gate"><span class="box"></span><span class="label">Every outbound call (LLM, embedder, GitHub, store) has an explicit timeout and a defined failure path <span class="note">(Phase 3/12, production-readiness)</span></span></div>
+    <div class="gate"><span class="box"></span><span class="label">All LLM output validated against the <code>Finding</code> schema before it is stored or shown <span class="note">(Phase 5, llmops)</span></span></div>
+    <div class="gate"><span class="box"></span><span class="label">Untrusted input handled per the trust boundary in §1: PR content never treated as instructions; LLM citations verified <span class="note">(Phase 11, security)</span></span></div>
+    <div class="gate"><span class="box"></span><span class="label"><code>ruff check .</code> clean AND <code>pytest -q</code> green <span class="note">(Python, chosen to reuse the memory project's provider layer, pacing and trace code)</span></span></div>
+    <div class="gate"><span class="box"></span><span class="label">No secrets or tokens in logs or traces; zero paid API calls unless config explicitly enables a paid tier <span class="note">(kickoff Q1, Q9)</span></span></div>
+    <div class="gate"><span class="box"></span><span class="label">One <code>verify</code> pass by a <b>separate</b> agent/model (L4). Maker is never checker.</span></div>
+    <div class="gate"><span class="box"></span><span class="label">No <code>context-graph.json</code> invariant violated: all five checked, not spot-checked</span></div>
+    <h3>2b · Attached to specific milestones</h3>
+    <div class="gate"><span class="box"></span><span class="label"><b>Ingress (Phase 3/12):</b> ingress failure matrix tests T1–T16 pass; T7, T8, T10, T12 also run against the baseline and both numbers recorded</span></div>
+    <div class="gate"><span class="box"></span><span class="label"><b>Evaluation (Phase 9):</b> golden PR set exists with labels written <i>before</i> any rung is scored (pre-registered); precision reported first, recall second; every rung scored on the same set</span></div>
+    <div class="gate"><span class="box"></span><span class="label"><b>Retrieval (Phase 6):</b> hybrid semantic + exact-identifier search; every finding cites retrieved code; context budget enforced</span></div>
+    <div class="gate"><span class="box"></span><span class="label"><b>Specialists (Phase 4/8):</b> 4 passes run in parallel with per-node timeout; a partial result (e.g. 3 of 4 done) is reported as partial, never as complete</span></div>
+    <div class="gate"><span class="box"></span><span class="label"><b>HITL (Phase 19):</b> approval queue, CRITICAL escalation and dispute path all work end-to-end; threshold set only from golden-set calibration (target ≥ 90% precision on posted findings)</span></div>
+    <div class="gate"><span class="box"></span><span class="label"><b>Observability (Phase 10):</b> every review has a trace covering retrieval, prompts/models, findings, cost, latency, confidence, human decisions and recovery (the brief's list)</span></div>
+    <h3>2c · Kit gates that do not apply (recorded, not silently dropped)</h3>
+    <div class="gate"><span class="box"></span><span class="label"><b>Frontend (Phase 2):</b> no dashboard UI planned; a static HTML trace/eval report replaces it. Revisit if the brief's "cost dashboard" is required for grading</span></div>
+    <div class="gate"><span class="box"></span><span class="label"><b>Infrastructure / CI-CD (Phases 13, 18):</b> local-only, zero cost; no cloud deploy or canary. Tests run locally; CI optional</span></div>
     <p class="note">A milestone is DONE only when every box above is checked by the verifier. Pull each
        gate from the relevant <code>agentic-swe-master</code> phase gate.</p>
   </div>
@@ -67,13 +80,19 @@
     <table>
       <thead><tr><th>#</th><th>Milestone</th><th>Phase</th><th>Demo command (proves it works)</th><th>Loops</th><th>Status</th></tr></thead>
       <tbody>
-        <tr><td>M1</td><td>{{M1_NAME}}</td><td>{{M1_PHASE}}</td><td><code>{{M1_DEMO}}</code></td><td>L1, L4</td><td><span class="pill">todo</span></td></tr>
-        <tr><td>M2</td><td>{{M2_NAME}}</td><td>{{M2_PHASE}}</td><td><code>{{M2_DEMO}}</code></td><td>L1, L3, L4</td><td><span class="pill">todo</span></td></tr>
-        <tr><td>M3</td><td>{{M3_NAME}}</td><td>{{M3_PHASE}}</td><td><code>{{M3_DEMO}}</code></td><td>L1, L2, L4</td><td><span class="pill">todo</span></td></tr>
-        <tr><td>…</td><td>add rows as the plan is sliced</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>M0</td><td>Research spikes S1–S5: free LLM, free embedding model, database, golden-PR source, what videos 6–10 build</td><td>L3 Research</td><td><code>ls .genesis/decisions/</code></td><td>L3, L4</td><td><span class="pill">todo</span></td></tr>
+        <tr><td>M1</td><td>Contracts (Finding, Review, Job) + golden PR set v0, labels committed before any scoring</td><td>1 Architecture · 9 Evaluation</td><td><code>python -m pr_review golden check</code></td><td>L1, L4</td><td><span class="pill">todo</span></td></tr>
+        <tr><td>M2</td><td>Rung 1: rule-based checks (linters, Semgrep) + the scorer</td><td>9 Evaluation</td><td><code>python -m pr_review eval --rung 1</code></td><td>L1, L4</td><td><span class="pill">todo</span></td></tr>
+        <tr><td>M3</td><td>Rung 2: single LLM reviewer: reused provider layer, budget guard, basic trace</td><td>5 LLM &amp; Reasoning · 16 Economics</td><td><code>python -m pr_review eval --rung 2</code></td><td>L1, L4</td><td><span class="pill">todo</span></td></tr>
+        <tr><td>M4</td><td>Ingress &amp; queue per FAILURE_MATRIX_01_INGRESS (group 1)</td><td>3 Backend · 12 Reliability</td><td><code>pytest tests/ingress -q</code></td><td>L1, L2, L4</td><td><span class="pill">todo</span></td></tr>
+        <tr><td>M5</td><td>Code index + hybrid search (groups 2, 3)</td><td>6 Memory · 14 Data</td><td><code>python -m pr_review search &quot;verify_token&quot;</code></td><td>L1, L4</td><td><span class="pill">todo</span></td></tr>
+        <tr><td>M6</td><td>Rung 3: 4 grounded specialists in parallel (group 4)</td><td>4 Orchestration · 8 Multi-agent</td><td><code>python -m pr_review eval --rung 3</code></td><td>L1, L2, L4</td><td><span class="pill">todo</span></td></tr>
+        <tr><td>M7</td><td>Rung 4: aggregator + approval queue + confidence calibration (group 5)</td><td>19 HITL</td><td><code>python -m pr_review eval --rung 4 &amp;&amp; python -m pr_review queue</code></td><td>L1, L4</td><td><span class="pill">todo</span></td></tr>
+        <tr><td>M8</td><td>Traces, cost report, audit trail (group 6)</td><td>10 Observability · 15 Governance</td><td><code>python -m pr_review trace &lt;review_id&gt;</code></td><td>L1, L4</td><td><span class="pill">todo</span></td></tr>
+        <tr><td>M9</td><td>Live PR → review demo (real GitHub App), ADRs, write-up</td><td>all</td><td><code>python -m pr_review demo --live</code></td><td>L1, L4</td><td><span class="pill">todo</span></td></tr>
       </tbody>
     </table>
-    <p class="note">Total token budget = (n milestones × 50000). Update <span class="pill wip">wip</span> /
+    <p class="note">Order chosen by Nishant, 19 Oct 2026: <b>evaluation first, fail early</b> (G5_DRAFT.md option 1). Total token budget = (10 milestones × 50000). Update <span class="pill wip">wip</span> /
        <span class="pill ok">done</span> as loops complete. This table is mirrored in <code>PLAN.md</code> for the agent to parse.</p>
   </div>
 

@@ -1,10 +1,10 @@
 # CURRENT
 - active_loop: NONE
-- target: <milestone-id>
+- target: M0 (research spikes S1–S5)
 - iteration: 0
 - last_gate: —
-- last_action: project genesis scaffolded; no milestone started
-- next_action: run G0 existence pre-flight on M1
+- last_action: Genesis G0–G5 complete 19 Oct 2026 (spec, approach A+C, context graph + 5 invariants, wiki pointers, definition of done, 10 milestones M0–M9, evaluation first)
+- next_action: G6, run the existence pre-flight on M0, then L3 RESEARCH for S1–S5. Per the sprint plan the build starts in week 5 (from 11 Nov); spikes S4/S5 can start earlier only if Nishant chooses to.
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000
