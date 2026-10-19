@@ -40,10 +40,10 @@
   <!-- ───────────── THE LOCKED SPEC ───────────── -->
   <h2>1 · The Locked Spec (what we are building)</h2>
   <div class="card locked">
-    <p><b>Cognitive job:</b> {{COGNITIVE_JOB}}</p>
-    <p><b>Inputs:</b> {{INPUTS}} &nbsp;→&nbsp; <b>Outputs:</b> {{OUTPUTS}}</p>
-    <p><b>Autonomy level:</b> {{AUTONOMY}} &nbsp;|&nbsp; <b>Human-in-the-loop points:</b> {{HITL}}</p>
-    <p><b>Failure tolerance:</b> {{FAILURE_TOLERANCE}} &nbsp;|&nbsp; <b>Trust boundary:</b> {{TRUST_BOUNDARY}}</p>
+    <p><b>Cognitive job:</b> For one PR&#x27;s latest commit, produce a selective, grounded review: a short list of findings, each with file, line, evidence and confidence. Mechanical, high-confidence findings post automatically; uncertain, critical or irreversible judgements go to a human. (Until the confidence threshold is calibrated on the golden set, every finding goes to the human approval queue.)</p>
+    <p><b>Inputs:</b> pull_request webhook or a member&#x27;s /review comment; PR diff; code retrieved from the repo (hybrid semantic + exact-identifier search); repo memory (past reviews, conventions) &nbsp;→&nbsp; <b>Outputs:</b> one review on the PR, or one held in the approval queue; a commit status; a trace per review (retrieval, prompts/models, findings, cost, latency, confidence, human decisions, recovery)</p>
+    <p><b>Autonomy level:</b> Level 3, human handles exceptions; level 4, human decides, for any CRITICAL finding. The bot comments only and never approves or merges. Effectively level 4 for everything until the threshold is calibrated. &nbsp;|&nbsp; <b>Human-in-the-loop points:</b> (1) overall confidence below threshold → approval queue; (2) any CRITICAL finding → escalate regardless of confidence; (3) developer dispute → dispute record, human rules, feeds evaluation; (4) draft/bot PRs and push bursts → only on a member&#x27;s /review</p>
+    <p><b>Failure tolerance:</b> zero tolerance for a confident, wrong posted finding (precision is the priority metric; target ≥ 90% on posted findings, threshold set after the golden set). Delay acceptable; silent loss not (WAL, DLQ, redelivery, sweeper) &nbsp;|&nbsp; <b>Trust boundary:</b> untrusted: all GitHub content (PR text, branch names, code, comments, fork PRs) AND all LLM output (schema-validated; every citation checked against code actually retrieved, else the finding is dropped). Trusted: repo config, secrets, golden-set labels</p>
     <p class="note">Filled during Genesis step G0 (Cognitive Design) via <code>agentic-swe-master</code>.</p>
   </div>
 

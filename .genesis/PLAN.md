@@ -14,22 +14,22 @@ human/visual view; this is the one loops read). Sliced so each milestone ships i
 > Three fundamentally different approaches to the cognitive job. Pick one. Record the rationale.
 > This is the cheapest design decision — you haven't written a line of code yet.
 
-### Approach A — {{APPROACH_A_NAME}}
-{{APPROACH_A_DESCRIPTION}}
-- Strengths: {{APPROACH_A_STRENGTHS}}
-- Weaknesses: {{APPROACH_A_WEAKNESSES}}
+### Approach A — The lecture's architecture, re-earned
+Webhook server → queue → orchestrator running 4 grounded specialists in parallel (security, quality, tests, docs) → aggregator (dedup, score) → confidence gate → GitHub.
+- Strengths: covers all 7 component groups the brief grades; natural baseline-vs-upgraded story.
+- Weaknesses: most moving parts and the biggest failure surface; the live demo needs a server GitHub can reach.
 
-### Approach B — {{APPROACH_B_NAME}}
-{{APPROACH_B_DESCRIPTION}}
-- Strengths: {{APPROACH_B_STRENGTHS}}
-- Weaknesses: {{APPROACH_B_WEAKNESSES}}
+### Approach B — GitHub Action, no server
+Review runs inside GitHub's CI on each PR; no webhook server, queue or ingress code.
+- Strengths: far less to build; free Actions minutes on public repos; most ingress failure modes disappear.
+- Weaknesses: group 1 (ingress & queue) can't be demonstrated, and it's graded; fork PRs get no secrets, so no LLM key; hard to show a human approval queue.
 
-### Approach C — {{APPROACH_C_NAME}}
-{{APPROACH_C_DESCRIPTION}}
-- Strengths: {{APPROACH_C_STRENGTHS}}
-- Weaknesses: {{APPROACH_C_WEAKNESSES}}
+### Approach C — Deterministic first, LLM second
+Static analysers (linters, Semgrep) produce candidate findings deterministically; the LLM only verifies each against retrieved code, explains it and ranks it.
+- Strengths: highest precision per unit of cost; matches the "only thinking needs an LLM" aim; very testable.
+- Weaknesses: finds only what rules exist for; misses design/logic findings; weaker agent story.
 
-### Chosen: {{CHOSEN_APPROACH}} — {{CHOSEN_RATIONALE}}
+### Chosen: A, with C as its first rung — the brief's improvement ladder is lint/static → single LLM → grounded specialist fan-out → confidence-routed review, so C is rung 1 of A. Each rung is measured on the same golden set, giving early numbers (fail early, kickoff Q10) and the baseline-vs-upgraded evaluation. B rejected: it removes group 1, which is graded. (Decided by Nishant, 19 Oct 2026; see G0_DRAFT.md.)
 
 ---
 
