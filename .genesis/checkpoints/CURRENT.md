@@ -1,10 +1,10 @@
 # CURRENT
 - active_loop: NONE
-- target: M0 (research spikes S1–S5)
+- target: M1 (contracts + golden PR set v0)
 - iteration: 0
 - last_gate: —
-- last_action: Genesis G0–G5 complete 19 Oct 2026 (spec, approach A+C, context graph + 5 invariants, wiki pointers, definition of done, 10 milestones M0–M9, evaluation first)
-- next_action: G6, run the existence pre-flight on M0, then L3 RESEARCH for S1–S5. Per the sprint plan the build starts in week 5 (from 11 Nov); spikes S4/S5 can start earlier only if Nishant chooses to.
+- last_action: 21 Oct 2026 — M0 committed (S1–S4 accepted, S5 provisional). M1 part 1: contracts (Finding, Span, Review, route, WorkKey, Job) + 32 tests green, ruff clean.
+- next_action: M1 part 2 — Nishant picks the real repo (M1_REAL_REPO_PICK.md); Claude drafts the 14 seeded PRs + label format; labels committed before any scoring.
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000

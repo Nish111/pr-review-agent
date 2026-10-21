@@ -1,0 +1,25 @@
+[project]
+name = "pr-review-agent"
+version = "0.1.0"
+description = "Selective, grounded, failure-aware PR reviewer (AI Sprint W8 deliverable), built with Genesis."
+requires-python = ">=3.10"
+dependencies = []          # stdlib only so far; each new dependency must be earned (brief section 2)
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# Explicit rule set so results don't change when ruff's defaults change.
+# EXE rules are left out on purpose: files on a Windows (NTFS) drive look executable to Linux tools.
+select = ["E", "F", "I", "B", "UP"]

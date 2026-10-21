@@ -14,3 +14,8 @@ Temporary.md
 
 # local scratch for this project: paste terminal output here, never committed
 Temp10.md
+
+# tool caches (created by test/lint runs)
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
