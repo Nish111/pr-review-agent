@@ -1,0 +1,19 @@
+--- a/notes_svc/notes.py
++++ b/notes_svc/notes.py
+@@ -26,6 +26,16 @@
+     return [dict(r) for r in rows]
+ 
+ 
++def list_notes_with_tags(conn: sqlite3.Connection, user_id: int, page: int = 1,
++                         per_page: int = 20) -> list[dict]:
++    """One page of notes, each with its tags."""
++    notes = list_notes(conn, user_id, page, per_page)
++    for note in notes:
++        rows = conn.execute("SELECT tag FROM tags WHERE note_id = ?", (note["id"],)).fetchall()
++        note["tags"] = [r["tag"] for r in rows]
++    return notes
++
++
+ def search(conn: sqlite3.Connection, user_id: int, keyword: str) -> list[dict]:
+     """Notes whose title or body contains `keyword`."""
+     pattern = f"%{keyword}%"

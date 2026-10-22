@@ -1,0 +1,19 @@
+--- a/notes_svc/notes.py
++++ b/notes_svc/notes.py
+@@ -13,6 +13,16 @@
+             (user_id, title, body, utc_now()),
+         )
+     return cur.lastrowid
++
++
++def archive_note(conn: sqlite3.Connection, user_id: int, note_id: int) -> bool:
++    """Archive one of the user's notes. Returns False if it isn't theirs."""
++    with conn:
++        cur = conn.execute(
++            "INSERT INTO tags (note_id, tag) SELECT id, 'archived' FROM notes WHERE id = ? AND user_id = ?",
++            (note_id, user_id),
++        )
++    return cur.rowcount == 1
+ 
+ 
+ def list_notes(conn: sqlite3.Connection, user_id: int, page: int = 1, per_page: int = 20) -> list[dict]:

@@ -1,0 +1,246 @@
+{
+  "version": 1,
+  "matching_rule": "same file AND line ranges overlap after widening the label by 3 lines each side; any specialist; severity/wording ignored",
+  "prs": [
+    {
+      "id": "S01",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Add note search by keyword",
+      "body": "Search was slow on big accounts; build the query directly.",
+      "diff": "golden/seeded/prs/S01.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "notes_svc/notes.py",
+          "line_start": 32,
+          "line_end": 33,
+          "severity": "critical",
+          "specialist": "security",
+          "category": "sql-injection",
+          "description": "keyword (user input) is pasted into the SQL text; a quote breaks out of the string"
+        }
+      ]
+    },
+    {
+      "id": "S02",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Speed up token check",
+      "body": "compare_digest is overkill here, plain comparison is faster.",
+      "diff": "golden/seeded/prs/S02.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "notes_svc/auth.py",
+          "line_start": 11,
+          "line_end": 11,
+          "severity": "high",
+          "specialist": "security",
+          "category": "timing-attack",
+          "description": "== on a secret leaks how many leading characters match; use hmac.compare_digest"
+        }
+      ]
+    },
+    {
+      "id": "S03",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Let users name their export file",
+      "body": "Users asked to pick the file name and extension themselves.",
+      "diff": "golden/seeded/prs/S03.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "notes_svc/export.py",
+          "line_start": 15,
+          "line_end": 15,
+          "severity": "high",
+          "specialist": "security",
+          "category": "path-traversal",
+          "description": "user-chosen name joined to EXPORT_DIR unchecked: '../../x' writes outside exports/"
+        }
+      ]
+    },
+    {
+      "id": "S04",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Save tags together with the note",
+      "body": "New helper so the UI can create a note and its tags in one call.",
+      "diff": "golden/seeded/prs/S04.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "notes_svc/notes.py",
+          "line_start": 21,
+          "line_end": 24,
+          "severity": "high",
+          "specialist": "quality",
+          "category": "partial-write",
+          "description": "note insert and tag insert are two separate transactions; a failed tag insert leaves the note saved without its tags"
+        }
+      ]
+    },
+    {
+      "id": "S05",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Show tags in the note list",
+      "body": "List view now shows each note's tags.",
+      "diff": "golden/seeded/prs/S05.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "notes_svc/notes.py",
+          "line_start": 33,
+          "line_end": 35,
+          "severity": "medium",
+          "specialist": "quality",
+          "category": "n-plus-one-query",
+          "description": "one tags query per note inside the loop; get_tags() already does it in one query"
+        }
+      ]
+    },
+    {
+      "id": "S06",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Add \"today's notes\" view",
+      "body": "Home screen shows what I wrote today.",
+      "diff": "golden/seeded/prs/S06.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "notes_svc/notes.py",
+          "line_start": 32,
+          "line_end": 32,
+          "severity": "high",
+          "specialist": "quality",
+          "category": "timezone",
+          "description": "date.today() is the server's local date but created_at is UTC; for UTC+05:30 users, notes from 00:00-05:30 local are missed"
+        }
+      ]
+    },
+    {
+      "id": "S07",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Add note archiving",
+      "body": "Users can archive a note; archived notes are hidden from lists.",
+      "diff": "golden/seeded/prs/S07.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "notes_svc/notes.py",
+          "line_start": 18,
+          "line_end": 25,
+          "severity": "medium",
+          "specialist": "tests",
+          "category": "missing-test",
+          "description": "new public function, including an ownership check, with no test"
+        }
+      ]
+    },
+    {
+      "id": "S08",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Fix flaky search test",
+      "body": "The search test failed on CI sometimes; simplified it.",
+      "diff": "golden/seeded/prs/S08.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "tests/test_notes.py",
+          "line_start": 28,
+          "line_end": 28,
+          "severity": "high",
+          "specialist": "tests",
+          "category": "assertion-removed",
+          "description": "the test no longer asserts anything, so it can never fail"
+        }
+      ]
+    },
+    {
+      "id": "S09",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Make JSON the default export format",
+      "body": "JSON is easier to import elsewhere.",
+      "diff": "golden/seeded/prs/S09.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "notes_svc/export.py",
+          "line_start": 12,
+          "line_end": 12,
+          "severity": "medium",
+          "specialist": "docs",
+          "category": "undocumented-breaking-change",
+          "description": "default output changes from .txt to .json but README and CHANGELOG still say txt; existing scripts that read exports/<name>.txt break"
+        }
+      ]
+    },
+    {
+      "id": "S10",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Add --format json to the CLI",
+      "body": "Lets the CLI write JSON exports.",
+      "diff": "golden/seeded/prs/S10.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "notes_svc/cli.py",
+          "line_start": 16,
+          "line_end": 16,
+          "severity": "low",
+          "specialist": "docs",
+          "category": "undocumented-option",
+          "description": "new --format option has no help text and the README usage isn't updated"
+        }
+      ]
+    },
+    {
+      "id": "C01",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Refactor: split tag queries into their own module",
+      "body": "notes.py is getting long; move tag helpers out. No behaviour change.",
+      "diff": "golden/seeded/prs/C01.diff",
+      "clean": true,
+      "expected": []
+    },
+    {
+      "id": "C02",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Add tests for export edge cases",
+      "body": "Cover the empty-account and unicode cases.",
+      "diff": "golden/seeded/prs/C02.diff",
+      "clean": true,
+      "expected": []
+    },
+    {
+      "id": "C03",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Retry failed exports with backoff",
+      "body": "Exports to a network drive fail now and then; retry a few times before giving up.",
+      "diff": "golden/seeded/prs/C03.diff",
+      "clean": true,
+      "expected": []
+    },
+    {
+      "id": "C04",
+      "source": "seeded",
+      "repo": "notes-svc",
+      "title": "Use fixed query strings in the admin report",
+      "body": "Replace string-built SQL with one fixed query per table.",
+      "diff": "golden/seeded/prs/C04.diff",
+      "clean": true,
+      "expected": []
+    }
+  ]
+}

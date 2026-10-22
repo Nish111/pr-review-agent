@@ -1,0 +1,43 @@
+--- a/notes_svc/export.py
++++ b/notes_svc/export.py
+@@ -1,5 +1,6 @@
+ """Export a user's notes to a file under exports/."""
+ 
++import json
+ import re
+ import sqlite3
+ from pathlib import Path
+@@ -8,15 +9,18 @@
+ _SAFE_NAME = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+ 
+ 
+-def export_notes(conn: sqlite3.Connection, user_id: int, name: str) -> Path:
+-    """Write the user's notes to exports/<name>.txt and return the path."""
++def export_notes(conn: sqlite3.Connection, user_id: int, name: str, fmt: str = "json") -> Path:
++    """Write the user's notes to exports/<name>.<fmt> and return the path."""
+     if not _SAFE_NAME.match(name):
+         raise ValueError("export name may only contain letters, digits, '_' and '-'")
+     rows = conn.execute(
+         "SELECT title, body, created_at FROM notes WHERE user_id = ? ORDER BY id", (user_id,)
+     ).fetchall()
+     EXPORT_DIR.mkdir(exist_ok=True)
+-    path = EXPORT_DIR / f"{name}.txt"
+-    text = "\n\n".join(f"{r['title']} ({r['created_at']})\n{r['body']}" for r in rows)
++    path = EXPORT_DIR / f"{name}.{fmt}"
++    if fmt == "json":
++        text = json.dumps([dict(r) for r in rows], indent=2)
++    else:
++        text = "\n\n".join(f"{r['title']} ({r['created_at']})\n{r['body']}" for r in rows)
+     path.write_text(text, encoding="utf-8")
+     return path
+--- a/tests/test_export.py
++++ b/tests/test_export.py
+@@ -11,7 +11,7 @@
+ 
+ def test_export_writes_txt(conn):
+     create_note(conn, 1, "hello", "world")
+-    path = export_mod.export_notes(conn, 1, "mine")
++    path = export_mod.export_notes(conn, 1, "mine", fmt="txt")
+     assert path.suffix == ".txt" and "hello" in path.read_text(encoding="utf-8")
+ 
+ 

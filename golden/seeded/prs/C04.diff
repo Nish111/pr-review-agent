@@ -1,0 +1,32 @@
+--- a/notes_svc/report.py
++++ b/notes_svc/report.py
+@@ -2,12 +2,13 @@
+ 
+ import sqlite3
+ 
+-_TABLES = ("users", "notes", "tags")
++# One fixed statement per table: no SQL is assembled at runtime.
++_COUNT_SQL = {
++    "users": "SELECT COUNT(*) AS n FROM users",
++    "notes": "SELECT COUNT(*) AS n FROM notes",
++    "tags": "SELECT COUNT(*) AS n FROM tags",
++}
+ 
+ 
+ def table_counts(conn: sqlite3.Connection) -> dict[str, int]:
+-    counts = {}
+-    for table in _TABLES:
+-        sql = "SELECT COUNT(*) AS n FROM " + table
+-        counts[table] = conn.execute(sql).fetchone()["n"]
+-    return counts
++    return {table: conn.execute(sql).fetchone()["n"] for table, sql in _COUNT_SQL.items()}
+--- /dev/null
++++ b/tests/test_report.py
+@@ -0,0 +1,7 @@
++from notes_svc.notes import create_note
++from notes_svc.report import table_counts
++
++
++def test_table_counts(conn):
++    create_note(conn, 1, "a", "b")
++    assert table_counts(conn) == {"users": 1, "notes": 1, "tags": 0}

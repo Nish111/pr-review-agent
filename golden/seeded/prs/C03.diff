@@ -1,0 +1,69 @@
+--- a/notes_svc/export.py
++++ b/notes_svc/export.py
+@@ -2,10 +2,13 @@
+ 
+ import re
+ import sqlite3
++import time
+ from pathlib import Path
+ 
+ EXPORT_DIR = Path("exports")
+ _SAFE_NAME = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
++MAX_ATTEMPTS = 3
++BACKOFF_SECONDS = 0.2
+ 
+ 
+ def export_notes(conn: sqlite3.Connection, user_id: int, name: str) -> Path:
+@@ -18,5 +21,12 @@
+     EXPORT_DIR.mkdir(exist_ok=True)
+     path = EXPORT_DIR / f"{name}.txt"
+     text = "\n\n".join(f"{r['title']} ({r['created_at']})\n{r['body']}" for r in rows)
+-    path.write_text(text, encoding="utf-8")
+-    return path
++    for attempt in range(1, MAX_ATTEMPTS + 1):
++        try:
++            path.write_text(text, encoding="utf-8")
++            return path
++        except OSError:
++            if attempt == MAX_ATTEMPTS:
++                raise
++            time.sleep(BACKOFF_SECONDS * 2 ** (attempt - 1))
++    raise AssertionError("unreachable")
+--- a/tests/test_export.py
++++ b/tests/test_export.py
+@@ -15,6 +15,35 @@
+     assert path.suffix == ".txt" and "hello" in path.read_text(encoding="utf-8")
+ 
+ 
++def _flaky_writer(fail_times, calls):
++    real = export_mod.Path.write_text
++
++    def write_text(self, *a, **kw):
++        calls.append(1)
++        if len(calls) <= fail_times:
++            raise OSError("drive busy")
++        return real(self, *a, **kw)
++    return write_text
++
++
++def test_export_retries_then_succeeds(conn, monkeypatch):
++    calls = []
++    monkeypatch.setattr(export_mod, "BACKOFF_SECONDS", 0)
++    monkeypatch.setattr(export_mod.Path, "write_text", _flaky_writer(2, calls))
++    create_note(conn, 1, "a", "b")
++    assert export_mod.export_notes(conn, 1, "r").name == "r.txt"
++    assert len(calls) == 3
++
++
++def test_export_gives_up_after_max_attempts(conn, monkeypatch):
++    calls = []
++    monkeypatch.setattr(export_mod, "BACKOFF_SECONDS", 0)
++    monkeypatch.setattr(export_mod.Path, "write_text", _flaky_writer(99, calls))
++    with pytest.raises(OSError):
++        export_mod.export_notes(conn, 1, "r")
++    assert len(calls) == export_mod.MAX_ATTEMPTS
++
++
+ @pytest.mark.parametrize("bad", ["../x", "a/b", "", "x" * 65, "na me"])
+ def test_export_rejects_unsafe_names(conn, bad):
+     with pytest.raises(ValueError):

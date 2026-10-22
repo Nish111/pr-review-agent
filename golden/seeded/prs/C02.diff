@@ -1,0 +1,20 @@
+--- a/tests/test_export.py
++++ b/tests/test_export.py
+@@ -15,6 +15,17 @@
+     assert path.suffix == ".txt" and "hello" in path.read_text(encoding="utf-8")
+ 
+ 
++def test_export_with_no_notes_writes_empty_file(conn):
++    path = export_mod.export_notes(conn, 1, "empty")
++    assert path.read_text(encoding="utf-8") == ""
++
++
++def test_export_keeps_unicode(conn):
++    create_note(conn, 1, "नमस्ते", "café")
++    text = export_mod.export_notes(conn, 1, "uni").read_text(encoding="utf-8")
++    assert "नमस्ते" in text and "café" in text
++
++
+ @pytest.mark.parametrize("bad", ["../x", "a/b", "", "x" * 65, "na me"])
+ def test_export_rejects_unsafe_names(conn, bad):
+     with pytest.raises(ValueError):

@@ -1,0 +1,44 @@
+--- a/notes_svc/cli.py
++++ b/notes_svc/cli.py
+@@ -13,8 +13,9 @@
+     exp.add_argument("--user", type=int, required=True, help="user id")
+     exp.add_argument("--file", required=True, help="export name (letters, digits, _ and -)")
+     exp.add_argument("--db", default="notes.db", help="database file")
++    exp.add_argument("--format", default="txt", choices=["txt", "json"])
+     args = parser.parse_args(argv)
+-    path = export_notes(connect(args.db), args.user, args.file)
++    path = export_notes(connect(args.db), args.user, args.file, args.format)
+     print(path)
+     return 0
+ 
+--- a/notes_svc/export.py
++++ b/notes_svc/export.py
+@@ -1,5 +1,6 @@
+ """Export a user's notes to a file under exports/."""
+ 
++import json
+ import re
+ import sqlite3
+ from pathlib import Path
+@@ -8,7 +9,7 @@
+ _SAFE_NAME = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+ 
+ 
+-def export_notes(conn: sqlite3.Connection, user_id: int, name: str) -> Path:
++def export_notes(conn: sqlite3.Connection, user_id: int, name: str, fmt: str = "txt") -> Path:
+     """Write the user's notes to exports/<name>.txt and return the path."""
+     if not _SAFE_NAME.match(name):
+         raise ValueError("export name may only contain letters, digits, '_' and '-'")
+@@ -16,7 +17,10 @@
+         "SELECT title, body, created_at FROM notes WHERE user_id = ? ORDER BY id", (user_id,)
+     ).fetchall()
+     EXPORT_DIR.mkdir(exist_ok=True)
+-    path = EXPORT_DIR / f"{name}.txt"
+-    text = "\n\n".join(f"{r['title']} ({r['created_at']})\n{r['body']}" for r in rows)
++    path = EXPORT_DIR / f"{name}.{fmt}"
++    if fmt == "json":
++        text = json.dumps([dict(r) for r in rows], indent=2)
++    else:
++        text = "\n\n".join(f"{r['title']} ({r['created_at']})\n{r['body']}" for r in rows)
+     path.write_text(text, encoding="utf-8")
+     return path

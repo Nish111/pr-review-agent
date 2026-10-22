@@ -1,0 +1,45 @@
+"""Command line: python -m pr_review <command>."""
+
+from __future__ import annotations
+
+import argparse
+import subprocess
+from pathlib import Path
+
+from pr_review.evaluation.golden import check
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def _last_commit(path: Path) -> str:
+    """Short hash of the last commit that touched `path`, read with git (run by the user)."""
+    try:
+        out = subprocess.run(["git", "log", "-1", "--format=%h", "--", str(path)], cwd=ROOT,
+                             capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return "unknown (git not available)"
+    return out.stdout.strip() or "NOT COMMITTED YET (labels must be committed before any scoring)"
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="pr_review")
+    sub = parser.add_subparsers(dest="cmd", required=True)
+    g = sub.add_parser("golden", help="golden PR set")
+    g.add_argument("action", choices=["check"])
+    g.add_argument("--labels", default="golden/labels_seeded.json")
+    g.add_argument("--no-git", action="store_true", help="skip the commit-hash lookup")
+    args = parser.parse_args(argv)
+
+    labels = ROOT / args.labels
+    r = check(labels, ROOT)
+    print(f"{r.total} PRs: {r.planted} with planted/known problems, {r.clean} clean, {r.real} real")
+    if not args.no_git:
+        print(f"labels last committed in: {_last_commit(labels)}")
+    for p in r.problems:
+        print(f"PROBLEM: {p}")
+    print("OK" if r.ok else f"FAILED: {len(r.problems)} problem(s)")
+    return 0 if r.ok else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

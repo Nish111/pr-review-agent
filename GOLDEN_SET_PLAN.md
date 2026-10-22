@@ -35,7 +35,7 @@ It becomes its own public GitHub repo later, which is also the live demo target 
 | C01 | Refactor: split storage module | **clean**: pure move, tests unchanged and passing | — | — |
 | C02 | Add tests for export edge cases | **clean**: tests only | — | — |
 | C03 | Retry failed exports with backoff | **clean, but looks risky**: a loop with sleeps, capped at 3 attempts, with tests for each path. A reviewer that flags "possible infinite loop" here raises a false alarm | — | — |
-| C04 | Switch internal report query to parameters | **clean, but looks security-sensitive**: replaces string-built SQL (with constant inputs only) by a parameterised query. It *fixes* a smell; flagging it as injection is a false alarm | — | — |
+| C04 | Use fixed query strings in the admin report | **clean, but looks security-sensitive**: replaces SQL built by string concatenation (constant table names only) with one fixed query per table. It *fixes* a smell; flagging it as injection is a false alarm. *(Changed while building: table names can't be passed as query parameters, so "fixed strings" is the realistic fix.)* | — | — |
 
 **Why the 4 clean PRs matter:** precision is your top metric (kickoff Q11). Any finding the reviewer raises on C01–C04 is a false alarm, and that's exactly what we most need to count.
 
@@ -94,3 +94,15 @@ Write any row IDs that look wrong, too easy, or unrealistic, with one line why. 
 | **Parameterised query** | a database query where user values are passed separately, never pasted into the SQL text; the standard fix for SQL injection |
 | **Backoff** | waiting a little longer between each retry |
 | **Breaking change** | a change that makes existing users' code or scripts stop working |
+
+---
+
+## Build status (21–22 Oct 2026)
+
+- **Built:** the demo app `golden/seeded/base/` (stdlib Python, 12 tests passing), and the 14 PRs from `golden/seeded/build.py` →
+  `golden/seeded/prs/*.diff` + labels in `golden/labels_seeded.json`.
+- **Deterministic:** running the build twice gives byte-identical diffs and labels (checked).
+- **Every PR's head version passes the app's own tests,** like a PR that got through CI. The planted bugs aren't caught by tests, which is the realistic case.
+  One adjustment while building: the base app's "search treats quotes as text" test was removed, because it made S01 fail CI, and a PR that fails CI never reaches a reviewer.
+- **Checked:** `python -m pr_review golden check` → 14 PRs (10 planted, 4 clean); every label sits on a line the PR actually changed.
+- **Still to do for M1:** the 6 real click PRs (next step).

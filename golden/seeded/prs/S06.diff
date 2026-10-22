@@ -1,0 +1,27 @@
+--- a/notes_svc/notes.py
++++ b/notes_svc/notes.py
+@@ -1,6 +1,7 @@
+ """Notes: create, list, search, tag."""
+ 
+ import sqlite3
++from datetime import date
+ 
+ from notes_svc.db import utc_now
+ 
+@@ -26,6 +27,16 @@
+     return [dict(r) for r in rows]
+ 
+ 
++def todays_notes(conn: sqlite3.Connection, user_id: int) -> list[dict]:
++    """Notes created today."""
++    today = date.today().isoformat()
++    rows = conn.execute(
++        "SELECT id, title, created_at FROM notes WHERE user_id = ? AND created_at LIKE ?",
++        (user_id, f"{today}%"),
++    ).fetchall()
++    return [dict(r) for r in rows]
++
++
+ def search(conn: sqlite3.Connection, user_id: int, keyword: str) -> list[dict]:
+     """Notes whose title or body contains `keyword`."""
+     pattern = f"%{keyword}%"
