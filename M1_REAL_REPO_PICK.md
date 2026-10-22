@@ -1,4 +1,4 @@
-# M1 · Pick the public repo for the 6 real PRs
+# M1 · Pick the public repo for the 6 real PRs (done: pallets/click)
 
 Written 21 Oct 2026. M0 is committed (`abf09b2`, from your `Temp10.md` paste).
 
@@ -32,10 +32,15 @@ So the three candidates below come from **my general knowledge, not checked toda
 2. For each repo, write below: **(a)** roughly how many closed bug issues there are, and **(b)** whether you can open 2 of them and find the PR they link to (yes / no).
 3. Pick one.
 
-- click:
-- httpx:
-- tenacity:
-- **My pick:**
+**Your check (Nishant, 21 Oct 2026):**
+
+| Repo | Closed bug issues | 2 of them link to a PR? |
+|---|---|---|
+| click | 77 | yes |
+| httpx | 64 | yes |
+| tenacity | 20 | yes |
+
+- **Pick (Nishant):** **pallets/click**, because it has the most closed bugs. → Recorded in `.genesis/decisions/S4-golden-pr-source.md`.
 
 **Recommendation: click**, if your check confirms it has plenty of closed bug issues with linked PRs.
 - **If you follow it:** mid-size code, clean issue history, and a CLI library is easy to reason about when you label PRs.
