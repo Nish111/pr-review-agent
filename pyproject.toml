@@ -16,7 +16,7 @@ pythonpath = ["src"]
 testpaths = ["tests"]
 
 [tool.ruff]
-line-length = 110
+line-length = 120
 src = ["src", "tests"]
 # The demo app (base/) and its generated PR versions (head/) are a separate project, test data for the
 # reviewer; head/ contains the planted bugs on purpose.

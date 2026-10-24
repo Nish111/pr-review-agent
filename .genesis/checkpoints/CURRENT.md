@@ -1,10 +1,10 @@
 # CURRENT
 - active_loop: NONE
-- target: M2 (rung 1: rule-based checks + scorer)
+- target: M3 (rung 2: single LLM reviewer)
 - iteration: 0
 - last_gate: —
-- last_action: 24 Oct 2026 — rung 1 on real click PRs: 0/6 except R2 fix#3764 matched by location only (S603 on subprocess two lines above the unlink bug), recorded as a coincidental match. M2 complete.
-- next_action: commit rung-1 real results; then M3 pre-registration (rung 2 single LLM reviewer), including the "right reason" check for matched findings.
+- last_action: 24 Oct 2026 — M3 code: llm_client copied from the memory project (b62a943), specialists/single.py (budgeted prompt, strict grounded parse), run_llm.py (resumable cache that never reuses failures, quota stop), prompt sha 134aa0d267f5; 47 tests green. PREREG_RUNG2.md drafted; waiting on the right-reason decision.
+- next_action: Nishant commits PREREG_RUNG2 (right-reason = A and B independently; judge gemini-3.6-flash sha 971537b18244), then runs rung 2 + judge + handcheck.
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000

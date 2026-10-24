@@ -1,0 +1,14 @@
+You are checking whether a code reviewer's comment describes a specific known bug.
+
+The known bug (from the project's records):
+{label}
+
+The reviewer's comment, attached to the same place in the code:
+summary: {summary}
+rationale: {rationale}
+
+Question: does the reviewer's comment identify THE SAME problem as the known bug? Being at the same location is not
+enough; it must describe the same underlying fault (same cause or same consequence). A different concern near the
+same lines is "false".
+
+Answer with JSON only: {"same_bug": true or false, "reason": "one sentence"}

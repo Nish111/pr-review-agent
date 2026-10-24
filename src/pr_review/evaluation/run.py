@@ -70,7 +70,19 @@ def _row(pr: dict, s: PRScore, fs: list) -> dict:
 
 def print_report(res: dict) -> None:
     t = res["seeded"]["totals"]
-    print(f"Rung {res['rung']} ({res['tool']}, rules {','.join(res['rules'])})")
+    if res["rung"] == 1:
+        print(f"Rung 1 ({res['tool']}, rules {','.join(res['rules'])})")
+    else:
+        print(f"Rung {res['rung']} ({res['provider']} / {res['model']}, "
+              f"prompt {res['prompt']} sha {res['prompt_sha']})")
+        for tr in res.get("trace", []):
+            bad = tr.get("error") or tr.get("parse_error")
+            print(f"  call {tr['pr']:4} sent={tr.get('sent')} cached={tr.get('cached')} "
+                  f"tokens~{tr.get('est_tokens')} {tr.get('latency_s')}s dropped={len(tr.get('dropped', []))}"
+                  + (f"  PROBLEM: {bad[:80]}" if bad else ""))
+        if res.get("stopped"):
+            print(f"  STOPPED: {res['stopped']}  (re-run the same command after the quota resets; "
+                  "finished PRs are cached)")
     print(f"SEEDED  precision {_fmt(t['precision'])} ({t['true_positives']}/{t['findings']} right)   "
           f"recall {_fmt(t['recall'])} ({t['problems_found']}/{t['problems']} planted problems found)   "
           f"false alarms on clean PRs: {t['false_alarms_on_clean_prs']}")
