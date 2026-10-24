@@ -26,19 +26,23 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="cmd", required=True)
     g = sub.add_parser("golden", help="golden PR set")
     g.add_argument("action", choices=["check"])
-    g.add_argument("--labels", default="golden/labels_seeded.json")
+    g.add_argument("--labels", nargs="+", default=["golden/labels_seeded.json", "golden/labels_real.json"])
     g.add_argument("--no-git", action="store_true", help="skip the commit-hash lookup")
     args = parser.parse_args(argv)
 
-    labels = ROOT / args.labels
-    r = check(labels, ROOT)
-    print(f"{r.total} PRs: {r.planted} with planted/known problems, {r.clean} clean, {r.real} real")
-    if not args.no_git:
-        print(f"labels last committed in: {_last_commit(labels)}")
-    for p in r.problems:
-        print(f"PROBLEM: {p}")
-    print("OK" if r.ok else f"FAILED: {len(r.problems)} problem(s)")
-    return 0 if r.ok else 1
+    ok = True
+    for rel in args.labels:
+        labels = ROOT / rel
+        r = check(labels, ROOT)
+        print(f"{rel}: {r.total} PRs ({r.planted} with known problems, {r.clean} clean, {r.real} real), "
+              f"{r.known_problems} known problems")
+        if not args.no_git:
+            print(f"  last committed in: {_last_commit(labels)}")
+        for p in r.problems:
+            print(f"  PROBLEM: {p}")
+        ok = ok and r.ok
+    print("OK" if ok else "FAILED")
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":

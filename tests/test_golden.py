@@ -46,3 +46,9 @@ def test_clean_flag_must_agree_with_labels(tmp_path):
                        "expected": [{"file_path": "x.py", "line_start": 2, "line_end": 2}]}]}
     (tmp_path / "l.json").write_text(json.dumps(labels))
     assert not check(tmp_path / "l.json", tmp_path).ok
+
+
+def test_committed_real_set_passes_the_check():
+    r = check(ROOT / "golden/labels_real.json", ROOT)
+    assert r.ok, r.problems
+    assert (r.total, r.real, r.clean, r.known_problems) == (5, 5, 0, 6)

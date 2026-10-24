@@ -51,7 +51,7 @@ Selection rule, fixed **before** looking at any reviewer output:
 *(My proposal, derived from your precision-first answer, Q11. Change it if you disagree; once labels are committed, it's frozen.)*
 - A reviewer finding **matches** a planted problem if it's in the **same file**, its lines **overlap the planted lines (±3 lines)**, and it comes from **any** specialist. Severity and wording don't need to match.
 - **Precision** = matched findings ÷ all findings the reviewer raised (clean PRs included).
-- **Recall** = planted problems matched ÷ planted problems (10 seeded + 6 real).
+- **Recall** = planted problems matched ÷ planted problems, **for the 10 seeded problems only**. The 5 real click PRs (6 problems) are reported **one by one**, with no percentage (your decision A, 24 Oct, `REAL_PRS_REVIEW.md`).
 - Seeded and real are **reported separately**, never as one blended number.
 - A finding that matches nothing is still **checked by you** before it's counted as a false alarm: it may be a real issue we didn't plant. That check is recorded, so the count can't drift afterwards.
 
@@ -106,3 +106,6 @@ Write any row IDs that look wrong, too easy, or unrealistic, with one line why. 
   One adjustment while building: the base app's "search treats quotes as text" test was removed, because it made S01 fail CI, and a PR that fails CI never reaches a reviewer.
 - **Checked:** `python -m pr_review golden check` → 14 PRs (10 planted, 4 clean); every label sits on a line the PR actually changed.
 - **Still to do for M1:** the 6 real click PRs (next step).
+
+**Update 23 Oct:** the real set is built: **5 PRs / 6 problems**, not 6, because click names the introducing change for only 5 bugs.
+`golden/real/build_real.py` → `golden/real/prs/R1–R5.diff` + `golden/labels_real.json`. Waiting on your fair/hard check in `REAL_PRS_REVIEW.md`.

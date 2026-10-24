@@ -29,3 +29,4 @@ select = ["E", "F", "I", "B", "UP"]
 
 [tool.ruff.lint.per-file-ignores]
 "golden/seeded/build.py" = ["E501"]   # long lines are verbatim code snippets and anchors
+"golden/real/build_real.py" = ["E501"]

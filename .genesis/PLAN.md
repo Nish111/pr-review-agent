@@ -143,4 +143,5 @@ Static analysers (linters, Semgrep) produce candidate findings deterministically
 
 ## Progress (loops append here on milestone completion — newest last)
 
-- _(none yet — first loop fills this)_
+- **M0 done (21 Oct 2026):** S1–S4 accepted, S5 provisional (`.genesis/decisions/`). Commit abf09b2.
+- **M1 done (24 Oct 2026):** contracts + 14 seeded PRs (10 problems, 4 clean) + 5 real click PRs (6 problems); `python -m pr_review golden check` OK; seeded labels committed in 3d9e146 before any scoring. Real set reported per PR (option A).

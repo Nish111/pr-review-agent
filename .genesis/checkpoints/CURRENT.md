@@ -1,10 +1,10 @@
 # CURRENT
 - active_loop: NONE
-- target: M1 (contracts + golden PR set v0)
+- target: M2 (rung 1: rule-based checks + scorer)
 - iteration: 0
 - last_gate: —
-- last_action: 22 Oct 2026 — M1 part 2: demo app notes-svc + 14 seeded PRs (deterministic build.py) + labels_seeded.json + `golden check` command; 36 tests green, ruff clean.
-- next_action: M1 part 3 — select 6 real pallets/click PRs by the pre-set rule (GOLDEN_SET_PLAN.md), label them, commit labels before any scoring.
+- last_action: 24 Oct 2026 — M1 done: golden set complete (seeded 14 + real 5), golden check OK, real set reported per PR.
+- next_action: M2 — pick the rule-based tools (ruff, bandit/semgrep), map their output to Finding, write the scorer (precision/recall on seeded, per-PR table on real), run `eval --rung 1`.
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000

@@ -17,6 +17,7 @@ Labels are committed to git **before** any rung is scored (pre-registration).
 - Positive: exact recall on the seeded part; a realism check on the real part; M1 fits in about a weekend; the demo repo doubles as the live-demo target (M9).
 - Negative / cost: seeded problems reflect our idea of a bug. Reported separately from the real part, never blended into one number.
 - **Real repo: `pallets/click`** (Nishant, 21 Oct 2026, `M1_REAL_REPO_PICK.md`): 77 closed bug issues, spot-checked that issues link to PRs. Runners-up: encode/httpx (64), jd/tenacity (20).
+- **Built 23–24 Oct:** 5 real PRs / 6 problems (only pairs click names itself), labels by deterministic SZZ-style tracing (`golden/real/build_real.py`). Reported **per PR, no percentage** (Nishant, option A, `REAL_PRS_REVIEW.md`).
 
 ## Alternatives rejected
 - Real-only: too slow to label. Seeded-only: easy to dismiss. Own repos: too few PRs and no independent truth.

@@ -45,10 +45,11 @@ def changed_lines(diff_text: str) -> dict[str, set[int]]:
 @dataclass(frozen=True)
 class CheckResult:
     total: int
-    planted: int
+    planted: int      # PRs with at least one known problem
     clean: int
     real: int
-    problems: tuple[str, ...]
+    known_problems: int   # distinct problems (a real problem may span several label ranges)
+    problems: tuple[str, ...]   # what is wrong with the label file itself
 
     @property
     def ok(self) -> bool:
@@ -83,5 +84,8 @@ def check(labels_path: Path, repo_root: Path) -> CheckResult:
                 problems.append(f"{pid} label {i}: {span.file_path}:{span.line_start}-{span.line_end} "
                                 f"is not on a line the PR changed")
     planted = sum(1 for p in prs if p.get("expected"))
+    known = sum(len({e.get("problem", f"{p.get('id')}/{i}") for i, e in enumerate(p.get("expected", []))})
+                for p in prs)
     return CheckResult(total=len(prs), planted=planted, clean=len(prs) - planted,
-                       real=sum(1 for p in prs if p.get("source") == "real"), problems=tuple(problems))
+                       real=sum(1 for p in prs if p.get("source") == "real"), known_problems=known,
+                       problems=tuple(problems))

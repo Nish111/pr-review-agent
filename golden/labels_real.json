@@ -1,0 +1,345 @@
+{
+  "version": 1,
+  "source": "pallets/click; pairs named by click itself (CHANGES.md / fix commit title)",
+  "matching_rule": "same as labels_seeded.json; a problem counts as found if ANY of its ranges is matched",
+  "prs": [
+    {
+      "id": "R1",
+      "source": "real",
+      "repo": "pallets/click",
+      "intro_commit": "2468b70",
+      "intro_pr": "2969",
+      "fix": [
+        {
+          "commit": "fe3ad76",
+          "pr": "3653"
+        }
+      ],
+      "issues": [
+        "3572"
+      ],
+      "title": "Fix readline backspace/line-wrapping on linux (#2969)",
+      "changed_lines": 36,
+      "diff": "golden/real/prs/R1.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "src/click/termui.py",
+          "line_start": 64,
+          "line_end": 64,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R1/fix#3653",
+          "description": "CHANGES.md 8.5.0: confirm()/prompt() ANSI stripping 'was lost in 8.4.0 when #2969 began writing the prompt with input() directly'"
+        },
+        {
+          "file_path": "src/click/termui.py",
+          "line_start": 68,
+          "line_end": 68,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R1/fix#3653",
+          "description": "CHANGES.md 8.5.0: confirm()/prompt() ANSI stripping 'was lost in 8.4.0 when #2969 began writing the prompt with input() directly'"
+        },
+        {
+          "file_path": "src/click/termui.py",
+          "line_start": 76,
+          "line_end": 76,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R1/fix#3653",
+          "description": "CHANGES.md 8.5.0: confirm()/prompt() ANSI stripping 'was lost in 8.4.0 when #2969 began writing the prompt with input() directly'"
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "source": "real",
+      "repo": "pallets/click",
+      "intro_commit": "c69643b",
+      "intro_pr": "1572",
+      "fix": [
+        {
+          "commit": "8b44edf",
+          "pr": "3739"
+        },
+        {
+          "commit": "fc5c7f4",
+          "pr": "3764"
+        }
+      ],
+      "issues": [
+        "3731",
+        "3732",
+        "3740"
+      ],
+      "title": "Add file-like pager: `click.get_pager_file()` (#1572)",
+      "changed_lines": 193,
+      "diff": "golden/real/prs/R2.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "src/click/_termui_impl.py",
+          "line_start": 581,
+          "line_end": 581,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R2/fix#3739",
+          "description": "CHANGES.md 8.5.0: get_pager_file temp-file backend opened its file in binary mode, 'Regression introduced in 8.4.0 by #1572'; and it unlinked the file without closing it, masking the real error on Windows"
+        },
+        {
+          "file_path": "src/click/_termui_impl.py",
+          "line_start": 588,
+          "line_end": 588,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R2/fix#3764",
+          "description": "CHANGES.md 8.5.0: get_pager_file temp-file backend opened its file in binary mode, 'Regression introduced in 8.4.0 by #1572'; and it unlinked the file without closing it, masking the real error on Windows"
+        }
+      ]
+    },
+    {
+      "id": "R3",
+      "source": "real",
+      "repo": "pallets/click",
+      "intro_commit": "19fd4d6",
+      "intro_pr": "3126",
+      "fix": [
+        {
+          "commit": "b7e5fd4",
+          "pr": "3504"
+        }
+      ],
+      "issues": [
+        "3502",
+        "3043"
+      ],
+      "title": "Fix: Ensure fish completion handles multiline help strings correctly (#3126)",
+      "changed_lines": 23,
+      "diff": "golden/real/prs/R3.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "src/click/shell_completion.py",
+          "line_start": 183,
+          "line_end": 183,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R3/fix#3504",
+          "description": "CHANGES.md 8.4.2: 'Fix Fish shell completion broken in 8.4.0 by #3126'"
+        },
+        {
+          "file_path": "src/click/shell_completion.py",
+          "line_start": 190,
+          "line_end": 194,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R3/fix#3504",
+          "description": "CHANGES.md 8.4.2: 'Fix Fish shell completion broken in 8.4.0 by #3126'"
+        },
+        {
+          "file_path": "src/click/shell_completion.py",
+          "line_start": 433,
+          "line_end": 436,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R3/fix#3504",
+          "description": "CHANGES.md 8.4.2: 'Fix Fish shell completion broken in 8.4.0 by #3126'"
+        }
+      ]
+    },
+    {
+      "id": "R4",
+      "source": "real",
+      "repo": "pallets/click",
+      "intro_commit": "262bdf0",
+      "intro_pr": "2934",
+      "fix": [
+        {
+          "commit": "2a0e3ba",
+          "pr": "2940"
+        }
+      ],
+      "issues": [
+        "2939"
+      ],
+      "title": "Raise an exception on end of input in CliRunner (#2934)",
+      "changed_lines": 11,
+      "diff": "golden/real/prs/R4.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 119,
+          "line_end": 124,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R4/fix#2940",
+          "description": "Fix commit title: 'testing/CliRunner: Fix regression related to EOF introduced in 262bdf0 (#2940)'"
+        },
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 351,
+          "line_end": 351,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R4/fix#2940",
+          "description": "Fix commit title: 'testing/CliRunner: Fix regression related to EOF introduced in 262bdf0 (#2940)'"
+        },
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 360,
+          "line_end": 360,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R4/fix#2940",
+          "description": "Fix commit title: 'testing/CliRunner: Fix regression related to EOF introduced in 262bdf0 (#2940)'"
+        }
+      ]
+    },
+    {
+      "id": "R5",
+      "source": "real",
+      "repo": "pallets/click",
+      "intro_commit": "8762c77",
+      "intro_pr": "(commit 'Expose original file descriptor in CliRunner', fixes issue 2865)",
+      "fix": [
+        {
+          "commit": "d959898",
+          "pr": "3391"
+        }
+      ],
+      "issues": [
+        "3384"
+      ],
+      "title": "Expose original file descriptor in `CliRunner`",
+      "changed_lines": 65,
+      "diff": "golden/real/prs/R5.diff",
+      "clean": false,
+      "expected": [
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 107,
+          "line_end": 111,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R5/fix#3391",
+          "description": "CHANGES.md 8.4.0: reverts the 8.3.3 change exposing the original fd via fileno() on CliRunner streams, which 'broke Pytest's fd-level capture teardown'"
+        },
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 113,
+          "line_end": 114,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R5/fix#3391",
+          "description": "CHANGES.md 8.4.0: reverts the 8.3.3 change exposing the original fd via fileno() on CliRunner streams, which 'broke Pytest's fd-level capture teardown'"
+        },
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 122,
+          "line_end": 123,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R5/fix#3391",
+          "description": "CHANGES.md 8.4.0: reverts the 8.3.3 change exposing the original fd via fileno() on CliRunner streams, which 'broke Pytest's fd-level capture teardown'"
+        },
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 129,
+          "line_end": 129,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R5/fix#3391",
+          "description": "CHANGES.md 8.4.0: reverts the 8.3.3 change exposing the original fd via fileno() on CliRunner streams, which 'broke Pytest's fd-level capture teardown'"
+        },
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 140,
+          "line_end": 141,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R5/fix#3391",
+          "description": "CHANGES.md 8.4.0: reverts the 8.3.3 change exposing the original fd via fileno() on CliRunner streams, which 'broke Pytest's fd-level capture teardown'"
+        },
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 143,
+          "line_end": 146,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R5/fix#3391",
+          "description": "CHANGES.md 8.4.0: reverts the 8.3.3 change exposing the original fd via fileno() on CliRunner streams, which 'broke Pytest's fd-level capture teardown'"
+        },
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 148,
+          "line_end": 148,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R5/fix#3391",
+          "description": "CHANGES.md 8.4.0: reverts the 8.3.3 change exposing the original fd via fileno() on CliRunner streams, which 'broke Pytest's fd-level capture teardown'"
+        },
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 358,
+          "line_end": 367,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R5/fix#3391",
+          "description": "CHANGES.md 8.4.0: reverts the 8.3.3 change exposing the original fd via fileno() on CliRunner streams, which 'broke Pytest's fd-level capture teardown'"
+        },
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 369,
+          "line_end": 370,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R5/fix#3391",
+          "description": "CHANGES.md 8.4.0: reverts the 8.3.3 change exposing the original fd via fileno() on CliRunner streams, which 'broke Pytest's fd-level capture teardown'"
+        },
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 391,
+          "line_end": 391,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R5/fix#3391",
+          "description": "CHANGES.md 8.4.0: reverts the 8.3.3 change exposing the original fd via fileno() on CliRunner streams, which 'broke Pytest's fd-level capture teardown'"
+        },
+        {
+          "file_path": "src/click/testing.py",
+          "line_start": 400,
+          "line_end": 400,
+          "severity": "high",
+          "specialist": "any",
+          "category": "regression",
+          "problem": "R5/fix#3391",
+          "description": "CHANGES.md 8.4.0: reverts the 8.3.3 change exposing the original fd via fileno() on CliRunner streams, which 'broke Pytest's fd-level capture teardown'"
+        }
+      ]
+    }
+  ],
+  "reporting": "per-PR: each real PR is reported on its own (bug, found/missed, what the bot said); no recall percentage for the real set (Nishant, 24 Oct 2026, REAL_PRS_REVIEW.md option A)"
+}

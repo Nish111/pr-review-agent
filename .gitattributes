@@ -1,0 +1,7 @@
+# Store and check out text files with LF line endings on every machine.
+# Why: golden/seeded/build.py must give byte-identical diffs on Windows and Linux; with Windows'
+# default CRLF conversion, a fresh checkout would change every generated diff. Also silences the
+# "LF will be replaced by CRLF" warnings.
+* text=auto eol=lf
+*.docx binary
+*.png binary
