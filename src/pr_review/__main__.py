@@ -28,7 +28,22 @@ def main(argv: list[str] | None = None) -> int:
     g.add_argument("action", choices=["check"])
     g.add_argument("--labels", nargs="+", default=["golden/labels_seeded.json", "golden/labels_real.json"])
     g.add_argument("--no-git", action="store_true", help="skip the commit-hash lookup")
+    e = sub.add_parser("eval", help="run one rung over the golden set and score it")
+    e.add_argument("--rung", type=int, choices=[1], required=True)
+    e.add_argument("--click", help="path to a local clone of pallets/click (for the 5 real PRs)")
     args = parser.parse_args(argv)
+
+    if args.cmd == "eval":
+        import json
+
+        from pr_review.evaluation.run import print_report, rung1
+        res = rung1(ROOT, Path(args.click) if args.click else None)
+        out = ROOT / "eval" / "results" / f"rung{args.rung}.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(res, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+        print_report(res)
+        print(f"saved {out.relative_to(ROOT).as_posix()}")
+        return 0
 
     ok = True
     for rel in args.labels:

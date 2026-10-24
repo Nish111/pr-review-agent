@@ -3,8 +3,8 @@
 - target: M2 (rung 1: rule-based checks + scorer)
 - iteration: 0
 - last_gate: —
-- last_action: 24 Oct 2026 — M1 done: golden set complete (seeded 14 + real 5), golden check OK, real set reported per PR.
-- next_action: M2 — pick the rule-based tools (ruff, bandit/semgrep), map their output to Finding, write the scorer (precision/recall on seeded, per-PR table on real), run `eval --rung 1`.
+- last_action: 24 Oct 2026 — M1 committed (cd8b40f). M2 code: static_checks (ruff, pre-registered rules), scorer (match ±3, problems counted once), `eval --rung 1`; 42 tests green. NOT yet run on the golden set: pre-registration (eval/PREREG_RUNG1.md) must be committed first.
+- next_action: Nishant commits PREREG_RUNG1 + code, then runs `eval --rung 1` (seeded); then clone click locally for the real 5.
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000
