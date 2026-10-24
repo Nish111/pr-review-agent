@@ -39,5 +39,28 @@ If `S101` is switched off in test files (a common team setting), precision becom
 This is shown only to explain the result. It was chosen **after** seeing the data, so it doesn't replace the pre-registered number.
 Any later comparison uses **0.22 / 0.20**.
 
-## Still to run
-The 5 real click PRs (needs a local copy of click; next step).
+## Real set: the 5 click PRs (run 24 Oct 2026, per PR, no percentage)
+
+**Prediction (written before the run):** rung 1 finds none of the 6 real problems.
+
+| PR | Problems found | Findings | Note |
+|---|---|---|---|
+| R1 | 0 / 1 | 0 | — |
+| R2 | **1 / 2** (by the rule) | 1 | ruff `S603` at `_termui_impl.py:586`, "subprocess call: check for execution of untrusted input" |
+| R3 | 0 / 1 | 0 | — |
+| R4 | 0 / 1 | 0 | — |
+| R5 | 0 / 1 | 0 | — |
+
+**R2 is a match by location, not by reason.** The real bug (fix #3764) is `os.unlink()` at line 588 deleting a file
+that may still be open. The warning is about `subprocess.call()` two lines above, a different concern. It counts as
+"found" only because the pre-registered rule matches on **file and lines (±3)**, not on what the finding says.
+
+- **Officially** (pre-registered rule, unchanged): R2 1/2, all others 0. So the prediction "0 of 6" was wrong by one.
+- **Honestly:** that one is a coincidence. Rung 1 understood none of the 6 real bugs.
+
+## What this teaches the evaluation (input for rung 2's pre-registration)
+
+The location-only rule can't tell **right place, right reason** from **right place, wrong reason**. With a linter
+that's rare; with an LLM, which writes plausible text near the changed lines, it could inflate recall a lot.
+**Proposal for M3's pre-registration:** every *matched* finding also gets a "right reason?" check (does the finding
+describe the labelled bug?), reported next to the location-only number. Decided when M3 is pre-registered.

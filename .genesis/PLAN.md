@@ -145,3 +145,4 @@ Static analysers (linters, Semgrep) produce candidate findings deterministically
 
 - **M0 done (21 Oct 2026):** S1–S4 accepted, S5 provisional (`.genesis/decisions/`). Commit abf09b2.
 - **M1 done (24 Oct 2026):** contracts + 14 seeded PRs (10 problems, 4 clean) + 5 real click PRs (6 problems); `python -m pr_review golden check` OK; seeded labels committed in 3d9e146 before any scoring. Real set reported per PR (option A).
+- **M2 done (24 Oct 2026):** rung 1 (ruff, pre-registered in a3f9a72). Seeded: precision 0.22, recall 0.20. Real: 0/6 understood (R2 1/2 by a location-only coincidence). `eval/findings_rung1.md`.

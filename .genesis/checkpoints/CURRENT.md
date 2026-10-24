@@ -3,8 +3,8 @@
 - target: M2 (rung 1: rule-based checks + scorer)
 - iteration: 0
 - last_gate: —
-- last_action: 24 Oct 2026 — prereg committed (a3f9a72), rung 1 run on seeded set: precision 0.22 (2/9), recall 0.20 (2/10); 7 false alarms (6× S101 assert in tests, 1× S608 on safe placeholder SQL). Written up in eval/findings_rung1.md.
-- next_action: commit rung-1 results; clone click locally and run rung 1 on the 5 real PRs; then M3 (rung 2, single LLM reviewer).
+- last_action: 24 Oct 2026 — rung 1 on real click PRs: 0/6 except R2 fix#3764 matched by location only (S603 on subprocess two lines above the unlink bug), recorded as a coincidental match. M2 complete.
+- next_action: commit rung-1 real results; then M3 pre-registration (rung 2 single LLM reviewer), including the "right reason" check for matched findings.
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000

@@ -258,7 +258,72 @@
   },
   "real": {
     "reporting": "per-PR",
-    "prs": [],
-    "skipped": true
+    "prs": [
+      {
+        "id": "R1",
+        "clean": false,
+        "problems": [
+          "R1/fix#3653"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "R2",
+        "clean": false,
+        "problems": [
+          "R2/fix#3739",
+          "R2/fix#3764"
+        ],
+        "found": [
+          "R2/fix#3764"
+        ],
+        "findings": [
+          {
+            "file": "src/click/_termui_impl.py",
+            "lines": [
+              586,
+              586
+            ],
+            "rule": "S603",
+            "message": "`subprocess` call: check for execution of untrusted input",
+            "matched": true
+          }
+        ],
+        "true_positives": 1
+      },
+      {
+        "id": "R3",
+        "clean": false,
+        "problems": [
+          "R3/fix#3504"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "R4",
+        "clean": false,
+        "problems": [
+          "R4/fix#2940"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "R5",
+        "clean": false,
+        "problems": [
+          "R5/fix#3391"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      }
+    ],
+    "skipped": false
   }
 }
