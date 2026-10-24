@@ -1,0 +1,264 @@
+{
+  "rung": 1,
+  "tool": "ruff 0.17.1",
+  "rules": [
+    "F",
+    "E9",
+    "B",
+    "S",
+    "DTZ",
+    "BLE",
+    "PERF"
+  ],
+  "seeded": {
+    "totals": {
+      "findings": 9,
+      "true_positives": 2,
+      "false_alarms": 7,
+      "false_alarms_on_clean_prs": 7,
+      "precision": 0.2222222222222222,
+      "problems": 10,
+      "problems_found": 2,
+      "recall": 0.2
+    },
+    "prs": [
+      {
+        "id": "S01",
+        "clean": false,
+        "problems": [
+          "S01/0"
+        ],
+        "found": [
+          "S01/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              32,
+              33
+            ],
+            "rule": "S608",
+            "message": "Possible SQL injection vector through string-based query construction",
+            "matched": true
+          }
+        ],
+        "true_positives": 1
+      },
+      {
+        "id": "S02",
+        "clean": false,
+        "problems": [
+          "S02/0"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "S03",
+        "clean": false,
+        "problems": [
+          "S03/0"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "S04",
+        "clean": false,
+        "problems": [
+          "S04/0"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "S05",
+        "clean": false,
+        "problems": [
+          "S05/0"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "S06",
+        "clean": false,
+        "problems": [
+          "S06/0"
+        ],
+        "found": [
+          "S06/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              32,
+              32
+            ],
+            "rule": "DTZ011",
+            "message": "`datetime.date.today()` used",
+            "matched": true
+          }
+        ],
+        "true_positives": 1
+      },
+      {
+        "id": "S07",
+        "clean": false,
+        "problems": [
+          "S07/0"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "S08",
+        "clean": false,
+        "problems": [
+          "S08/0"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "S09",
+        "clean": false,
+        "problems": [
+          "S09/0"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "S10",
+        "clean": false,
+        "problems": [
+          "S10/0"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "C01",
+        "clean": true,
+        "problems": [],
+        "found": [],
+        "findings": [
+          {
+            "file": "notes_svc/tags.py",
+            "lines": [
+              11,
+              11
+            ],
+            "rule": "S608",
+            "message": "Possible SQL injection vector through string-based query construction",
+            "matched": false
+          }
+        ],
+        "true_positives": 0
+      },
+      {
+        "id": "C02",
+        "clean": true,
+        "problems": [],
+        "found": [],
+        "findings": [
+          {
+            "file": "tests/test_export.py",
+            "lines": [
+              20,
+              20
+            ],
+            "rule": "S101",
+            "message": "Use of `assert` detected",
+            "matched": false
+          },
+          {
+            "file": "tests/test_export.py",
+            "lines": [
+              26,
+              26
+            ],
+            "rule": "S101",
+            "message": "Use of `assert` detected",
+            "matched": false
+          }
+        ],
+        "true_positives": 0
+      },
+      {
+        "id": "C03",
+        "clean": true,
+        "problems": [],
+        "found": [],
+        "findings": [
+          {
+            "file": "tests/test_export.py",
+            "lines": [
+              34,
+              34
+            ],
+            "rule": "S101",
+            "message": "Use of `assert` detected",
+            "matched": false
+          },
+          {
+            "file": "tests/test_export.py",
+            "lines": [
+              35,
+              35
+            ],
+            "rule": "S101",
+            "message": "Use of `assert` detected",
+            "matched": false
+          },
+          {
+            "file": "tests/test_export.py",
+            "lines": [
+              44,
+              44
+            ],
+            "rule": "S101",
+            "message": "Use of `assert` detected",
+            "matched": false
+          }
+        ],
+        "true_positives": 0
+      },
+      {
+        "id": "C04",
+        "clean": true,
+        "problems": [],
+        "found": [],
+        "findings": [
+          {
+            "file": "tests/test_report.py",
+            "lines": [
+              7,
+              7
+            ],
+            "rule": "S101",
+            "message": "Use of `assert` detected",
+            "matched": false
+          }
+        ],
+        "true_positives": 0
+      }
+    ]
+  },
+  "real": {
+    "reporting": "per-PR",
+    "prs": [],
+    "skipped": true
+  }
+}
