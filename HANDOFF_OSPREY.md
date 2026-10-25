@@ -4,6 +4,8 @@
 OSPREY chat: **the PR Review Agent only** (W8 deliverable). The memory project continues under
 KESTREL; LinkedIn, SBL and outreach are separate chats.
 
+> **STATUS 25 Oct 2026 (read this first).** M0–M4 done. M4 = ingress & queue on SQLite (`src/pr_review/webhook_receiver`, `store`, `job_queue`), tests T1–T16 in `tests/ingress`, before/after numbers in `FAILURE_MATRIX_01_INGRESS.md` §6 (v4). Next: M5 index & search. Live pointer: `.genesis/checkpoints/CURRENT.md`.
+>
 > **STATUS 19 Oct 2026 (read this first in a new OSPREY chat).** Genesis setup G0–G5 is complete in this repo
 > (github.com/Nish111/pr-review-agent). Decisions: approach A (lecture architecture) with C (rule-based checks)
 > as rung 1; no confidence threshold until the golden set exists; milestone order = evaluation first (M0 spikes →

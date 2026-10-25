@@ -1,0 +1,77 @@
+{
+  "tests": {
+    "T7": {
+      "want": 1,
+      "baseline_jobs": 2,
+      "ours_jobs": 1
+    },
+    "T8": {
+      "want": 1,
+      "copies": 50,
+      "trials": 20,
+      "baseline_jobs_per_trial": [
+        37,
+        50,
+        42,
+        43,
+        47,
+        42,
+        31,
+        36,
+        35,
+        44,
+        37,
+        40,
+        47,
+        43,
+        50,
+        44,
+        45,
+        39,
+        47,
+        32
+      ],
+      "ours_jobs_per_trial": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseline_trials_wrong": 20,
+      "ours_trials_wrong": 0
+    },
+    "T10": {
+      "want": 20,
+      "baseline_replies": [
+        500
+      ],
+      "ours_replies": [
+        202
+      ],
+      "baseline_jobs_after": 0,
+      "ours_jobs_after": 20
+    },
+    "T12": {
+      "want": 1,
+      "baseline_jobs": 0,
+      "ours_jobs": 1,
+      "note": "the baseline has no sweeper, so nothing can recover the missing job"
+    }
+  }
+}

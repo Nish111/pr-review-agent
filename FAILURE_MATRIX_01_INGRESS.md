@@ -1,11 +1,13 @@
 # Failure matrix 01 · Ingress & queue
 
-Draft v3, 19 Oct 2026 (v2: sections 3-6 rewritten; v3: Nishant's answers applied). It follows the brief's failure-mode loop (§2): purpose & contract → assumptions → failure
+Draft v4, 25 Oct 2026 (v2: sections 3-6 rewritten; v3: Nishant's answers applied; v4: Redis replaced by SQLite per decision S3, built and measured in M4). It follows the brief's failure-mode loop (§2): purpose & contract → assumptions → failure
 modes → prevention/detection → recovery → test & evidence. The scope is the brief's §3 row for this group:
 *authenticity, event filtering, schema drift, <10s acknowledgement, atomic idempotency, retries,
 backpressure, dead-letter recovery.*
 Baseline = what `pr-review-agent.html` §3.1 specifies. **Upgrade** = what this matrix adds on top.
 
+> **Updated 25 Oct (v4):** built in M4. Redis is gone (decision S3: one SQLite file), so F9, F12, the test notes and T10 now say SQLite. The measured before/after numbers are in section 6. **Nothing for you to do in this file.**
+>
 > **Updated 19 Oct (v2):** sections 3-6 rewritten so each step says what we're doing and why. Every term is in the glossary at the bottom.
 > **What you need to do in this file:** your 3 answers (F7, F10, F16) are applied and reformatted, and they added F17 plus tests T14–T16. Two small suggestions of mine are marked "Claude's suggestion". Change them if you disagree. The TODO in section 6 is a later decision; just read it. Your docs answer under section 2 is applied.
 
@@ -32,7 +34,7 @@ fast enough that GitHub never sees a timeout. Do **no** review work in the reque
 | A3 | GitHub's payload shape is stable | a renamed field crashes the parser → F6 |
 | A4 | One delivery ID = one event | it is true, but **two different events can mean the same work** (opened + ready_for_review on the same SHA) → F8 |
 | A5 | GitHub retries failed deliveries | **confirmed false** (your docs check, 19 Oct): a failed reply means the event is lost unless we redeliver it → F11 |
-| A6 | The queue (Redis) is up when the webhook arrives | the event can't be stored → F12 |
+| A6 | The queue (the SQLite file, decision S3) can be written when the webhook arrives | the event can't be stored → F12 |
 | A7 | The arrival rate is below the worker drain rate | the queue grows without limit → F13 |
 
 **A5 checked by Nishant (19 Oct), from GitHub's docs page "Handling failed webhook deliveries":**
@@ -148,8 +150,9 @@ reading and pushing back on, if something looks wrong to you.
 **F9 · Two copies arriving at the same instant both get through.** *(engineering · unknown-known)*
 - **What goes wrong:** this is a **race condition**. The design does "have I seen this?" then "add to queue"
   as two separate steps. Two copies arriving at once can both ask, both hear "no", and both get added.
-- **What we build:** make check-and-claim **one step** (**atomic**), so only one copy can ever win. In
-  Redis that's a single command that sets a key only if it doesn't exist yet. A database "unique" rule works the same way.
+- **What we build:** make check-and-claim **one step** (**atomic**), so only one copy can ever win. We use
+  SQLite (decision S3): the work key has a UNIQUE rule, and each delivery is handled inside one **transaction**
+  that starts with `BEGIN IMMEDIATE`, so only one copy at a time can be deciding "new or seen?".
 - **How we notice:** test T8 below; in normal running, "more than 1 job for the same work" in the trace.
 - **What happens after:** a second safety net: the aggregator also drops duplicate findings before posting.
 
@@ -194,12 +197,16 @@ reading and pushing back on, if something looks wrong to you.
 - **What happens after:** the event is recovered late (an honest delay) instead of never.
 
 **F12 · The queue is down when a webhook arrives.** *(operational · known-known)*
-- **What goes wrong:** the queue is **Redis** (a small, fast database the lecture uses for the waiting
-  list). If it's down, we can't add the job, and by F11 a failed reply means the event is lost.
-- **What we build:** a **write-ahead log**: before replying "OK", append the event to a plain local
-  file or SQLite table. A background loop moves entries from that file into the queue.
-- **How we notice:** a "log entries not yet moved" number above 0.
-- **What happens after:** when Redis is back, the loop empties the log. Nothing is lost.
+- **What goes wrong:** the queue is a table in our SQLite file (decision S3; the lecture used **Redis**).
+  If the file can't be written (disk full, locked, broken), we can't add the job, and by F11 a failed reply
+  means the event is lost.
+- **What we build:** a **write-ahead log**: before touching the database, append the raw event to a plain
+  file, `inbox.jsonl` (**JSONL**: one JSON record per line). It must be a separate file, not a table in the
+  same database, or it would fail together with it. When the database is back, `drain_inbox` replays the file;
+  replaying twice is harmless because already-seen delivery IDs are dropped.
+- **How we notice:** the "database unavailable" event in the log; inbox lines with no matching delivery row.
+- **What happens after:** GitHub still got "202 OK", and the job appears once the inbox is drained. Nothing is lost.
+  If even the inbox file can't be written, we reply 503 honestly, because nothing was saved.
 
 **F13 · More PRs arrive than we can review.** *(operational + cost · known-unknown)*
 - **What goes wrong:** this is **backpressure**: the waiting list grows faster than workers clear it.
@@ -256,8 +263,8 @@ that failure on purpose** and checks the system did the right thing. The brief c
 "observable evidence": a number or a log line anyone can check.
 
 **How these run:** all on your laptop, at zero cost. We save a few real GitHub webhook messages to
-files once, then replay them with **pytest** (Python's standard test runner). Redis runs locally, or
-`fakeredis` (a Python package that imitates Redis in memory) is used. No GitHub account setup is
+files once, then replay them with **pytest** (Python's standard test runner). The database is a throwaway
+SQLite file per test. No GitHub account setup is
 needed until the final demo.
 
 **Your part:** nothing yet. These get written and run when we code group 1. Read the "baseline should fail" column,
@@ -274,7 +281,7 @@ because that's where the before/after numbers for the evaluation come from.
 | T7 | "opened" then "ready for review", same commit | F8 | 1 job | **yes**: baseline makes 2 |
 | T8 | send the same message 50 times at the same instant | F9 | exactly 1 job | **yes**: the headline before/after number |
 | T9 | push commit A, then commit B, same PR | F10 | A superseded, only B reviewed | yes |
-| T10 | stop Redis, send 20 webhooks, start Redis | F12 | 20 "OK", 20 jobs once Redis is back | **yes**: baseline loses them |
+| T10 | close the database, send 20 webhooks, reopen it | F12 | 20 "OK", 20 jobs once the database is back | **yes**: baseline loses them |
 | T11 | a worker that always crashes | F14 | 3 tries, then 1 entry on the dead-letter shelf | depends on the queue library |
 | T12 | remove a job by hand, run the sweeper | F11 | sweeper re-adds it | **yes**: baseline has no sweeper |
 | T13 | send 500 webhooks at 10× the speed we can review | F13 | 500 saved, 0 lost, "oldest waiting" alert fires | yes |
@@ -334,8 +341,24 @@ program. That matches the lecture's own decision record ADR-002 (build one progr
 - **After (ours):** the atomic same-work claim, the write-ahead log, the redelivery job and the sweeper.
 - **Proof:** tests T7, T8, T10 and T12 run against both versions.
 
-**Decision needed later, not now:**
-<!-- TODO (Nishant): before we code group 1 — use a real GitHub App (needs a public internet
+**Measured, 25 Oct 2026 (M4)** — `python -m pr_review ingress-compare`, saved in `eval/results/ingress_compare.json`.
+The "before" is the lecture's design rebuilt faithfully on SQLite (`webhook_receiver/baseline.py`): check the
+message ID, then add to the queue, as two steps.
+
+| Test | What it checks | Right answer | Lecture design | Ours |
+|---|---|---|---|---|
+| T7 | "opened" + "ready for review", same commit | 1 job | 2 jobs | 1 job |
+| T8 | same message 50× at once, 20 trials | 1 job every trial | wrong in 20/20 trials (31–50 jobs each) | 1 job in 20/20 |
+| T10 | database down for 20 webhooks | 20 jobs, 0 lost | replied 500, 0 jobs after (all 20 lost) | replied 202, 20 jobs after |
+| T12 | a webhook never arrives | 1 job | 0 (no sweeper) | 1 |
+
+How to read T8: the exact count for the lecture design depends on timing on this machine. What matters is
+that it was never 1. Ours used one transaction per delivery, which is why it was always 1.
+All 16 matrix tests (T1–T16) pass in `pytest tests/ingress -q`.
+
+**Decided by default (25 Oct, when group 1 coding started):** replay saved webhooks for all tests;
+a real GitHub App only for the final demo (M9). Kept below for the record.
+<!-- DECIDED BY DEFAULT (was TODO, Nishant): before we code group 1 — use a real GitHub App (needs a public internet
      address so GitHub can reach your laptop, e.g. a tunnel tool) or only replay saved webhooks?
      If you follow the direction: tests stay free and repeatable; the real app is set up once, just to record the demo.
      If you don't (real app for everything): every test run depends on internet + GitHub, so tests become slow and flaky.
@@ -355,7 +378,11 @@ program. That matches the lecture's own decision record ADR-002 (build one progr
 | **X-GitHub-Delivery** | the unique ID GitHub puts on each webhook message. A redelivery keeps the same ID. |
 | **Ingress** | the front door: receives, checks and queues; does no review work |
 | **Queue / job** | the waiting list of reviews to do / one entry on it |
-| **Redis** | a fast in-memory database; the lecture uses it for the queue (with **ARQ**, a Python library that runs queued jobs) |
+| **Redis** | a fast in-memory database; the lecture uses it for the queue (with **ARQ**, a Python library that runs queued jobs). **Not used here:** decision S3 replaced it with one SQLite file |
+| **SQLite** | a database stored in one ordinary file, built into Python; our queue and records live in it |
+| **Transaction** | a group of database writes that either all happen or none do |
+| **`BEGIN IMMEDIATE`** | the SQLite command that starts a transaction by taking the write lock at once, so two copies can't both decide "this is new" |
+| **JSONL** | JSON Lines: a text file with one JSON record per line; our write-ahead inbox uses it |
 | **Idempotency** | doing something twice has the same effect as doing it once |
 | **Atomic** | done as one indivisible step, so nothing can sneak in between |
 | **Race condition** | a bug where the result depends on which of two simultaneous things happens first |
@@ -369,7 +396,7 @@ program. That matches the lecture's own decision record ADR-002 (build one progr
 | **Fork** | someone else's copy of a repository |
 | **Constant-time compare** | comparing two values in a way that always takes the same time, so timing reveals nothing |
 | **Commit status** | the pending/success/failure badge GitHub shows next to a commit on a PR |
-| **pytest / fakeredis** | Python's test runner / a Python package imitating Redis in memory, for tests |
+| **pytest** | Python's test runner |
 | **ADR** | Architecture Decision Record: a short note of one design decision, the options and why |
 | **LLM** | Large Language Model (e.g. Claude, GPT) |
 | **PR** | Pull Request |

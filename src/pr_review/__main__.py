@@ -39,7 +39,19 @@ def main(argv: list[str] | None = None) -> int:
     j.add_argument("--rung", type=int, default=2)
     j.add_argument("--provider")
     j.add_argument("--model")
+    sub.add_parser("ingress-compare", help="before/after ingress numbers: lecture design vs ours (T7 T8 T10 T12)")
     args = parser.parse_args(argv)
+
+    if args.cmd == "ingress-compare":
+        from pr_review.evaluation.ingress_compare import run
+        res = run()
+        for name, r in res["tests"].items():
+            shown = {k: v for k, v in r.items() if k != "note"}
+            print(f"{name}: {shown}")
+        out = ROOT / "eval" / "results" / "ingress_compare.json"
+        out.write_text(json.dumps(res, indent=2) + "\n", encoding="utf-8", newline="\n")
+        print(f"saved {out.relative_to(ROOT).as_posix()}")
+        return 0
 
     if args.cmd == "rightreason":
         from pr_review.evaluation import right_reason as rr
