@@ -107,5 +107,35 @@ def test_right_reason_handcheck_roundtrip(repo):
     p = rr.write_handcheck(repo, 2)
     p.write_text(p.read_text().replace("**Your answer:** ", "**Your answer:** Yes, same bug"))
     assert rr.read_handcheck(repo, 2) == {"M1": True}
+    rr.write_handcheck(repo, 2)                                     # regenerating keeps the answer
+    assert rr.read_handcheck(repo, 2) == {"M1": True}
     out = rr.run_judge(repo, 2, "fake", "j", complete=lambda *a: '{"same_bug": false, "reason": "no"}')
-    assert out["verdicts"] == [{"id": "M1", "same_bug": False, "reason": "no"}]
+    assert [(v["id"], v["same_bug"]) for v in out["verdicts"]] == [("M1", False)]
+    again = rr.run_judge(repo, 2, "fake", "j", complete=lambda *a: 1 / 0)
+    assert again["asked"] == 0 and again["verdicts"][0]["same_bug"] is False     # reused, not re-asked
+
+
+def test_valid_json_with_code_fence_inside_a_string_is_accepted():
+    """Regression: rung 2's S01 answer (24 Oct) was valid JSON whose suggestion contained ```python."""
+    item = _item(suggestion="use:\n```python\nconn.execute(sql, params)\n```")
+    raw = json.dumps({"findings": [item]}, indent=2)
+    p = parse_response(raw, CTX)
+    assert not p.parse_error and len(p.findings) == 1
+
+
+def test_real_s01_answer_parses():
+    raw_file = ROOT / "eval/results/rung2_raw/S01.json"
+    if not raw_file.is_file():
+        pytest.skip("rung 2 not run on this machine")
+    raw = json.loads(raw_file.read_text(encoding="utf-8"))["raw"]
+    assert not parse_response(raw, [Span("notes_svc/notes.py", 1, 200)]).parse_error
+
+
+def test_handcheck_regeneration_keeps_each_answer_with_its_own_finding(tmp_path):
+    from pr_review.evaluation import right_reason as rr
+
+    text = "".join(f"## M{i} · PR S0{i} · `a.py:{i}`\n\n- **Known bug:** k\n- **Reviewer said:** said {i}\n"
+                   f"- **Reviewer's reasoning:** r\n- **Your answer:** {'yes' if i == 1 else 'no, other'}\n\n"
+                   for i in (1, 2))
+    got = {f"{m.group(1)}|{m.group(2)}|{m.group(3)}": m.group(4) for m in rr._HC_ENTRY.finditer(text)}
+    assert got == {"S01|a.py:1|said 1": "yes", "S02|a.py:2|said 2": "no, other"}

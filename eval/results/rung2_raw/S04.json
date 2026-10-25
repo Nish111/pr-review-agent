@@ -1,0 +1,10 @@
+{
+  "prompt_sha": "134aa0d267f5",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"transactionality\",\n      \"summary\": \"Note creation and tag insertion are not performed atomically, risking orphan notes if tag insertion fails\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 21,\n      \"line_end\": 24,\n      \"confidence\": 0.92,\n      \"rationale\": \"The function `create_note_with_tags` first calls `create_note`, which commits the note insertion in its own transaction (lines 21-22). It then opens a separate transaction to insert tags (lines 22-24). If the tag insertion fails, the note remains in the database without its tags, leading to inconsistent state.\",\n      \"suggestion\": \"Wrap both the note creation and tag insertion in a single transaction, e.g., using a single `with conn:` block that encompasses both operations, or use a savepoint/explicit transaction management to ensure atomicity.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 21,\n          \"line_end\": 24\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.19,
+  "http_requests": 1
+}

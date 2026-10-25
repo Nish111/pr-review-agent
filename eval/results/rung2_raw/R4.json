@@ -1,0 +1,10 @@
+{
+  "prompt_sha": "134aa0d267f5",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"iterator-protocol-violation\",\n      \"summary\": \"__next__ raises EOFError instead of StopIteration, breaking iterator semantics\",\n      \"file_path\": \"src/click/testing.py\",\n      \"line_start\": 119,\n      \"line_end\": 124,\n      \"confidence\": 0.93,\n      \"rationale\": \"The overridden __next__ method catches StopIteration from the superclass and re‑raises EOFError (lines 119‑124). This means any code that iterates over the _NamedTextIOWrapper (e.g., \\\"for line in sys.stdin:\\\") will receive EOFError instead of the expected StopIteration, violating the iterator protocol and potentially causing uncaught exceptions.\",\n      \"suggestion\": \"Raise StopIteration to preserve normal iteration behavior and raise EOFError only in contexts that explicitly expect it (e.g., wrap the call in visible_input/hidden_input). Alternatively, provide a separate method for prompting that raises EOFError, leaving __next__ unchanged.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/testing.py\",\n          \"line_start\": 119,\n          \"line_end\": 124\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 36.91,
+  "http_requests": 3
+}

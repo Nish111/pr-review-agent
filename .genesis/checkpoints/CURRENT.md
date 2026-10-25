@@ -1,10 +1,10 @@
 # CURRENT
 - active_loop: NONE
-- target: M3 (rung 2: single LLM reviewer)
+- target: M4 (ingress & queue, per FAILURE_MATRIX_01_INGRESS)
 - iteration: 0
 - last_gate: —
-- last_action: 24 Oct 2026 — M3 code: llm_client copied from the memory project (b62a943), specialists/single.py (budgeted prompt, strict grounded parse), run_llm.py (resumable cache that never reuses failures, quota stop), prompt sha 134aa0d267f5; 47 tests green. PREREG_RUNG2.md drafted; waiting on the right-reason decision.
-- next_action: Nishant commits PREREG_RUNG2 (right-reason = A and B independently; judge gemini-3.6-flash sha 971537b18244), then runs rung 2 + judge + handcheck.
+- last_action: 25 Oct 2026 — M3 done: rung 2 seeded location 0.70/0.70, right-reason (hand, official) 0.50/0.50, 0 clean false alarms; real R3+R4 found; judge agreement 6/9 independent. eval/findings_rung2.md.
+- next_action: commit rung 2; carry into rung-3 prereg: real labels get plain-words descriptions; hand check stays (judge 6/9 too weak). Then M4 ingress.
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000

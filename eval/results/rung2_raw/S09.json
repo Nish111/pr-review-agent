@@ -1,0 +1,10 @@
+{
+  "prompt_sha": "134aa0d267f5",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"runtime-error\",\n      \"summary\": \"json.dumps attempts to convert sqlite3.Row objects to dict using dict(r), which raises a TypeError\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 21,\n      \"line_end\": 23,\n      \"confidence\": 0.99,\n      \"rationale\": \"The code builds JSON with `json.dumps([dict(r) for r in rows], indent=2)` (line 22). `rows` are sqlite3.Row objects; `dict(r)` expects an iterable of (key, value) pairs, but a Row yields only values, causing a TypeError at runtime, so JSON export will fail.\",\n      \"suggestion\": \"Replace `dict(r) for r in rows` with a proper conversion, e.g., `{k: r[k] for k in r.keys()} for r in rows`.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 21,\n          \"line_end\": 23\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 16.23,
+  "http_requests": 3
+}

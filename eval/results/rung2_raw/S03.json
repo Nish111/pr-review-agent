@@ -1,0 +1,10 @@
+{
+  "prompt_sha": "134aa0d267f5",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"security\",\n      \"summary\": \"Missing validation allows path traversal and arbitrary file writes\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 15,\n      \"line_end\": 15,\n      \"confidence\": 0.98,\n      \"rationale\": \"The function now builds the export path directly from the user‑provided `name` without any safety checks (see line 15: `path = EXPORT_DIR / name`). This permits names like \\\"../secret.txt\\\" or absolute paths, causing files to be written outside the intended `exports` directory, leading to potential data loss or security breaches.\",\n      \"suggestion\": \"Re‑introduce validation to ensure `name` is a simple filename without directory components (e.g., reject names containing '/', '\\\\\\\\', or '..') and optionally enforce a safe pattern. Alternatively, use `path = (EXPORT_DIR / name).resolve()` and verify it is still within `EXPORT_DIR` before writing.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 15,\n          \"line_end\": 15\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.44,
+  "http_requests": 1
+}

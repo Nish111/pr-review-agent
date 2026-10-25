@@ -48,7 +48,8 @@ def main(argv: list[str] | None = None) -> int:
                 parser.error("judge needs --provider and --model (a different model from the reviewer)")
             out = rr.run_judge(ROOT, args.rung, args.provider, args.model)
             n = len(out["verdicts"])
-            print(f"judged {n} matched finding(s); verdicts saved, NOT printed (keeps the hand check independent)")
+            print(f"judged {n} matched finding(s) ({out['asked']} newly asked, rest reused); "
+                  "verdicts saved, NOT printed (keeps the hand check independent)")
         elif args.action == "handcheck":
             print(f"wrote {rr.write_handcheck(ROOT, args.rung).relative_to(ROOT).as_posix()}")
         else:

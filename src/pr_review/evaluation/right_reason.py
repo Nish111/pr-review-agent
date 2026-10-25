@@ -43,8 +43,21 @@ def matched_items(root: Path, rung: int) -> list[dict]:
 
 def run_judge(root: Path, rung: int, provider: str, model: str, complete=real_complete) -> dict:
     template = (root / JUDGE_PROMPT).read_text(encoding="utf-8")
-    out = {"rung": rung, "provider": provider, "model": model, "prompt_sha": prompt_sha(template), "verdicts": []}
+    sha = prompt_sha(template)
+    path = root / f"eval/results/rung{rung}_judge.json"
+    # Reuse a verdict only if the same judge (model + prompt) already answered for the same finding text, and it
+    # actually answered (same rule as the reviewer cache). Saves the judge's small daily quota (Gemini: 20/day).
+    old = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    reuse = {}
+    if old.get("model") == model and old.get("provider") == provider and old.get("prompt_sha") == sha:
+        reuse = {v.get("key"): v for v in old.get("verdicts", []) if v.get("same_bug") is not None and v.get("key")}
+    out = {"rung": rung, "provider": provider, "model": model, "prompt_sha": sha, "verdicts": [], "asked": 0}
     for it in matched_items(root, rung):
+        key = f"{it['pr']}|{it['file']}|{it['lines'][0]}-{it['lines'][1]}|{it['summary']}"
+        if key in reuse:
+            out["verdicts"].append({**reuse[key], "id": it["id"]})
+            continue
+        out["asked"] += 1
         prompt = (template.replace("{label}", it["label"]).replace("{summary}", it["summary"])
                   .replace("{rationale}", it["rationale"]))
         try:
@@ -52,14 +65,29 @@ def run_judge(root: Path, rung: int, provider: str, model: str, complete=real_co
             v = {"id": it["id"], "same_bug": bool(data["same_bug"]), "reason": str(data.get("reason", ""))}
         except Exception as e:  # noqa: BLE001 - an unanswered verdict is recorded as such, never guessed
             v = {"id": it["id"], "same_bug": None, "reason": f"judge failed: {type(e).__name__}: {e}"[:300]}
-        out["verdicts"].append(v)
-    path = root / f"eval/results/rung{rung}_judge.json"
+        out["verdicts"].append({**v, "key": key})
     path.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
     return out
 
 
+_HC_ENTRY = re.compile(r"^## M\d+ · PR (\S+) · `([^`]+)`.*?\*\*Reviewer said:\*\* (.*?)\n"
+                       r".*?\*\*Your answer:\*\*[ \t]*([^\n]*)$", re.MULTILINE | re.DOTALL)
+
+
+def _hc_key(it: dict) -> str:
+    return f"{it['pr']}|{it['file']}:{it['lines'][0]}|{it['summary']}"
+
+
 def write_handcheck(root: Path, rung: int) -> Path:
+    """(Re)write the hand-check file. Answers already written are KEPT (matched by PR + location + summary),
+    so regenerating after a re-score never wipes Nishant's work."""
     items = matched_items(root, rung)
+    path = root / f"eval/HANDCHECK_RUNG{rung}.md"
+    kept: dict[str, str] = {}
+    if path.is_file():
+        for m in _HC_ENTRY.finditer(path.read_text(encoding="utf-8")):
+            if m.group(4).strip():
+                kept[f"{m.group(1)}|{m.group(2)}|{m.group(3)}"] = m.group(4).strip()
     lines = [f"# Hand check: rung {rung} matched findings (right reason?)", "",
              "**What this is:** each finding below is in the right PLACE for a known bug. Your call: does it describe "
              "the SAME bug? Write `yes` or `no` (and a few words why, if you like) on each `Your answer` line.",
@@ -68,10 +96,10 @@ def write_handcheck(root: Path, rung: int) -> Path:
     for it in items:
         lines += [f"## {it['id']} · PR {it['pr']} · `{it['file']}:{it['lines'][0]}`", "",
                   f"- **Known bug:** {it['label']}", f"- **Reviewer said:** {it['summary']}",
-                  f"- **Reviewer's reasoning:** {it['rationale']}", "- **Your answer:** ", ""]
+                  f"- **Reviewer's reasoning:** {it['rationale']}",
+                  "- **Your answer:** " + kept.get(_hc_key(it), ""), ""]
     if not items:
         lines.append("_No location-matched findings: nothing to check._")
-    path = root / f"eval/HANDCHECK_RUNG{rung}.md"
     path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     return path
 

@@ -1,0 +1,10 @@
+{
+  "prompt_sha": "134aa0d267f5",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"bug\",\n      \"summary\": \"Fish completion script splits on literal \\\"\\\\n\\\" instead of actual newline, causing parsing errors\",\n      \"file_path\": \"src/click/shell_completion.py\",\n      \"line_start\": 182,\n      \"line_end\": 184,\n      \"confidence\": 0.93,\n      \"rationale\": \"The updated script uses `set -l metadata (string split \\\\n $completion);` (lines 182‑184). In fish, the `string split` command does not interpret escape sequences, so the delimiter `\\\\n` is taken as the two characters backslash and \\\"n\\\" rather than a newline. This prevents the completion string (which is newline‑delimited) from being split into its type, value, and help components, breaking fish completion handling.\",\n      \"suggestion\": \"Replace the delimiter with an actual newline character, e.g., `set -l metadata (string split $'\\\\n' $completion);` or use `string split '\\n'` if fish supports it, ensuring the split occurs on real newline characters.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/shell_completion.py\",\n          \"line_start\": 182,\n          \"line_end\": 184\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 29.46,
+  "http_requests": 2
+}

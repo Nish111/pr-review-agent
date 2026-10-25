@@ -1,0 +1,48 @@
+{
+  "rung": 2,
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "prompt_sha": "971537b18244",
+  "verdicts": [
+    {
+      "id": "M1",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment identify a timing attack vulnerability caused by using plain string equality (`==`) instead of constant-time comparison (`hmac.compare_digest`) for secrets."
+    },
+    {
+      "id": "M2",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment describe the exact same path traversal vulnerability caused by joining an unvalidated user-supplied name to EXPORT_DIR."
+    },
+    {
+      "id": "M3",
+      "same_bug": true,
+      "reason": "Both the reviewer comment and the known bug describe the non-atomic separation of note creation and tag insertion transactions, leading to notes being saved without tags if tag insertion fails."
+    },
+    {
+      "id": "M4",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment describe the same underlying issue where using server local date from `date.today()` to filter UTC `created_at` timestamps causes notes to be incorrectly omitted due to timezone mismatch."
+    },
+    {
+      "id": "M5",
+      "same_bug": false,
+      "reason": "The reviewer's comment concerns a potential SQL duplicate key violation, whereas the known bug is about a missing test for a new public function."
+    },
+    {
+      "id": "M6",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment describe the removal of the test's assertions, which prevents it from failing when results are incorrect."
+    },
+    {
+      "id": "M7",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment describe the defect that breaks Fish shell completion due to incorrect handling of newline delimiters."
+    },
+    {
+      "id": "M8",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer comment describe the same regression where CliRunner's stream wrapper raises EOFError instead of StopIteration upon reaching EOF in __next__."
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "prompt_sha": "134aa0d267f5",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"security\",\n      \"summary\": \"Plain token comparison introduces timing attack vulnerability\",\n      \"file_path\": \"notes_svc/auth.py\",\n      \"line_start\": 11,\n      \"line_end\": 11,\n      \"confidence\": 0.9,\n      \"rationale\": \"The function now returns `row[\\\"token\\\"] == token` (line 11), which performs a short-circuit string equality check that can leak timing information about the token. The previous implementation used `hmac.compare_digest` for constant‑time comparison, which mitigates this risk. Removing it reintroduces a security hole in authentication.\",\n      \"suggestion\": \"Restore constant‑time comparison, e.g., `return hmac.compare_digest(row[\\\"token\\\"], token)`, and re‑add the documentation note about constant‑time behavior.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/auth.py\",\n          \"line_start\": 11,\n          \"line_end\": 11\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.45,
+  "http_requests": 1
+}

@@ -1,0 +1,10 @@
+{
+  "prompt_sha": "134aa0d267f5",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-test-assertion\",\n      \"summary\": \"Test no longer verifies search results\",\n      \"file_path\": \"tests/test_notes.py\",\n      \"line_start\": 28,\n      \"line_end\": 28,\n      \"confidence\": 0.9,\n      \"rationale\": \"The original test asserted that the titles returned by `search(conn, 1, \\\"milk\\\")` matched the expected set {\\\"groceries\\\", \\\"work\\\"}. The change replaces the assert with a bare function call, removing any verification of the search output, so the test will pass even if `search` returns incorrect results.\",\n      \"suggestion\": \"Reintroduce an assertion that checks the returned titles, e.g., `assert {n[\\\"title\\\"] for n in search(conn, 1, \\\"milk\\\")} == {\\\"groceries\\\", \\\"work\\\"}`, or add appropriate checks for the expected behavior.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"tests/test_notes.py\",\n          \"line_start\": 28,\n          \"line_end\": 28\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 13.96,
+  "http_requests": 3
+}

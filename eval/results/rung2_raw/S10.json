@@ -1,0 +1,10 @@
+{
+  "prompt_sha": "134aa0d267f5",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"documentation\",\n      \"summary\": \"Docstring incorrectly states output file extension is always .txt\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 13,\n      \"line_end\": 13,\n      \"confidence\": 0.95,\n      \"rationale\": \"The function now supports both txt and json formats, but the docstring still says \\\"exports/<name>.txt\\\" which is inaccurate for json output.\",\n      \"suggestion\": \"Update the docstring to reflect that the file extension matches the chosen format, e.g., \\\"exports/<name>.<fmt>\\\".\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 13,\n          \"line_end\": 13\n        }\n      ]\n    },\n    {\n      \"severity\": \"low\",\n      \"category\": \"documentation\",\n      \"summary\": \"CLI help text mentions only .txt files despite new json format support\",\n      \"file_path\": \"notes_svc/cli.py\",\n      \"line_start\": 12,\n      \"line_end\": 12,\n      \"confidence\": 0.95,\n      \"rationale\": \"The subparser help string still says \\\"export a user's notes to exports/<file>.txt\\\" even though the command now supports a json format.\",\n      \"suggestion\": \"Modify the help string to indicate that the export can be either .txt or .json, e.g., \\\"export a user's notes to exports/<file>.<format>\\\".\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/cli.py\",\n          \"line_start\": 12,\n          \"line_end\": 12\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 25.48,
+  "http_requests": 3
+}

@@ -1,0 +1,10 @@
+{
+  "prompt_sha": "134aa0d267f5",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"data-integrity\",\n      \"summary\": \"Inserting an 'archived' tag without checking for existing tag can cause duplicate entries or integrity errors\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 18,\n      \"line_end\": 25,\n      \"confidence\": 0.92,\n      \"rationale\": \"The function `archive_note` unconditionally executes an INSERT SELECT to add the tag 'archived' (lines 21‑24). If the note is already archived, this will attempt to insert a duplicate (note_id, 'archived') row, which will violate a typical UNIQUE constraint on (note_id, tag) and raise an exception, breaking the operation.\",\n      \"suggestion\": \"Check whether the note already has the 'archived' tag before inserting, or use INSERT OR IGNORE / ON CONFLICT DO NOTHING to avoid duplicate errors.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 21,\n          \"line_end\": 24\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 15.16,
+  "http_requests": 2
+}

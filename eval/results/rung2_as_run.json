@@ -1,0 +1,640 @@
+{
+  "rung": 2,
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "prompt": "prompts/rung2_single.txt",
+  "prompt_sha": "134aa0d267f5",
+  "seeded": {
+    "prs": [
+      {
+        "id": "S01",
+        "clean": false,
+        "problems": [
+          "S01/0"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "S02",
+        "clean": false,
+        "problems": [
+          "S02/0"
+        ],
+        "found": [
+          "S02/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/auth.py",
+            "lines": [
+              11,
+              11
+            ],
+            "rule": "security",
+            "message": "Plain token comparison introduces timing attack vulnerability",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.9,
+            "rationale": "The function now returns `row[\"token\"] == token` (line 11), which performs a short-circuit string equality check that can leak timing information about the token. The previous implementation used `hmac.compare_digest` for constant‑time comparison, which mitigates this risk. Removing it reintroduces a security hole in authentication."
+          }
+        ],
+        "true_positives": 1
+      },
+      {
+        "id": "S03",
+        "clean": false,
+        "problems": [
+          "S03/0"
+        ],
+        "found": [
+          "S03/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              15,
+              15
+            ],
+            "rule": "security",
+            "message": "Missing validation allows path traversal and arbitrary file writes",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.98,
+            "rationale": "The function now builds the export path directly from the user‑provided `name` without any safety checks (see line 15: `path = EXPORT_DIR / name`). This permits names like \"../secret.txt\" or absolute paths, causing files to be written outside the intended `exports` directory, leading to potential data loss or security breaches."
+          }
+        ],
+        "true_positives": 1
+      },
+      {
+        "id": "S04",
+        "clean": false,
+        "problems": [
+          "S04/0"
+        ],
+        "found": [
+          "S04/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              21,
+              24
+            ],
+            "rule": "transactionality",
+            "message": "Note creation and tag insertion are not performed atomically, risking orphan notes if tag insertion fails",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.92,
+            "rationale": "The function `create_note_with_tags` first calls `create_note`, which commits the note insertion in its own transaction (lines 21-22). It then opens a separate transaction to insert tags (lines 22-24). If the tag insertion fails, the note remains in the database without its tags, leading to inconsistent state."
+          }
+        ],
+        "true_positives": 1
+      },
+      {
+        "id": "S05",
+        "clean": false,
+        "problems": [
+          "S05/0"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "S06",
+        "clean": false,
+        "problems": [
+          "S06/0"
+        ],
+        "found": [
+          "S06/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              30,
+              36
+            ],
+            "rule": "timezone-mismatch",
+            "message": "Using local date to filter UTC timestamps can miss or include notes from the wrong day",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.92,
+            "rationale": "The function `todays_notes` computes `today = date.today().isoformat()` which yields the server's local date, but notes are stored with `created_at` set by `utc_now()` (UTC time). Comparing the local date string with a UTC timestamp via `LIKE` may exclude notes created after midnight UTC or include notes from a different local day, leading to incorrect results."
+          }
+        ],
+        "true_positives": 1
+      },
+      {
+        "id": "S07",
+        "clean": false,
+        "problems": [
+          "S07/0"
+        ],
+        "found": [
+          "S07/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              18,
+              25
+            ],
+            "rule": "data-integrity",
+            "message": "Inserting an 'archived' tag without checking for existing tag can cause duplicate entries or integrity errors",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.92,
+            "rationale": "The function `archive_note` unconditionally executes an INSERT SELECT to add the tag 'archived' (lines 21‑24). If the note is already archived, this will attempt to insert a duplicate (note_id, 'archived') row, which will violate a typical UNIQUE constraint on (note_id, tag) and raise an exception, breaking the operation."
+          }
+        ],
+        "true_positives": 1
+      },
+      {
+        "id": "S08",
+        "clean": false,
+        "problems": [
+          "S08/0"
+        ],
+        "found": [
+          "S08/0"
+        ],
+        "findings": [
+          {
+            "file": "tests/test_notes.py",
+            "lines": [
+              28,
+              28
+            ],
+            "rule": "missing-test-assertion",
+            "message": "Test no longer verifies search results",
+            "matched": true,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "The original test asserted that the titles returned by `search(conn, 1, \"milk\")` matched the expected set {\"groceries\", \"work\"}. The change replaces the assert with a bare function call, removing any verification of the search output, so the test will pass even if `search` returns incorrect results."
+          }
+        ],
+        "true_positives": 1
+      },
+      {
+        "id": "S09",
+        "clean": false,
+        "problems": [
+          "S09/0"
+        ],
+        "found": [],
+        "findings": [
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              21,
+              23
+            ],
+            "rule": "runtime-error",
+            "message": "json.dumps attempts to convert sqlite3.Row objects to dict using dict(r), which raises a TypeError",
+            "matched": false,
+            "severity": "high",
+            "confidence": 0.99,
+            "rationale": "The code builds JSON with `json.dumps([dict(r) for r in rows], indent=2)` (line 22). `rows` are sqlite3.Row objects; `dict(r)` expects an iterable of (key, value) pairs, but a Row yields only values, causing a TypeError at runtime, so JSON export will fail."
+          }
+        ],
+        "true_positives": 0
+      },
+      {
+        "id": "S10",
+        "clean": false,
+        "problems": [
+          "S10/0"
+        ],
+        "found": [],
+        "findings": [
+          {
+            "file": "notes_svc/cli.py",
+            "lines": [
+              12,
+              12
+            ],
+            "rule": "documentation",
+            "message": "CLI help text mentions only .txt files despite new json format support",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.95,
+            "rationale": "The subparser help string still says \"export a user's notes to exports/<file>.txt\" even though the command now supports a json format."
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              13,
+              13
+            ],
+            "rule": "documentation",
+            "message": "Docstring incorrectly states output file extension is always .txt",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.95,
+            "rationale": "The function now supports both txt and json formats, but the docstring still says \"exports/<name>.txt\" which is inaccurate for json output."
+          }
+        ],
+        "true_positives": 0
+      },
+      {
+        "id": "C01",
+        "clean": true,
+        "problems": [],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "C02",
+        "clean": true,
+        "problems": [],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "C03",
+        "clean": true,
+        "problems": [],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "C04",
+        "clean": true,
+        "problems": [],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      }
+    ],
+    "totals": {
+      "findings": 9,
+      "true_positives": 6,
+      "false_alarms": 3,
+      "false_alarms_on_clean_prs": 0,
+      "precision": 0.6666666666666666,
+      "problems": 10,
+      "problems_found": 6,
+      "recall": 0.6
+    }
+  },
+  "real": {
+    "reporting": "per-PR",
+    "prs": [
+      {
+        "id": "R1",
+        "clean": false,
+        "problems": [
+          "R1/fix#3653"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "R2",
+        "clean": false,
+        "problems": [
+          "R2/fix#3739",
+          "R2/fix#3764"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      },
+      {
+        "id": "R3",
+        "clean": false,
+        "problems": [
+          "R3/fix#3504"
+        ],
+        "found": [
+          "R3/fix#3504"
+        ],
+        "findings": [
+          {
+            "file": "src/click/shell_completion.py",
+            "lines": [
+              182,
+              184
+            ],
+            "rule": "bug",
+            "message": "Fish completion script splits on literal \"\\n\" instead of actual newline, causing parsing errors",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.93,
+            "rationale": "The updated script uses `set -l metadata (string split \\n $completion);` (lines 182‑184). In fish, the `string split` command does not interpret escape sequences, so the delimiter `\\n` is taken as the two characters backslash and \"n\" rather than a newline. This prevents the completion string (which is newline‑delimited) from being split into its type, value, and help components, breaking fish completion handling."
+          }
+        ],
+        "true_positives": 1
+      },
+      {
+        "id": "R4",
+        "clean": false,
+        "problems": [
+          "R4/fix#2940"
+        ],
+        "found": [
+          "R4/fix#2940"
+        ],
+        "findings": [
+          {
+            "file": "src/click/testing.py",
+            "lines": [
+              119,
+              124
+            ],
+            "rule": "iterator-protocol-violation",
+            "message": "__next__ raises EOFError instead of StopIteration, breaking iterator semantics",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.93,
+            "rationale": "The overridden __next__ method catches StopIteration from the superclass and re‑raises EOFError (lines 119‑124). This means any code that iterates over the _NamedTextIOWrapper (e.g., \"for line in sys.stdin:\") will receive EOFError instead of the expected StopIteration, violating the iterator protocol and potentially causing uncaught exceptions."
+          }
+        ],
+        "true_positives": 1
+      },
+      {
+        "id": "R5",
+        "clean": false,
+        "problems": [
+          "R5/fix#3391"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0
+      }
+    ],
+    "skipped": false
+  },
+  "trace": [
+    {
+      "pr": "S01",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 1037,
+      "latency_s": 1.45,
+      "http_requests": 1,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+      "dropped": []
+    },
+    {
+      "pr": "S02",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 624,
+      "latency_s": 1.45,
+      "http_requests": 1,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "S03",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 1100,
+      "latency_s": 1.44,
+      "http_requests": 1,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "S04",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 1193,
+      "latency_s": 2.19,
+      "http_requests": 1,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "S05",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 1193,
+      "latency_s": 1.31,
+      "http_requests": 1,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "S06",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 1192,
+      "latency_s": 15.2,
+      "http_requests": 2,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "S07",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 1171,
+      "latency_s": 15.16,
+      "http_requests": 2,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "S08",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 836,
+      "latency_s": 13.96,
+      "http_requests": 3,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "S09",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 1295,
+      "latency_s": 16.23,
+      "http_requests": 3,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "S10",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 1396,
+      "latency_s": 25.48,
+      "http_requests": 3,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "C01",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 1295,
+      "latency_s": 8.78,
+      "http_requests": 2,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "C02",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 872,
+      "latency_s": 18.51,
+      "http_requests": 3,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "C03",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 1791,
+      "latency_s": 14.74,
+      "http_requests": 2,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "C04",
+      "part": "seeded",
+      "sent": true,
+      "cached": false,
+      "context_mode": "whole-files",
+      "est_tokens": 844,
+      "latency_s": 13.54,
+      "http_requests": 2,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "R1",
+      "part": "real",
+      "sent": true,
+      "cached": false,
+      "context_mode": "window-30",
+      "est_tokens": 3315,
+      "latency_s": 30.83,
+      "http_requests": 2,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "R2",
+      "part": "real",
+      "sent": false,
+      "error": "PR R2 does not fit 5000 tokens even with ±10 lines; not sent (S1: a call over budget is trimmed, never sent)"
+    },
+    {
+      "pr": "R3",
+      "part": "real",
+      "sent": true,
+      "cached": false,
+      "context_mode": "window-30",
+      "est_tokens": 2188,
+      "latency_s": 29.46,
+      "http_requests": 2,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "R4",
+      "part": "real",
+      "sent": true,
+      "cached": false,
+      "context_mode": "window-30",
+      "est_tokens": 2036,
+      "latency_s": 36.91,
+      "http_requests": 3,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    },
+    {
+      "pr": "R5",
+      "part": "real",
+      "sent": true,
+      "cached": false,
+      "context_mode": "window-30",
+      "est_tokens": 3305,
+      "latency_s": 23.32,
+      "http_requests": 3,
+      "call_ok": true,
+      "error": "",
+      "parse_error": "",
+      "dropped": []
+    }
+  ],
+  "stopped": ""
+}

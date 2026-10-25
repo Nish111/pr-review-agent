@@ -79,12 +79,23 @@ class Parsed:
 
 
 def _json_block(text: str) -> str:
+    """The JSON object in a model answer.
+
+    Fixed 24 Oct 2026 (eval/findings_rung2.md): the first version looked for a ``` fence FIRST, and rung 2's
+    answer for S01 was valid JSON whose `suggestion` string itself contained a ```python code fence, so the
+    extractor cut the object in half and a correct finding was thrown away. Now: whole text as JSON first; then
+    the outermost {...}; a fenced block only as a last resort. Valid JSON is never rejected.
+    """
     t = text.strip()
-    m = re.search(r"```(?:json)?\s*(.*?)```", t, re.DOTALL)
-    if m:
-        t = m.group(1).strip()
-    start, end = t.find("{"), t.rfind("}")
-    return t[start:end + 1] if start != -1 and end > start else t
+    for candidate in (t, t[t.find("{"):t.rfind("}") + 1] if "{" in t and "}" in t else ""):
+        if candidate:
+            try:
+                json.loads(candidate)
+                return candidate
+            except ValueError:
+                pass
+    m = re.search(r"```(?:json)?\s*(\{.*\})\s*```", t, re.DOTALL)
+    return m.group(1) if m else t
 
 
 def parse_response(text: str, context: list[Span]) -> Parsed:

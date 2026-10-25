@@ -1,0 +1,10 @@
+{
+  "prompt_sha": "134aa0d267f5",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"security\",\n      \"summary\": \"SQL injection vulnerability due to interpolating user input directly into query\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 31,\n      \"line_end\": 34,\n      \"confidence\": 0.95,\n      \"rationale\": \"The new code builds the SQL statement by embedding `user_id` and `keyword` directly into the string (lines 32‑34). If either value contains malicious content (e.g., a quote or SQL fragment), it can alter the query semantics or execute arbitrary SQL, leading to a security breach.\",\n      \"suggestion\": \"Use a parameterized query with placeholders for both `user_id` and `keyword`, e.g.,\\n```python\\npattern = f\\\"%{keyword}%\\\"\\nrows = conn.execute(\\n    \\\"SELECT id, title, body FROM notes WHERE user_id = ? AND (title LIKE ? OR body LIKE ?)\\\",\\n    (user_id, pattern, pattern)\\n).fetchall()\\n```\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 31,\n          \"line_end\": 34\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.45,
+  "http_requests": 1
+}
