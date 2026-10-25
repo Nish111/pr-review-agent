@@ -25,3 +25,6 @@ golden/seeded/head/
 
 # extracted click trees for evaluation (rebuilt from the click clone; never committed)
 eval/workdir/
+
+# the local code index (rebuilt with `python -m pr_review index`)
+.pr_review/

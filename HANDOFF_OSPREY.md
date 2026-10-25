@@ -4,6 +4,8 @@
 OSPREY chat: **the PR Review Agent only** (W8 deliverable). The memory project continues under
 KESTREL; LinkedIn, SBL and outreach are separate chats.
 
+> **STATUS 25 Oct 2026, later (read this first).** M5 in progress: part 1 built (index + search, matrices 02/03); waiting on the S2 model spike in `M5_START.md`.
+>
 > **STATUS 25 Oct 2026 (read this first).** M0–M4 done. M4 = ingress & queue on SQLite (`src/pr_review/webhook_receiver`, `store`, `job_queue`), tests T1–T16 in `tests/ingress`, before/after numbers in `FAILURE_MATRIX_01_INGRESS.md` §6 (v4). Next: M5 index & search. Live pointer: `.genesis/checkpoints/CURRENT.md`.
 >
 > **STATUS 19 Oct 2026 (read this first in a new OSPREY chat).** Genesis setup G0–G5 is complete in this repo

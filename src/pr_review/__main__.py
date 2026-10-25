@@ -40,7 +40,58 @@ def main(argv: list[str] | None = None) -> int:
     j.add_argument("--provider")
     j.add_argument("--model")
     sub.add_parser("ingress-compare", help="before/after ingress numbers: lecture design vs ours (T7 T8 T10 T12)")
+    ix = sub.add_parser("index", help="build or refresh the code index for one repo tree (matrix 02)")
+    ix.add_argument("--repo", required=True, help="repo name, e.g. pallets/click")
+    ix.add_argument("--path", required=True, help="folder holding the repo's files at one commit")
+    ix.add_argument("--commit", required=True, help="the commit SHA that folder holds")
+    ix.add_argument("--embedder", default="none", help="none (keyword only) | bge | jina | hash-64 (test only)")
+    ix.add_argument("--db", default=".pr_review/index.db")
+    se = sub.add_parser("search", help="search the code index (matrix 03)")
+    se.add_argument("query")
+    se.add_argument("--repo", help="repo name; default: the only indexed repo")
+    se.add_argument("--embedder", default="none")
+    se.add_argument("--k", type=int, default=5)
+    se.add_argument("--db", default=".pr_review/index.db")
+    ic = sub.add_parser("index-compare", help="before/after index numbers: html design vs ours (Y1, X2-X4)")
+    ic.add_argument("--tree", required=True, help="a repo folder, e.g. eval/workdir/click-c69643b")
     args = parser.parse_args(argv)
+
+    if args.cmd in ("index", "search"):
+        import sqlite3
+
+        from pr_review import embedder as emb
+        from pr_review.ingestion.index import Index
+        from pr_review.retrieval import search
+        db = ROOT / args.db
+        db.parent.mkdir(parents=True, exist_ok=True)
+        index = Index(sqlite3.connect(db, isolation_level=None), emb.get(args.embedder))
+        if args.cmd == "index":
+            rep = index.refresh(args.repo, Path(args.path), args.commit)
+            for k, v in vars(rep).items():
+                print(f"{k:<18} {dict(v) if hasattr(v, 'most_common') else v}")
+            return 0
+        repos = [r[0] for r in index.conn.execute("SELECT DISTINCT repo FROM index_files")]
+        repo = args.repo or (repos[0] if len(repos) == 1 else None)
+        if repo is None:
+            parser.error(f"--repo needed; indexed repos: {repos or 'none'}")
+        res = search(index, repo, args.query, k=args.k)
+        print(f"mode: {res.mode}  repo: {repo}  names: {res.names}  {res.note}")
+        for h in res.hits:
+            print(f"  {h.path}:{h.start_line}-{h.end_line}  {h.symbol or '-'}  [{'+'.join(h.lanes)}]")
+        return 0
+
+    if args.cmd == "index-compare":
+        from pr_review.evaluation.index_compare import run as index_run
+        res = index_run(ROOT / args.tree)
+        y = res["Y1_exact_name_top5"]
+        print(f"Y1 exact name in top {5}: baseline {y['baseline_hits']}/{y['names']} ({y['baseline_rate']}), "
+              f"ours {y['ours_hits']}/{y['names']} ({y['ours_rate']})")
+        for k in ("X2_X3_ghost_chunks", "X4_embeddings_after_one_line_edit"):
+            print(f"{k}: {res[k]}")
+        out = ROOT / "eval" / "results" / "index_compare.json"
+        out.write_text(json.dumps(res, indent=2) + "\n", encoding="utf-8", newline="\n")
+        print(f"saved {out.relative_to(ROOT).as_posix()}")
+        return 0
 
     if args.cmd == "ingress-compare":
         from pr_review.evaluation.ingress_compare import run

@@ -3,8 +3,8 @@
 - target: M5 (index & search: one SQLite file, FTS5 + sqlite-vec, per S2/S3)
 - iteration: 0
 - last_gate: —
-- last_action: 25 Oct 2026 — M4 done: ingress & queue on SQLite; T1-T16 pass (73 tests total). ingress-compare (lecture design vs ours): T7 2 vs 1 job; T8 wrong 20/20 trials vs 0/20; T10 0/20 vs 20/20 kept; T12 0 vs 1. Matrix v4. eval/results/ingress_compare.json.
-- next_action: commit M4; then M5 (index & search).
+- last_action: 25 Oct 2026 — M5 part 1: matrices 02 (index) and 03 (retrieval) v1; ingestion/ (AST chunker, walker with secret/junk skips, SQLite index with FTS5 + sqlite-vec, hash-cached vectors), retrieval/ (definition lookup + whole-name FTS + vector lane, RRF, token budget, mode flag); index/search/index-compare commands; 91 tests. Y1 exact name top-5: html 0.91, ours 1.00 (by construction, tuned after looking: see matrix 03 §6); ghost chunks 7 vs 0; embeds after small edits 13 vs 2.
+- next_action: Nishant commits M5 part 1, then runs the S2 spike (M5_START.md) and says A/B on jina remote code; then pin the model revision in embedder MODELS and S2, index click with the real model, and close M5.
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000

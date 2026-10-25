@@ -1,0 +1,38 @@
+{
+  "tree": "/sessions/rcw-014hxwjptve5vhdkmhjjzbyk/mnt/AI-Sprint-Execution/10-PR-Review-Agent/eval/workdir/click-c69643b",
+  "Y1_exact_name_top5": {
+    "names": 891,
+    "baseline_hits": 813,
+    "ours_hits": 891,
+    "baseline_rate": 0.912,
+    "ours_rate": 1.0,
+    "ours_misses_sample": [],
+    "baseline_misses_sample": [
+      "Abort",
+      "Argument",
+      "BadParameter",
+      "Class1",
+      "CliRunner",
+      "Color",
+      "Command",
+      "CompletionItem",
+      "Context",
+      "Environment",
+      "File",
+      "FloatRange",
+      "Group",
+      "HelpFormatter",
+      "Hinted"
+    ]
+  },
+  "X2_X3_ghost_chunks": {
+    "want": 0,
+    "baseline": 7,
+    "ours": 0
+  },
+  "X4_embeddings_after_one_line_edit": {
+    "baseline": 13,
+    "ours": 2,
+    "note": "baseline re-embeds all 4 chunks of every changed file (here m.py, big.txt and renamed.txt)"
+  }
+}
