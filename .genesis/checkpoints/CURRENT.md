@@ -1,10 +1,10 @@
 # CURRENT
 - active_loop: NONE
-- target: M5 (index & search: one SQLite file, FTS5 + sqlite-vec, per S2/S3)
+- target: M6 (rung 3: 4 grounded specialists in parallel, group 4)
 - iteration: 0
 - last_gate: —
-- last_action: 25 Oct 2026 — M5 part 1: matrices 02 (index) and 03 (retrieval) v1; ingestion/ (AST chunker, walker with secret/junk skips, SQLite index with FTS5 + sqlite-vec, hash-cached vectors), retrieval/ (definition lookup + whole-name FTS + vector lane, RRF, token budget, mode flag); index/search/index-compare commands; 91 tests. Y1 exact name top-5: html 0.91, ours 1.00 (by construction, tuned after looking: see matrix 03 §6); ghost chunks 7 vs 0; embeds after small edits 13 vs 2.
-- next_action: Nishant commits M5 part 1, then runs the S2 spike (M5_START.md) and says A/B on jina remote code; then pin the model revision in embedder MODELS and S2, index click with the real model, and close M5.
+- last_action: 27 Oct 2026 — M5 done: click indexed with bge-small on Nishant's laptop (179 s, hybrid mode); exact-name search right; vector lane finds the right neighbourhood, not the exact spot (matrix 03 §5). jina fails with transformers 5 (S2 amended). Vector lane's value decided in M6 (with vs without).
+- next_action: commit M5 part 2; then M6: failure matrix 04 (specialists), PREREG_RUNG3 (real labels get plain-words descriptions; hand check stays; retrieval on/off arms).
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000

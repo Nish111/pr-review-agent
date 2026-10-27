@@ -157,6 +157,21 @@ Whether retrieval actually improves reviews is measured in M6, when rung 3 runs 
    a development measurement, not a pre-registered result. Whether retrieval makes **reviews** better is measured in M6,
    with a pre-registration, by running rung 3 with and without it.
 
+**With the real model (bge-small, Nishant's laptop, 26-27 Oct 2026).** Click indexed in 179 s (1,284 chunks, 1,274 embedded,
+10 reused because identical text appears twice). Three demo searches:
+
+| Query | Top results | Verdict |
+|---|---|---|
+| `make_context` (exact name) | `core.py` `Command.make_context` first, found by both lanes | right |
+| "turn a string into a number and complain if it is not one" (plain English, vector lane only) | tests about bad values, `utils.make_str`, `examples/validation` `validate_count` | related, but missed the number types in `types.py` |
+| `try: return int(value) except ValueError: fail(invalid integer)` (code-shaped, like a diff) | `types.py` `ParamType.fail`, `test_range_fail`, `test_int_option` | related and useful, but not `IntParamType` itself |
+
+Reading: the exact-name lane is strong; the vector lane finds the right *neighbourhood*, not the exact spot. One likely
+cause, not yet checked: bge-small reads at most 512 tokens, so a long class chunk (the number types live in one) is cut
+before its end. The first version of free-text search also sent English words to the keyword lane, which buried the vector
+results; fixed on 27 Oct (only code-like words go to the keyword lane now). Whether the vector lane earns its place is decided in M6 by
+measuring rung 3 with and without it (R5), not by tuning demo queries.
+
 Y2–Y6 pass in `pytest tests/index`. The vector lane (R5) is tested only with a stand-in until the real model runs (`M5_START.md`).
 
 ## 6 · Glossary

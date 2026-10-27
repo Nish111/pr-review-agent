@@ -110,12 +110,21 @@ def _mode(index: Index, repo: str, embedder: Embedder | None) -> str:
     return "hybrid" if embedder is not None and index.vec else "keyword-only"
 
 
+def _code_like(conn: sqlite3.Connection, repo: str, word: str) -> bool:
+    """R3 for free-text queries: a word goes to the keyword lane only if it looks like code (snake_case, camelCase,
+    digits) or something in the repo is defined with that name. Plain English words go to the vector lane only."""
+    if "_" in word or any(c.isdigit() for c in word) or (word[1:] != word[1:].lower() and word != word.upper()):
+        return True
+    return conn.execute("SELECT 1 FROM chunks WHERE repo=? AND instr(' ' || defines || ' ', ?) > 0 LIMIT 1",
+                        (repo, f" {word} ")).fetchone() is not None
+
+
 def search(index: Index, repo: str, query: str, k: int = 5) -> Result:
     """Free-text search for the CLI demo: `python -m pr_review search "verify_token"`."""
     mode = _mode(index, repo, index.embedder)
     if mode == "no-index":
         return Result(mode, note=f"no index for {repo}; run `python -m pr_review index` first")
-    names = [n for n in identifiers(query) if n not in STOP] or identifiers(query)
+    names = [n for n in identifiers(query) if n not in STOP and len(n) >= 3 and _code_like(index.conn, repo, n)]
     extra = [p for n in names for p in parts(n) if len(parts(n)) > 1]
     lanes = {"keyword": _keyword(index.conn, repo, names, extra)}
     if mode == "hybrid":
