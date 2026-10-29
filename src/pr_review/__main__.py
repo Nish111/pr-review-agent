@@ -30,13 +30,16 @@ def main(argv: list[str] | None = None) -> int:
     g.add_argument("--labels", nargs="+", default=["golden/labels_seeded.json", "golden/labels_real.json"])
     g.add_argument("--no-git", action="store_true", help="skip the commit-hash lookup")
     e = sub.add_parser("eval", help="run one rung over the golden set and score it")
-    e.add_argument("--rung", type=int, choices=[1, 2], required=True)
+    e.add_argument("--rung", type=int, choices=[1, 2, 3], required=True)
+    e.add_argument("--arm", choices=["search", "nosearch"], default="search",
+                   help="rung 3: with code search (official) or without (PREREG_RUNG3 D1)")
+    e.add_argument("--embedder", default="bge", help="rung 3 search arm: bge (S2) | none")
     e.add_argument("--click", help="path to a local clone of pallets/click (for the 5 real PRs)")
     e.add_argument("--provider", help="rung 2: groq | gemini | openrouter | ollama (key from env)")
     e.add_argument("--model", help="rung 2: exact model id, never defaulted (e.g. openai/gpt-oss-120b)")
     j = sub.add_parser("rightreason", help="right-reason check of location-matched findings")
     j.add_argument("action", choices=["judge", "handcheck", "compare"])
-    j.add_argument("--rung", type=int, default=2)
+    j.add_argument("--rung", default="2", choices=["2", "3", "3n"], help="3n = rung 3 without search")
     j.add_argument("--provider")
     j.add_argument("--model")
     sub.add_parser("ingress-compare", help="before/after ingress numbers: lecture design vs ours (T7 T8 T10 T12)")
@@ -132,12 +135,18 @@ def main(argv: list[str] | None = None) -> int:
         click = Path(args.click) if args.click else None
         if args.rung == 1:
             res = rung1(ROOT, click)
+        elif args.rung == 3:
+            if not (args.provider and args.model):
+                parser.error("--rung 3 needs --provider and --model (the model id is never defaulted)")
+            from pr_review.evaluation.run_rung3 import rung3
+            res = rung3(ROOT, args.provider, args.model, click, arm=args.arm, embedder_key=args.embedder)
         else:
             if not (args.provider and args.model):
                 parser.error("--rung 2 needs --provider and --model (the model id is never defaulted)")
             from pr_review.evaluation.run_llm import rung2
             res = rung2(ROOT, args.provider, args.model, click)
-        out = ROOT / "eval" / "results" / f"rung{args.rung}.json"
+        name = res["rung"] if args.rung == 3 else args.rung
+        out = ROOT / "eval" / "results" / f"rung{name}.json"
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(res, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
         print_report(res)

@@ -63,8 +63,8 @@ It searches two ways and merges the results:
 
 **R3 · Too many names, mostly noise.** *(quality · known-known)*
 - **What goes wrong:** `self`, `return`, `str`, `i` appear in every file. Searching for them returns everything.
-- **What we build:** names come from the **changed lines** only; Python keywords and built-ins are dropped; at most 20 names,
-  the rarest in the index first.
+- **What we build:** names come from the **changed lines** only; Python keywords and built-ins are dropped, and so are plain
+  English words (from comments) unless something in the repo is defined with that name; at most 20 names, the rarest in the index first.
 - **How we notice:** the trace lists the names used for each PR.
 - **What happens after:** the query is specific to what the PR touched.
 

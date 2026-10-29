@@ -3,8 +3,8 @@
 - target: M6 (rung 3: 4 grounded specialists in parallel, group 4)
 - iteration: 0
 - last_gate: —
-- last_action: 27 Oct 2026 — M5 done: click indexed with bge-small on Nishant's laptop (179 s, hybrid mode); exact-name search right; vector lane finds the right neighbourhood, not the exact spot (matrix 03 §5). jina fails with transformers 5 (S2 amended). Vector lane's value decided in M6 (with vs without).
-- next_action: commit M5 part 2; then M6: failure matrix 04 (specialists), PREREG_RUNG3 (real labels get plain-words descriptions; hand check stays; retrieval on/off arms).
+- last_action: 27 Oct 2026 — M6 built, not run: FAILURE_MATRIX_04_SPECIALISTS.md; 4 specialist prompts; orchestrator (shared 8k TPM token bucket, partial reviews, exact-duplicate merge, per-specialist cache); eval --rung 3 --arm search|nosearch; real labels carry plain descriptions; 101 tests. eval/PREREG_RUNG3.md has D1 (two arms) and D2 (hand-check both) for Nishant.
+- next_action: Nishant answers D1/D2 in PREREG_RUNG3.md, commits the prereg + code, then runs rung 3 (≈3 quota days if D1 = A).
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000

@@ -155,7 +155,7 @@ def _diff_parts(diff: str) -> tuple[dict[str, list[tuple[int, int]]], str, list[
 
 
 def _rarest(conn: sqlite3.Connection, repo: str, names: list[str]) -> list[str]:
-    keep = [n for n in names if n not in STOP and len(n) >= 3]
+    keep = [n for n in names if n not in STOP and len(n) >= 3 and _code_like(conn, repo, n)]
     freq = {}
     for n in keep:
         freq[n] = conn.execute(

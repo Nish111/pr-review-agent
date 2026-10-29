@@ -14,9 +14,10 @@ from pr_review.static_checks import RULES, review_tree
 from pr_review.static_checks.ruff_check import ruff_version
 
 
-def _click_tree(click_repo: Path, commit: str, workdir: Path) -> Path:
-    """click at `commit`, extracted once into eval/workdir/ (gitignored, kept, never deleted)."""
-    dest = workdir / f"click-{commit}"
+def _click_tree(click_repo: Path, commit: str, workdir: Path, name: str | None = None) -> Path:
+    """click at `commit` (any git revision, e.g. "2468b70^" for its parent), extracted once into eval/workdir/
+    (gitignored, kept, never deleted). `name` overrides the folder name."""
+    dest = workdir / (name or f"click-{commit}")
     if not dest.exists():
         data = subprocess.run(["git", "-C", str(click_repo), "archive", commit], capture_output=True,
                               check=True, timeout=120).stdout
@@ -75,7 +76,16 @@ def print_report(res: dict) -> None:
     else:
         print(f"Rung {res['rung']} ({res['provider']} / {res['model']}, "
               f"prompt {res['prompt']} sha {res['prompt_sha']})")
+        if str(res["rung"]).startswith("3"):
+            print(f"  arm: {res['arm']}   embedder: {res['embedder']}")
         for tr in res.get("trace", []):
+            if "specialists" in tr:
+                sp = "  ".join(f"{k}={'ok' if v['ok'] else 'FAILED'}{'(c)' if v['cached'] else ''}"
+                               f"/{v['findings']}" for k, v in tr["specialists"].items())
+                ret = tr.get("retrieval", {})
+                print(f"  {tr['pr']:4} {'PARTIAL ' if tr['partial'] else ''}{sp}  merged={len(tr['merges'])}"
+                      + (f"  search={ret.get('mode')} chunks={len(ret.get('hits', []))}" if ret else ""))
+                continue
             bad = tr.get("error") or tr.get("parse_error")
             print(f"  call {tr['pr']:4} sent={tr.get('sent')} cached={tr.get('cached')} "
                   f"tokens~{tr.get('est_tokens')} {tr.get('latency_s')}s dropped={len(tr.get('dropped', []))}"

@@ -37,7 +37,7 @@ def matched_items(root: Path, rung: int) -> list[dict]:
                        and f["lines"][1] >= lab["line_start"] - TOLERANCE]
                 items.append({"id": f"M{len(items) + 1}", "pr": row["id"], "file": f["file"], "lines": f["lines"],
                               "summary": f["message"], "rationale": f.get("rationale", ""),
-                              "label": "; ".join(sorted({lab["description"] for lab in hit}))})
+                              "label": "; ".join(sorted({lab.get("plain") or lab["description"] for lab in hit}))})
     return items
 
 

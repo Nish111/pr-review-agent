@@ -98,7 +98,7 @@ def _json_block(text: str) -> str:
     return m.group(1) if m else t
 
 
-def parse_response(text: str, context: list[Span]) -> Parsed:
+def parse_response(text: str, context: list[Span], agent: AgentType = AgentType.SINGLE) -> Parsed:
     out = Parsed()
     try:
         data = json.loads(_json_block(text))
@@ -110,7 +110,7 @@ def parse_response(text: str, context: list[Span]) -> Parsed:
         return out
     for item in items:
         try:
-            f = Finding.from_dict({**item, "agent_type": AgentType.SINGLE.value})
+            f = Finding.from_dict({**item, "agent_type": agent.value})
         except ContractError as e:
             out.dropped.append({"reason": f"contract: {e}", "item": item})
             continue
