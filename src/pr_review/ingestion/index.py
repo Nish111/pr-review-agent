@@ -92,8 +92,23 @@ class Index:
         if embedder:
             self._check_model()
             if self.vec:
-                conn.execute("CREATE VIRTUAL TABLE IF NOT EXISTS chunks_vec USING vec0("
-                             f"embedding float[{embedder.dims}])")
+                # Vectors are partitioned by repo, so one repo's search never sees another repo's chunks.
+                # (Fixed 30 Oct 2026: the first table, chunks_vec, had no repo column; a k-nearest search over
+                # all repos, filtered afterwards, returned different chunks for notes-svc once click was indexed.)
+                conn.execute("CREATE VIRTUAL TABLE IF NOT EXISTS chunks_vec_repo USING vec0("
+                             f"repo text partition key, embedding float[{embedder.dims}])")
+                self._backfill_vectors()
+
+    def _backfill_vectors(self) -> None:
+        """Fill chunks_vec_repo from the vector cache for chunks indexed before it existed (no re-embedding)."""
+        if self.conn.execute("SELECT COUNT(*) FROM chunks_vec_repo").fetchone()[0]:
+            return
+        rows = self.conn.execute("SELECT c.id, c.repo, v.vector FROM chunks c JOIN vec_cache v "
+                                 "ON v.text_hash = c.text_hash AND v.model = ?", (self.embedder.name,)).fetchall()
+        if rows:
+            self.conn.execute("BEGIN IMMEDIATE")
+            self.conn.executemany("INSERT INTO chunks_vec_repo (rowid, repo, embedding) VALUES (?, ?, ?)", rows)
+            self.conn.execute("COMMIT")
 
     # ------------------------------------------------------------------ I8
     def _meta(self, key: str) -> str | None:
@@ -160,7 +175,7 @@ class Index:
         for i in ids:
             self.conn.execute("DELETE FROM chunks_fts WHERE rowid=?", (i,))
             if self.vec:
-                self.conn.execute("DELETE FROM chunks_vec WHERE rowid=?", (i,))
+                self.conn.execute("DELETE FROM chunks_vec_repo WHERE rowid=?", (i,))
         self.conn.execute("DELETE FROM chunks WHERE repo=? AND path=?", (repo, path))
 
     def _vectors(self, texts: list[str], rep: Report) -> list[bytes | None]:
@@ -206,7 +221,8 @@ class Index:
                 self.conn.execute("INSERT INTO chunks_fts (rowid, idents, body) VALUES (?, ?, ?)",
                                   (cid, ident_field(c.symbol + "\n" + c.text), c.text))
                 if self.vec and v is not None:
-                    self.conn.execute("INSERT INTO chunks_vec (rowid, embedding) VALUES (?, ?)", (cid, v))
+                    self.conn.execute("INSERT INTO chunks_vec_repo (rowid, repo, embedding) VALUES (?, ?, ?)",
+                                      (cid, repo, v))
             self.conn.execute("INSERT OR REPLACE INTO index_files VALUES (?, ?, ?, ?)",
                               (repo, path, digest, commit))          # last: marks the file as done
             self.conn.execute("COMMIT")

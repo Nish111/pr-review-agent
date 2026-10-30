@@ -1,0 +1,993 @@
+{
+  "rung": "3n",
+  "arm": "nosearch",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "prompt": "prompts/rung3_<specialist>.txt",
+  "prompt_sha": {
+    "security": "97f82a1e3926",
+    "quality": "6182838ac2bb",
+    "tests": "193fad60fc04",
+    "docs": "d48d1966c39b"
+  },
+  "seeded": {
+    "prs": [
+      {
+        "id": "S01",
+        "clean": false,
+        "problems": [
+          "S01/0"
+        ],
+        "found": [
+          "S01/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              30,
+              34
+            ],
+            "rule": "missing-escape-warning",
+            "message": "Docstring does not warn that `keyword` is interpolated directly into SQL and must be escaped",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.93,
+            "rationale": "The function `search` now builds the SQL query with f‑string interpolation (lines 31‑34) inserting `keyword` directly into the query, which can cause syntax errors or SQL injection if the keyword contains quotes or special characters. The existing docstring (line 30) only states that notes containing `keyword` are returned and does not mention any required escaping or safety considerations.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              31,
+              34
+            ],
+            "rule": "missing-test",
+            "message": "Search now builds SQL via string interpolation, introducing SQL injection risk that is not covered by tests",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.94,
+            "rationale": "The function `search` directly interpolates `user_id` and `keyword` into the SQL statement (lines 31‑34), removing the previous parameterized query. This changes behaviour (introduces injection vulnerability) but there is no accompanying test to verify safe handling of malicious input.",
+            "specialist": "tests"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              31,
+              34
+            ],
+            "rule": "sql-injection",
+            "message": "User-controlled keyword is interpolated directly into SQL query",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.98,
+            "rationale": "The search function builds the SQL statement using f-strings, inserting `user_id` and `keyword` directly (lines 32‑34). This allows an attacker to inject malicious SQL via the `keyword` parameter, bypassing intended filtering and potentially accessing or modifying data.",
+            "specialist": "security"
+          }
+        ],
+        "true_positives": 3,
+        "partial": false,
+        "found_by": {
+          "S01": [
+            "docs",
+            "security",
+            "tests"
+          ]
+        }
+      },
+      {
+        "id": "S02",
+        "clean": false,
+        "problems": [
+          "S02/0"
+        ],
+        "found": [
+          "S02/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/auth.py",
+            "lines": [
+              3,
+              11
+            ],
+            "rule": "security-regression",
+            "message": "Removed constant-time token comparison, reintroducing timing attack vulnerability",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.92,
+            "rationale": "The diff deletes the `import hmac` statement (line 3) and replaces `hmac.compare_digest(row[\"token\"], token)` with a plain equality check `row[\"token\"] == token` (line 11). This eliminates the constant‑time comparison that protected against timing attacks, changing the security behaviour of `check_token`.",
+            "specialist": "quality"
+          },
+          {
+            "file": "notes_svc/auth.py",
+            "lines": [
+              7,
+              7
+            ],
+            "rule": "documentation-missing",
+            "message": "Docstring no longer mentions that token comparison is not constant-time, misleading about security behavior",
+            "matched": false,
+            "severity": "high",
+            "confidence": 0.9,
+            "rationale": "The original docstring included \"Constant-time comparison.\" indicating a security property. After the change, the docstring on line 7 only says \"True if `token` is the user's token.\", omitting the change in comparison method, which is now a plain equality check and not constant-time.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/auth.py",
+            "lines": [
+              11,
+              11
+            ],
+            "rule": "insecure-token-comparison",
+            "message": "Plain equality is used to compare authentication tokens, enabling timing attacks",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.98,
+            "rationale": "The function `check_token` now returns `row[\"token\"] == token` (line 11) instead of the constant‑time `hmac.compare_digest` that was previously used. Direct string comparison can leak timing information about the secret token, allowing an attacker to perform a brute‑force or timing attack.",
+            "specialist": "security"
+          }
+        ],
+        "true_positives": 2,
+        "partial": false,
+        "found_by": {
+          "S02": [
+            "quality",
+            "security"
+          ]
+        }
+      },
+      {
+        "id": "S03",
+        "clean": false,
+        "problems": [
+          "S03/0"
+        ],
+        "found": [
+          "S03/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              10,
+              10
+            ],
+            "rule": "docstring-mismatch",
+            "message": "Docstring still states that the function adds a .txt extension, but the code now expects the full filename including extension",
+            "matched": false,
+            "severity": "medium",
+            "confidence": 0.98,
+            "rationale": "The docstring on line 10 says \"Write the user's notes to exports/<name>.txt and return the path.\", yet the implementation on line 15 builds the path as `EXPORT_DIR / name` without appending \".txt\". This mismatch can mislead users about the required `name` argument.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              15,
+              15
+            ],
+            "rule": "path-traversal",
+            "message": "User-controlled filename is used to construct a filesystem path without validation",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.98,
+            "rationale": "The function now directly concatenates the untrusted `name` argument into a path (line 15: `path = EXPORT_DIR / name`) after removing the previous whitelist check. This allows path traversal (e.g., \"../secret.txt\") or absolute paths, enabling an attacker to write files outside the intended export directory.",
+            "specialist": "security"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              15,
+              15
+            ],
+            "rule": "security-path-traversal",
+            "message": "User-supplied export name is not validated, allowing directory traversal and writes outside EXPORT_DIR",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.97,
+            "rationale": "The function now directly concatenates the user-provided `name` to `EXPORT_DIR` (line 15) without any safety checks. Previously a regex `_SAFE_NAME` validated the name and prevented characters like \"../\". Removing that validation reintroduces the risk of paths such as \"../secret.txt\" escaping the intended export directory, leading to potential data loss or overwriting of arbitrary files.",
+            "specialist": "quality"
+          }
+        ],
+        "true_positives": 2,
+        "partial": false,
+        "found_by": {
+          "S03": [
+            "quality",
+            "security"
+          ]
+        }
+      },
+      {
+        "id": "S04",
+        "clean": false,
+        "problems": [
+          "S04/0"
+        ],
+        "found": [
+          "S04/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              1,
+              1
+            ],
+            "rule": "missing-documentation",
+            "message": "Module docstring does not mention the newly added create_note_with_tags function",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "The top-level module docstring (line 1) lists the provided functionalities as \"create, list, search, tag\" but does not include the newly added create_note_with_tags helper, leaving the documentation incomplete for this change.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              21,
+              24
+            ],
+            "rule": "non-atomic-transaction",
+            "message": "create_note_with_tags inserts note and tags in separate transactions, risking orphan notes on tag insertion failure",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.85,
+            "rationale": "The function first calls create_note (which commits its own transaction) on line 21, then opens a new transaction block on line 22 to insert tags. If the INSERT into tags fails, the note has already been committed, leaving an orphan note without tags. This behavior is not atomic and is not covered by existing tests.",
+            "specialist": "tests"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              21,
+              24
+            ],
+            "rule": "partial-write",
+            "message": "Note and its tags are saved in separate transactions, causing possible orphan notes if tag insertion fails",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.93,
+            "rationale": "The function `create_note_with_tags` first calls `create_note`, which commits its INSERT inside its own `with conn:` block (lines 21-22). It then opens a second `with conn:` block to insert tags (lines 22-24). If the tag insertion raises an exception, the note remains persisted while its tags are not, leading to inconsistent data.",
+            "specialist": "quality"
+          }
+        ],
+        "true_positives": 2,
+        "partial": false,
+        "found_by": {
+          "S04": [
+            "quality",
+            "tests"
+          ]
+        }
+      },
+      {
+        "id": "S05",
+        "clean": false,
+        "problems": [
+          "S05/0"
+        ],
+        "found": [
+          "S05/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              1,
+              36
+            ],
+            "rule": "missing-doc",
+            "message": "Module docstring does not mention the newly added list_notes_with_tags function",
+            "matched": true,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "The top‑level module docstring (line 1) lists the available operations as \"create, list, search, tag\" but the PR adds a new public function `list_notes_with_tags` (lines 29‑36). The docstring is now incomplete and does not inform users of this new capability.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              32,
+              36
+            ],
+            "rule": "performance-n-plus-one-query",
+            "message": "N+1 query pattern causes a separate DB query per note",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.95,
+            "rationale": "The function `list_notes_with_tags` iterates over each note returned by `list_notes` and executes a separate `SELECT tag FROM tags WHERE note_id = ?` query for each note (lines 33-35). This results in one query per note, leading to potential performance degradation when many notes are listed.",
+            "specialist": "quality"
+          }
+        ],
+        "true_positives": 2,
+        "partial": false,
+        "found_by": {
+          "S05": [
+            "docs",
+            "quality"
+          ]
+        }
+      },
+      {
+        "id": "S06",
+        "clean": false,
+        "problems": [
+          "S06/0"
+        ],
+        "found": [
+          "S06/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              32,
+              36
+            ],
+            "rule": "timezone-mismatch",
+            "message": "Using local date to filter UTC timestamps may miss notes created today in UTC",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.7,
+            "rationale": "The function `todays_notes` computes `today` with `date.today().isoformat()` (local date) on line 32, then filters `created_at` (stored in UTC by `utc_now()`) using a LIKE pattern on line 35. If the server's local timezone differs from UTC, notes created after midnight UTC but before local midnight will be excluded, leading to incorrect results.",
+            "specialist": "quality"
+          }
+        ],
+        "true_positives": 1,
+        "partial": false,
+        "found_by": {
+          "S06": [
+            "quality"
+          ]
+        }
+      },
+      {
+        "id": "S07",
+        "clean": false,
+        "problems": [
+          "S07/0"
+        ],
+        "found": [
+          "S07/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              1,
+              1
+            ],
+            "rule": "documentation-missing",
+            "message": "Module docstring does not mention newly added archive_note functionality",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.95,
+            "rationale": "The top‑level docstring lists the provided operations as \"create, list, search, tag\" (line 1). The PR adds a new `archive_note` function (lines 18‑25) but does not update the docstring, leaving it inaccurate.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              18,
+              25
+            ],
+            "rule": "insecure-direct-object-reference",
+            "message": "Function trusts caller-provided user_id, enabling IDOR to archive others' notes",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.92,
+            "rationale": "The `archive_note` function receives `user_id` as a parameter and uses it directly in the SQL query (lines 22-24). If the caller supplies an arbitrary user_id, they can archive notes belonging to other users, leading to an insecure direct object reference.",
+            "specialist": "security"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              18,
+              25
+            ],
+            "rule": "missing-test",
+            "message": "New archive_note function is not covered by any test",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.97,
+            "rationale": "The PR introduces the archive_note function (lines 18‑25) which adds an 'archived' tag to a note. No existing test suite is shown to exercise this new behavior, leaving the functionality unverified.",
+            "specialist": "tests"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              20,
+              25
+            ],
+            "rule": "logic-bug",
+            "message": "Duplicate archiving can raise an IntegrityError instead of returning False",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.78,
+            "rationale": "The function inserts a row into the tags table without checking whether an 'archived' tag already exists for the note. If the tags table enforces a UNIQUE constraint on (note_id, tag), a second call to archive_note for the same note will cause sqlite3.IntegrityError, breaking the service instead of returning False.",
+            "specialist": "quality"
+          }
+        ],
+        "true_positives": 3,
+        "partial": false,
+        "found_by": {
+          "S07": [
+            "quality",
+            "security",
+            "tests"
+          ]
+        }
+      },
+      {
+        "id": "S08",
+        "clean": false,
+        "problems": [
+          "S08/0"
+        ],
+        "found": [
+          "S08/0"
+        ],
+        "findings": [
+          {
+            "file": "tests/test_notes.py",
+            "lines": [
+              24,
+              28
+            ],
+            "rule": "test-coverage-reduced",
+            "message": "search test no longer asserts expected results",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.95,
+            "rationale": "The original assertion checking that search returns the expected titles was removed (line 28 changed from an assert to a bare function call). This weakens the test, allowing regressions in search behavior to go undetected.",
+            "specialist": "tests"
+          },
+          {
+            "file": "tests/test_notes.py",
+            "lines": [
+              25,
+              28
+            ],
+            "rule": "missing-assertion",
+            "message": "Test no longer verifies search results, allowing regressions to go unnoticed",
+            "matched": true,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "The original assertion `assert {n[\"title\"] for n in search(conn, 1, \"milk\")} == {\"groceries\", \"work\"}` was removed and replaced with a bare call `search(conn, 1, \"milk\")`. This eliminates verification of the search function's correctness, so failures in search logic will not be caught by this test.",
+            "specialist": "quality"
+          }
+        ],
+        "true_positives": 2,
+        "partial": false,
+        "found_by": {
+          "S08": [
+            "quality",
+            "tests"
+          ]
+        }
+      }
+    ],
+    "totals": {
+      "findings": 21,
+      "true_positives": 17,
+      "false_alarms": 4,
+      "false_alarms_on_clean_prs": 0,
+      "precision": 0.8095238095238095,
+      "problems": 8,
+      "problems_found": 8,
+      "recall": 1.0
+    }
+  },
+  "real": {
+    "reporting": "per-PR",
+    "prs": [],
+    "skipped": false
+  },
+  "trace": [
+    {
+      "pr": "S01",
+      "part": "seeded",
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [
+        {
+          "kept": "security:notes_svc/notes.py:31",
+          "dropped": "quality:notes_svc/notes.py:31",
+          "category": "sql-injection"
+        }
+      ],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1134,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1142,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1119,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1141,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S02",
+      "part": "seeded",
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 721,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 728,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 706,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 727,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S03",
+      "part": "seeded",
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1197,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1204,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1181,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": [
+            {
+              "reason": "ungrounded: cites lines the reviewer was not shown",
+              "item": {
+                "severity": "high",
+                "category": "missing-test",
+                "summary": "No test ensures unsafe export names are rejected after validation was removed",
+                "file_path": "notes_svc/export.py",
+                "line_start": 15,
+                "line_end": 15,
+                "confidence": 0.95,
+                "rationale": "The function now directly uses the provided name to construct the export path (line 15) without any safety checks, but the test suite no longer includes the \"test_export_rejects_unsafe_names\" test that previously verified that unsafe names raise ValueError. This leaves a potential path‑traversal vulnerability untested.",
+                "suggestion": "Add a test that passes unsafe names (e.g., \"../secret\", \"a/b\", \"\", overly long strings, names with spaces) to export_notes and asserts that a ValueError or appropriate error is raised, or re‑introduce validation in the implementation.",
+                "evidence": [
+                  {
+                    "file_path": "notes_svc/export.py",
+                    "line_start": 15,
+                    "line_end": 15
+                  },
+                  {
+                    "file_path": "tests/test_export.py",
+                    "line_start": 15,
+                    "line_end": 19
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1203,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S04",
+      "part": "seeded",
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1290,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1297,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1275,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1297,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S05",
+      "part": "seeded",
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1290,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1297,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1275,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1297,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S06",
+      "part": "seeded",
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1289,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1297,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1274,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1296,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S07",
+      "part": "seeded",
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1268,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1275,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1253,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 1274,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S08",
+      "part": "seeded",
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 933,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 940,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 918,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 940,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S09",
+      "part": "seeded",
+      "error": "quota exhausted"
+    }
+  ],
+  "stopped": "daily quota exhausted at S09: HTTP 429 from https://api.groq.com/openai/v1/chat/completions - DAILY quota exhausted, not a rate limit.\n{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01",
+  "embedder": null
+}

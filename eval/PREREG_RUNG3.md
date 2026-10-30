@@ -85,3 +85,20 @@ The first run also extracts each real PR's **base** version of click into `eval/
 - 27 Oct: retrieval for a diff now ignores plain English words from comments and docstrings in the changed lines
   (only code-like names or names defined in the repo are searched), the same rule the free-text search got after the
   M5 demo. Checked on the seeded set only for "does the README still come back for S09" (it does); no reviewer was run.
+
+## Changed after the first calls (30 Oct 2026; recorded so nothing is hidden)
+
+- **Bug found: the vector search could see other repositories.** The vector table had no repo column; the search took
+  the 90 nearest chunks across *all* indexed repos and then kept only the PR's repo. Once click was indexed (for the real
+  PRs), notes-svc's nearest chunks could be crowded out, so retrieval for a seeded PR changed. It showed up as a cache miss:
+  on 30 Oct the with-search run tried to re-ask S01 instead of reusing its answer.
+- **Effect on answers already received:** none for the seeded PRs. All 14 were asked on 29-30 Oct **before** click was
+  indexed, when notes-svc was the only repo, so their related code was exactly what the pre-registered design intended. The real
+  PRs were asked with notes-svc's ~30 chunks also in the table; any real PR whose related code changes under the fix is re-asked
+  (the cache key includes the full prompt), so every official answer matches the fixed design.
+- **Fix:** the vector table is now partitioned by repo (`chunks_vec_repo`), filled from the saved vectors without re-embedding.
+  Tests: a second repo no longer changes the first repo's results; an old index is filled without new embeddings.
+- **Second fix:** a run that stops on the quota no longer overwrites a more complete result file. It saves to
+  `rung3_stopped.json` instead. (On 30 Oct the stopped run replaced `rung3.json` with an empty result; the answers were
+  never lost, because they are cached, and re-running regenerates the file.)
+

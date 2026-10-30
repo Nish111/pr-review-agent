@@ -212,3 +212,28 @@ def test_y6_stale_index_refused_and_no_index_flagged():
     ix = demo_index()
     assert for_diff(ix, "notes-svc", "", "other-commit").mode == "stale"
     assert for_diff(ix, "unknown/repo", "", "base").mode == "no-index"
+
+
+@pytest.mark.skipif(not load_vec(sqlite3.connect(":memory:")), reason="sqlite-vec not installed")
+def test_vector_lane_ignores_other_repos(tmp_path):
+    """30 Oct 2026 bug: adding a second repo changed the first repo's vector results."""
+    ix = demo_index(HashEmbedder(64))
+    before = [h.chunk_id for h in search(ix, "notes-svc", "create note title body").hits]
+    other = mk(tmp_path / "o", {f"m{i}.py": "def create_note(title, body):\n    return title + body\n"
+                                for i in range(120)})
+    ix.refresh("other/repo", other, "c1")
+    after = search(ix, "notes-svc", "create note title body")
+    assert [h.chunk_id for h in after.hits] == before and all(h.path for h in after.hits)
+
+
+@pytest.mark.skipif(not load_vec(sqlite3.connect(":memory:")), reason="sqlite-vec not installed")
+def test_old_index_backfilled_without_reembedding(tmp_path):
+    db = str(tmp_path / "ix.db")
+    emb = CountingEmbedder()
+    ix = Index(sqlite3.connect(db, isolation_level=None), emb)
+    ix.refresh("notes-svc", DEMO, "base")
+    ix.conn.execute("DELETE FROM chunks_vec_repo")                  # simulate an index built before the fix
+    emb.calls = 0
+    ix2 = Index(sqlite3.connect(db, isolation_level=None), emb)
+    n = ix2.conn.execute("SELECT COUNT(*) FROM chunks_vec_repo").fetchone()[0]
+    assert n == ix2.conn.execute("SELECT COUNT(*) FROM chunks").fetchone()[0] and emb.calls == 0

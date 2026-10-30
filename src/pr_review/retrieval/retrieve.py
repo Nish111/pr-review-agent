@@ -74,16 +74,12 @@ def _keyword(conn: sqlite3.Connection, repo: str, names: list[str], extra: list[
 
 
 def _vector(conn: sqlite3.Connection, repo: str, embedder: Embedder, text: str) -> list[int]:
+    """Nearest chunks of THIS repo only (the vector table is partitioned by repo; see ingestion/index.py)."""
     v = pack(embedder.embed([text])[0])
-    rows = conn.execute("SELECT rowid, distance FROM chunks_vec WHERE embedding MATCH ? AND k = ?",
-                        (v, LANE_DEPTH * 3)).fetchall()
+    rows = conn.execute("SELECT rowid, distance FROM chunks_vec_repo WHERE embedding MATCH ? AND k = ? AND repo = ?",
+                        (v, LANE_DEPTH * 3, repo)).fetchall()
     max_dist = (2 - 2 * MIN_SIMILARITY) ** 0.5
-    ids = [r[0] for r in rows if r[1] <= max_dist]
-    if not ids:
-        return []
-    marks = ",".join("?" * len(ids))
-    in_repo = {r[0] for r in conn.execute(f"SELECT id FROM chunks WHERE repo=? AND id IN ({marks})", (repo, *ids))}
-    return [i for i in ids if i in in_repo][:LANE_DEPTH]
+    return [r[0] for r in rows if r[1] <= max_dist][:LANE_DEPTH]
 
 
 def _rrf(lanes: dict[str, list[int]]) -> list[tuple[int, float, tuple[str, ...]]]:

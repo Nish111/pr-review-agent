@@ -94,6 +94,7 @@ def rung3(root: Path, provider: str, model: str, click_repo: Path | None, arm: s
             base = _click_tree(click_repo, pr["intro_commit"] + "^", wd, name=f"click-{pr['intro_commit']}-base")
             jobs.append(("real", pr, head, "pallets/click", base, pr["intro_commit"] + "^"))
     scores = []
+    print(f"rung 3 [{arm}]: {len(jobs)} PRs x 4 specialists; progress is printed per PR", flush=True)
     for part, pr, tree, repo, base_tree, base in jobs:
         diff = (root / pr["diff"]).read_text(encoding="utf-8")
         changed = changed_lines(diff)
@@ -118,6 +119,8 @@ def rung3(root: Path, provider: str, model: str, click_repo: Path | None, arm: s
                       "findings": len(r.findings), "dropped": r.dropped}
             for a, r in rv["specialists"].items()})
         out["trace"].append(tr)
+        print(f"  [{arm}] {pr['id']} done: {len(rv['completed'])}/4 specialists"
+              f"{' (PARTIAL)' if rv['partial'] else ''}, {len(rv['findings'])} finding(s)", flush=True)
         fs = rv["findings"]
         s = score_pr(pr, fs)
         row = _row(pr, s, fs)

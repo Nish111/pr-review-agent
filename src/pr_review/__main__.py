@@ -147,6 +147,11 @@ def main(argv: list[str] | None = None) -> int:
             res = rung2(ROOT, args.provider, args.model, click)
         name = res["rung"] if args.rung == 3 else args.rung
         out = ROOT / "eval" / "results" / f"rung{name}.json"
+
+        def scored(r: dict) -> int:
+            return len(r["seeded"]["prs"]) + len(r["real"]["prs"])
+        if res.get("stopped") and out.is_file() and scored(json.loads(out.read_text(encoding="utf-8"))) > scored(res):
+            out = out.with_name(f"rung{name}_stopped.json")      # never replace a more complete result (30 Oct)
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(res, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
         print_report(res)
