@@ -101,16 +101,21 @@ The first run also extracts each real PR's **base** version of click into `eval/
 - **Second fix:** a run that stops on the quota no longer overwrites a more complete result file. It saves to
   `rung3_stopped.json` instead. (On 30 Oct the stopped run replaced `rung3.json` with an empty result; the answers were
   never lost, because they are cached, and re-running regenerates the file.)
-- **The first fix was not enough (found 30 Oct, the next run).** The re-run still re-asked S01. The keyword search had the
-  same kind of leak: its ranking (bm25) uses word statistics over the **whole** search table, so click's 1,284 chunks
-  changed the order of notes-svc's results. **Fix:** rung 3 now keeps **one index file per repo**
-  (`eval/workdir/rung3_index_notes-svc.db`, `rung3_index_pallets_click.db`), rebuilt from the same files, so notes-svc's index is
-  again exactly what it was on 29 Oct, when it was the only repo.
-- **What was lost, and what wasn't:** before this was noticed, two runs (30 Oct, 12:18 and 12:54 IST) re-asked three of
-  S01's four specialists (security, tests, quality) with the leaked related code, and those answers **replaced** the
-  29 Oct ones in the cache. The 29 Oct findings for S01 are still in `eval/results/rung3_day1_partial.json` and the day-1 log,
-  but the raw answers are gone. S01's official answers will be the next run's, asked with the pre-registered related code
-  (the same prompts as 29 Oct; temperature 0, but not guaranteed to give the same words). Both are reported.
+- **Second change, a precaution (30 Oct).** After fix 1, S01 was asked again, and I concluded (wrongly, see the
+  correction below) that fix 1 wasn't enough. I found a second possible leak: keyword ranking (bm25) uses word statistics over the
+  **whole** search table, so another repo's chunks can change the order. **Change:** rung 3 now keeps **one index file per repo**
+  (`eval/workdir/rung3_index_notes-svc.db`, `rung3_index_pallets_click.db`). It is the correct design either way (matrix 03, R12).
+- **Correction (31 Oct, from the cache timestamps).** The re-ask after fix 1 was **not** caused by the bm25 leak. The run
+  at 12:18 IST on 30 Oct (before fix 1, with the leaked related code) had already **replaced** three of S01's 29 Oct answers
+  (security, tests, quality) in the cache, so the next run found leaked answers, not the originals, and asked again.
+  Evidence that fix 1 already restored the pre-registered retrieval: on 31 Oct, with fix 2, **S01's docs answer from 29 Oct,
+  every answer for S02-C04 and every real-PR answer except R1/security were reused unchanged**; the cache only
+  reuses an answer when the whole prompt is identical. The bm25 leak is real in principle but did not change any
+  prompt here.
+- **What was lost, and what wasn't:** the raw 29 Oct answers of S01's security, tests and quality specialists (overwritten
+  by the 12:18 IST run). Their findings survive in `eval/results/rung3_day1_partial.json` and the day-1 log. Official S01 answers:
+  quality from 30 Oct 12:54 IST, security and tests from 31 Oct. All three were asked with the pre-registered related code.
+  The leaked-context versions of security and tests are kept in `rung3_raw/search/superseded/`. Both sets are reported.
 - **So it can't happen again:** a cached good answer is never overwritten any more; before a re-ask it is copied to
   `rung3_raw/<arm>/superseded/`. A test checks this.
 
