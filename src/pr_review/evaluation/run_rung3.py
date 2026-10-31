@@ -72,18 +72,26 @@ def rung3(root: Path, provider: str, model: str, click_repo: Path | None, arm: s
            "prompt": "prompts/rung3_<specialist>.txt", "prompt_sha": {a.value: s for a, s in shas.items()},
            "seeded": {"prs": []}, "real": {"reporting": "per-PR", "prs": [], "skipped": click_repo is None},
            "trace": [], "stopped": "", "embedder": None}
-    index = None
+    indexes: dict = {}
+    e = None
     if arm == "search":
         from pr_review import embedder as emb
-        from pr_review.ingestion.index import Index
-        db = index_db or root / "eval/workdir/rung3_index.db"
-        db.parent.mkdir(parents=True, exist_ok=True)
         try:
             e = emb.get(embedder_key)
         except ImportError:
             e = None                                                   # keyword-only, recorded below (R8)
-        index = Index(sqlite3.connect(db, isolation_level=None), e)
         out["embedder"] = e.name if e else f"unavailable ({embedder_key}): keyword-only"
+
+    def index_for(repo: str):
+        """One index FILE per repo (fixed 30 Oct 2026): in a shared file, keyword ranking (bm25) and the vector
+        search both depended on the other repo's chunks, so notes-svc retrieval changed once click was indexed."""
+        if repo not in indexes:
+            from pr_review.ingestion.index import Index
+            base_db = index_db or root / "eval/workdir/rung3_index.db"
+            db = base_db.with_name(f"{base_db.stem}_{repo.replace('/', '_')}{base_db.suffix}")
+            db.parent.mkdir(parents=True, exist_ok=True)
+            indexes[repo] = Index(sqlite3.connect(db, isolation_level=None), e)
+        return indexes[repo]
     jobs = [("seeded", pr, root / "golden/seeded/head" / pr["id"], "notes-svc", root / "golden/seeded/base",
              "seeded-base") for pr in seeded]
     if click_repo is not None:
@@ -100,7 +108,8 @@ def rung3(root: Path, provider: str, model: str, click_repo: Path | None, arm: s
         changed = changed_lines(diff)
         tr: dict = {"pr": pr["id"], "part": part}
         hits = []
-        if index is not None:
+        if arm == "search":
+            index = index_for(repo)
             if index.commit_of(repo) != base:
                 rep = index.refresh(repo, base_tree, base)             # incremental (matrix 02, I5-I7)
                 tr["index_refresh"] = {"embedded": rep.embedded, "reused": rep.vectors_reused, "s": rep.seconds}

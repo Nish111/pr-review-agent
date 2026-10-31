@@ -28,6 +28,11 @@ def _ask(cache: Path, key: dict, prompt: str, provider: str, model: str, complet
         old = json.loads(cache.read_text(encoding="utf-8"))
         if old.get("ok") and all(old.get(k) == v for k, v in key.items()):
             return {**old, "cached": True}
+        if old.get("ok"):                     # a good answer to a DIFFERENT question: keep a copy, never lose it
+            keep = cache.parent / "superseded" / f"{cache.stem}.{old.get('input_sha') or old.get('prompt_sha')}.json"
+            keep.parent.mkdir(parents=True, exist_ok=True)
+            if not keep.exists():
+                keep.write_text(cache.read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
     before, t0 = http_attempts(), time.monotonic()
     rec = dict(key)
     try:

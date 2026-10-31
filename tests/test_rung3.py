@@ -175,7 +175,8 @@ def test_end_to_end_seeded(tmp_path, monkeypatch, arm):
     assert ("retrieval" in tr) == (arm == "search")
     if arm == "search":
         assert res["embedder"] == "hash-32" and tr["retrieval"]["mode"] in ("hybrid", "keyword-only")
-        assert sqlite3.connect(db).execute("SELECT COUNT(*) FROM chunks").fetchone()[0] > 0
+        per_repo = tmp_path / "ix_notes-svc.db"                     # one index file per repo (30 Oct fix)
+        assert sqlite3.connect(per_repo).execute("SELECT COUNT(*) FROM chunks").fetchone()[0] > 0
     calls.clear()
     run()
     assert calls == []                                          # Z6: everything answered from the cache
@@ -204,3 +205,12 @@ def test_z3_quota_then_resume_end_to_end(tmp_path):
     seen.clear()
     res = rung3(ROOT, "fake", "m", None, complete=fake, bucket=TokenBucket(10**6), **kw)
     assert not res["stopped"] and len(res["seeded"]["prs"]) == 14 and len(seen) == 14 * 4 - answered
+
+
+def test_superseded_answer_is_kept(tmp_path):
+    from pr_review.evaluation.run_llm import _ask
+    cache = tmp_path / "S01_security.json"
+    _ask(cache, {"input_sha": "aaa"}, "p1", "x", "m", lambda *a: "first")
+    _ask(cache, {"input_sha": "bbb"}, "p2", "x", "m", lambda *a: "second")
+    kept = tmp_path / "superseded" / "S01_security.aaa.json"
+    assert json.loads(kept.read_text())["raw"] == "first" and json.loads(cache.read_text())["raw"] == "second"

@@ -123,6 +123,13 @@ It searches two ways and merges the results:
 - **How we notice:** an "ungrounded, dropped" counter (M6).
 - **What happens after:** the made-up finding is dropped and traced.
 
+**R12 · Two repos in one index change each other's results.** *(quality · unknown-unknown; found 30 Oct 2026 during rung 3)*
+- **What goes wrong:** keyword ranking (bm25) uses word statistics across the whole search table, and the first vector table
+  had no repo column. Indexing click changed which notes-svc chunks came back, with no error.
+- **What we build:** one index file per repo (the vector table is also partitioned by repo).
+- **How we notice:** it surfaced as unexpected cache misses; a test now checks that a second repo doesn't change the first one's results.
+- **What happens after:** each repo's retrieval depends only on that repo.
+
 ## 4 · Tests
 
 | Test | What we do | Which failure | Pass means | Baseline should fail? |
