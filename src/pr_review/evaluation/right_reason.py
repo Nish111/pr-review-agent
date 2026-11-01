@@ -45,6 +45,9 @@ def run_judge(root: Path, rung: int, provider: str, model: str, complete=real_co
     template = (root / JUDGE_PROMPT).read_text(encoding="utf-8")
     sha = prompt_sha(template)
     path = root / f"eval/results/rung{rung}_judge.json"
+    if complete is real_complete:
+        from pr_review.llm_client import pick_provider
+        pick_provider(provider)       # a missing API key stops here, before recording N failed verdicts (1 Nov fix)
     # Reuse a verdict only if the same judge (model + prompt) already answered for the same finding text, and it
     # actually answered (same rule as the reviewer cache). Saves the judge's small daily quota (Gemini: 20/day).
     old = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}

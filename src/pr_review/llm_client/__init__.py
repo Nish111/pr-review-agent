@@ -23,4 +23,4 @@ def complete(provider: str, model: str, prompt: str) -> str:
     return fn(model, prompt, key) if name != "gemini" else fn(model, prompt, key, base)
 
 
-__all__ = ["LLMError", "ProviderUnavailable", "QuotaExhausted", "complete", "http_attempts"]
+__all__ = ["pick_provider", "LLMError", "ProviderUnavailable", "QuotaExhausted", "complete", "http_attempts"]

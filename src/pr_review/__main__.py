@@ -114,8 +114,12 @@ def main(argv: list[str] | None = None) -> int:
                 parser.error("judge needs --provider and --model (a different model from the reviewer)")
             out = rr.run_judge(ROOT, args.rung, args.provider, args.model)
             n = len(out["verdicts"])
-            print(f"judged {n} matched finding(s) ({out['asked']} newly asked, rest reused); "
+            failed = [v for v in out["verdicts"] if v.get("same_bug") is None]
+            print(f"judged {n - len(failed)} of {n} matched finding(s) ({out['asked']} asked this run); "
                   "verdicts saved, NOT printed (keeps the hand check independent)")
+            if failed:
+                print(f"  {len(failed)} NOT answered (first reason: {failed[0]['reason'][:120]}); "
+                      "run the same command again (after the quota resets, if that was the reason)")
         elif args.action == "handcheck":
             print(f"wrote {rr.write_handcheck(ROOT, args.rung).relative_to(ROOT).as_posix()}")
         else:
