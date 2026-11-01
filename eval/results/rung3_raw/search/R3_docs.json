@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "fb3c74f8398ccb98",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"documentation\",\n      \"summary\": \"Docstring for FishComplete.format_completion does not document the changed output format (now newline‑separated fields)\",\n      \"file_path\": \"src/click/shell_completion.py\",\n      \"line_start\": 423,\n      \"line_end\": 436,\n      \"confidence\": 0.94,\n      \"rationale\": \"The method previously returned a comma‑separated string (\\\"type,value\\\\thelp\\\") as shown by the removed lines. The new implementation (lines 433‑436) returns a newline‑separated string (\\\"type\\\\nvalue\\\\nhelp\\\"). The docstring added in lines 424‑432 only mentions escaping newlines but never states that the overall format has changed, leaving users unaware of the new delimiter and placeholder behavior.\",\n      \"suggestion\": \"Update the docstring to explicitly describe the new format, e.g., \\\"Returns a string with three newline‑separated fields: the completion type, the escaped value, and the escaped help text (or '_' when no help is provided).\\\"\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/shell_completion.py\",\n          \"line_start\": 423,\n          \"line_end\": 436\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.45,
+  "http_requests": 1
+}

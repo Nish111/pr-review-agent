@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "03c5f339fa2b3092",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"behavior-regression\",\n      \"summary\": \"Iterating over sys.stdout or sys.stderr now raises EOFError instead of StopIteration\",\n      \"file_path\": \"src/click/testing.py\",\n      \"line_start\": 119,\n      \"line_end\": 124,\n      \"confidence\": 0.78,\n      \"rationale\": \"The added __next__ method (lines 119‑124) catches StopIteration from the base TextIOWrapper and re‑raises EOFError. This changes the iterator protocol for all _NamedTextIOWrapper instances, including the ones used for sys.stdout and sys.stderr (created at lines 336‑345). Code that iterates over these streams expecting StopIteration will now receive an unexpected EOFError, potentially breaking existing behaviour.\",\n      \"suggestion\": \"Limit the custom __next__ implementation to the stdin wrapper only, or preserve the original StopIteration semantics for stdout/stderr by raising StopIteration instead of EOFError for those cases.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/testing.py\",\n          \"line_start\": 119,\n          \"line_end\": 124\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.91,
+  "http_requests": 2
+}

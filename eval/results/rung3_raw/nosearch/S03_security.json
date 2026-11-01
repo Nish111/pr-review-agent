@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "97f82a1e3926",
+  "input_sha": "93ad0c7855b1db9f",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"path-traversal\",\n      \"summary\": \"User-controlled filename is used to construct a filesystem path without validation\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 15,\n      \"line_end\": 15,\n      \"confidence\": 0.98,\n      \"rationale\": \"The function now directly concatenates the untrusted `name` argument into a path (line 15: `path = EXPORT_DIR / name`) after removing the previous whitelist check. This allows path traversal (e.g., \\\"../secret.txt\\\") or absolute paths, enabling an attacker to write files outside the intended export directory.\",\n      \"suggestion\": \"Re‑introduce strict validation of `name` to reject path separators, \\\"..\\\", and enforce a safe filename pattern (e.g., alphanumeric, underscore, hyphen) and a fixed \\\".txt\\\" extension, or use a safe filename generator.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 15,\n          \"line_end\": 15\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.63,
+  "http_requests": 1
+}

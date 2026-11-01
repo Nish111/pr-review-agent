@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "9eb3af5e23398363",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"missing-test-coverage\",\n      \"summary\": \"The new err handling path in _readline_prompt (redirecting stdout to stderr) is not exercised by existing tests\",\n      \"file_path\": \"src/click/termui.py\",\n      \"line_start\": 62,\n      \"line_end\": 79,\n      \"confidence\": 0.78,\n      \"rationale\": \"Lines 62‑79 introduce a redirect of stdout to sys.stderr when err is True. No test in the repository calls _readline_prompt with err=True, nor verifies that the prompt is written to stderr. This new behavior is therefore untested.\",\n      \"suggestion\": \"Add a test that invokes prompt(..., err=True) (or confirm(..., err=True)) and asserts that the prompt text is sent to stderr, exercising the redirect_stdout branch.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/termui.py\",\n          \"line_start\": 62,\n          \"line_end\": 79\n        }\n      ]\n    },\n    {\n      \"severity\": \"high\",\n      \"category\": \"test-regression\",\n      \"summary\": \"Existing tests that expect the prompt to be printed to stderr when err=True may now fail because the output is redirected via redirect_stdout\",\n      \"file_path\": \"src/click/termui.py\",\n      \"line_start\": 172,\n      \"line_end\": 173,\n      \"confidence\": 0.71,\n      \"rationale\": \"The prompt implementation now calls _readline_prompt (line 172) which redirects stdout to stderr for err=True (see lines 62‑79). Previously the prompt text was printed to stderr directly via echo. Tests that capture stdout for err=True will no longer see the prompt, causing failures.\",\n      \"suggestion\": \"Update affected tests to capture stderr instead of stdout when err=True, or adjust the implementation to preserve the original stdout behavior if that is required.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/termui.py\",\n          \"line_start\": 172,\n          \"line_end\": 173\n        },\n        {\n          \"file_path\": \"src/click/termui.py\",\n          \"line_start\": 62,\n          \"line_end\": 79\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 3.63,
+  "http_requests": 1
+}

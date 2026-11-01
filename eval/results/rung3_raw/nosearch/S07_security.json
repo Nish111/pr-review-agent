@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "97f82a1e3926",
+  "input_sha": "f55af93e8eda0b4c",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"insecure-direct-object-reference\",\n      \"summary\": \"Function trusts caller-provided user_id, enabling IDOR to archive others' notes\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 18,\n      \"line_end\": 25,\n      \"confidence\": 0.92,\n      \"rationale\": \"The `archive_note` function receives `user_id` as a parameter and uses it directly in the SQL query (lines 22-24). If the caller supplies an arbitrary user_id, they can archive notes belonging to other users, leading to an insecure direct object reference.\",\n      \"suggestion\": \"Derive the authenticated user's ID from the session or request context inside the function instead of accepting it as an argument, and verify that the note belongs to that user before performing the operation.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 18,\n          \"line_end\": 25\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.15,
+  "http_requests": 1
+}

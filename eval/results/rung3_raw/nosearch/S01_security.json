@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "97f82a1e3926",
+  "input_sha": "de3cb91388ee298b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"sql-injection\",\n      \"summary\": \"User-controlled keyword is interpolated directly into SQL query\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 31,\n      \"line_end\": 34,\n      \"confidence\": 0.98,\n      \"rationale\": \"The search function builds the SQL statement using f-strings, inserting `user_id` and `keyword` directly (lines 32‑34). This allows an attacker to inject malicious SQL via the `keyword` parameter, bypassing intended filtering and potentially accessing or modifying data.\",\n      \"suggestion\": \"Use a parameterized query with placeholders for both `user_id` and the LIKE pattern, e.g., `SELECT ... WHERE user_id = ? AND (title LIKE ? OR body LIKE ?)` and pass `(user_id, f\\\"%{keyword}%\\\", f\\\"%{keyword}%\\\")` as parameters.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 32,\n          \"line_end\": 34\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 12.58,
+  "http_requests": 4
+}

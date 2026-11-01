@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "b48ae8a1c6e70279",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-doc\",\n      \"summary\": \"Module docstring does not mention the newly added list_notes_with_tags function\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 1,\n      \"line_end\": 36,\n      \"confidence\": 0.9,\n      \"rationale\": \"The top‑level module docstring (line 1) lists the available operations as \\\"create, list, search, tag\\\" but the PR adds a new public function `list_notes_with_tags` (lines 29‑36). The docstring is now incomplete and does not inform users of this new capability.\",\n      \"suggestion\": \"Update the module docstring to include `list_notes_with_tags` in the list of provided functionalities, e.g., \\\"create, list, list‑with‑tags, search, tag\\\".\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 1,\n          \"line_end\": 1\n        },\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 29,\n          \"line_end\": 36\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.75,
+  "http_requests": 1
+}

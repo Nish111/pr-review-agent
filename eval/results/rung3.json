@@ -1,0 +1,3242 @@
+{
+  "rung": "3",
+  "arm": "search",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "prompt": "prompts/rung3_<specialist>.txt",
+  "prompt_sha": {
+    "security": "97f82a1e3926",
+    "quality": "6182838ac2bb",
+    "tests": "193fad60fc04",
+    "docs": "d48d1966c39b"
+  },
+  "seeded": {
+    "prs": [
+      {
+        "id": "S01",
+        "clean": false,
+        "problems": [
+          "S01/0"
+        ],
+        "found": [
+          "S01/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              29,
+              34
+            ],
+            "rule": "documentation",
+            "message": "Docstring does not warn that `keyword` is interpolated directly into SQL, leading to potential injection or syntax errors",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.98,
+            "rationale": "The function `search` now builds the SQL query with f-strings (lines 31‑33) inserting `user_id` and `keyword` directly, removing the previous parameterized query. The existing docstring (line 30) still only says \"Notes whose title or body contains `keyword`.\" and does not mention the new requirement that `keyword` must be safe or escaped, nor the security implications.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              31,
+              34
+            ],
+            "rule": "sql-injection",
+            "message": "User-supplied keyword is interpolated directly into SQL query",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.98,
+            "rationale": "The search function builds the SQL statement using f-strings with the `keyword` parameter (lines 32-33). This allows an attacker to inject arbitrary SQL via a crafted keyword, bypassing intended filtering and potentially exposing or modifying data.",
+            "specialist": "security"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              31,
+              34
+            ],
+            "rule": "untested-behaviour",
+            "message": "search() now interpolates user_id and keyword directly into SQL, introducing SQL injection risk that is not covered by any test",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.9,
+            "rationale": "The diff replaces the safe parameterised query with an f‑string that embeds `user_id` and `keyword` (lines 31‑34). This changes behaviour: special characters in `keyword` (e.g., quotes, % or _) can alter the query semantics or cause syntax errors. No test in the suite exercises search() with such inputs, so the new vulnerability is untested.",
+            "specialist": "tests"
+          }
+        ],
+        "true_positives": 3,
+        "partial": false,
+        "found_by": {
+          "S01": [
+            "docs",
+            "security",
+            "tests"
+          ]
+        }
+      },
+      {
+        "id": "S02",
+        "clean": false,
+        "problems": [
+          "S02/0"
+        ],
+        "found": [
+          "S02/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/auth.py",
+            "lines": [
+              3,
+              11
+            ],
+            "rule": "missing-test",
+            "message": "Constant-time token comparison removed but no test verifies timing behavior",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.95,
+            "rationale": "The diff deletes the import of `hmac` (line 3) and replaces `hmac.compare_digest` with a plain equality check (line 11). This changes the security property of `check_token` from constant‑time comparison to a potentially timing‑leaky comparison. No tests in the repository assert or measure constant‑time behavior, so the regression is untested.",
+            "specialist": "tests"
+          },
+          {
+            "file": "notes_svc/auth.py",
+            "lines": [
+              6,
+              11
+            ],
+            "rule": "insecure-comparison",
+            "message": "Plain equality check leaks timing information for token comparison",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.98,
+            "rationale": "The diff replaced the constant‑time `hmac.compare_digest` with a plain `==` comparison (line 11). This allows an attacker to perform a timing attack to guess valid tokens, violating secure authentication practices.",
+            "specialist": "security"
+          },
+          {
+            "file": "notes_svc/auth.py",
+            "lines": [
+              7,
+              7
+            ],
+            "rule": "docstring-missing-security-note",
+            "message": "Docstring no longer mentions that token comparison is not constant-time, omitting important security information",
+            "matched": false,
+            "severity": "high",
+            "confidence": 0.95,
+            "rationale": "The docstring was changed from \"True if `token` is the user's token. Constant-time comparison.\" to \"True if `token` is the user's token.\" (see diff lines - and +). This removes the note about constant‑time comparison, so users are not informed that the function now uses a plain equality check, which may be vulnerable to timing attacks.",
+            "specialist": "docs"
+          }
+        ],
+        "true_positives": 2,
+        "partial": false,
+        "found_by": {
+          "S02": [
+            "security",
+            "tests"
+          ]
+        }
+      },
+      {
+        "id": "S03",
+        "clean": false,
+        "problems": [
+          "S03/0"
+        ],
+        "found": [
+          "S03/0"
+        ],
+        "findings": [
+          {
+            "file": "CHANGELOG.md",
+            "lines": [
+              4,
+              4
+            ],
+            "rule": "changelog",
+            "message": "Changelog entry still claims export creates `<name>.txt` files",
+            "matched": false,
+            "severity": "medium",
+            "confidence": 1.0,
+            "rationale": "Entry \"Export notes to a text file (`exports/<name>.txt`).\" no longer matches the current behavior where the filename is taken verbatim (see export.py line 15).",
+            "specialist": "docs"
+          },
+          {
+            "file": "README.md",
+            "lines": [
+              9,
+              9
+            ],
+            "rule": "readme",
+            "message": "README example still shows a fixed .txt extension",
+            "matched": false,
+            "severity": "medium",
+            "confidence": 1.0,
+            "rationale": "The README states \"Writes `exports/mynotes.txt`\", but the export function now writes the exact filename supplied by the user (see export.py line 15). The example is outdated.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/cli.py",
+            "lines": [
+              14,
+              14
+            ],
+            "rule": "cli-help",
+            "message": "CLI help still restricts export name characters despite removal of validation",
+            "matched": false,
+            "severity": "high",
+            "confidence": 1.0,
+            "rationale": "The export function no longer validates the filename (validation code removed in export.py lines with '-' prefixes), but the argument help text still says \"export name (letters, digits, _ and -)\" which misleads users.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              10,
+              10
+            ],
+            "rule": "docstring",
+            "message": "Docstring mentions a .txt extension but function now writes the file exactly as given",
+            "matched": false,
+            "severity": "high",
+            "confidence": 1.0,
+            "rationale": "The function now builds the path with `path = EXPORT_DIR / name` (line 15) and no longer appends \".txt\". The docstring on line 10 still says \"exports/<name>.txt\", which is now inaccurate.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              14,
+              15
+            ],
+            "rule": "missing-directory",
+            "message": "Export fails when `name` contains a subdirectory because the subdirectory is not created",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.94,
+            "rationale": "Only `EXPORT_DIR` is created (line 14). If `name` includes a path separator (e.g., \"subdir/file.txt\"), `path = EXPORT_DIR / name` points to a non‑existent subdirectory, and `path.write_text` will raise `FileNotFoundError`.",
+            "specialist": "quality"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              15,
+              15
+            ],
+            "rule": "invalid-filename",
+            "message": "Empty `name` results in attempting to write to a directory, causing `IsADirectoryError`",
+            "matched": true,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "If `name` is an empty string, `path = EXPORT_DIR / name` evaluates to `EXPORT_DIR` itself. The subsequent `path.write_text` call will try to write text to a directory, raising an exception.",
+            "specialist": "quality"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              15,
+              15
+            ],
+            "rule": "path-traversal",
+            "message": "User-controlled filename is written to the filesystem without validation, allowing path traversal",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.98,
+            "rationale": "The function now builds the output path directly from the untrusted `name` argument (line 15: `path = EXPORT_DIR / name`). The previous validation that restricted `name` to a safe pattern and raised ValueError has been removed (lines removed: the regex definition and the `if not _SAFE_NAME.match(name): raise ValueError` block). This permits strings such as \"../evil.txt\" or absolute paths, causing the service to write files outside the intended `exports/` directory.",
+            "specialist": "security"
+          }
+        ],
+        "true_positives": 3,
+        "partial": false,
+        "found_by": {
+          "S03": [
+            "quality",
+            "security"
+          ]
+        }
+      },
+      {
+        "id": "S04",
+        "clean": false,
+        "problems": [
+          "S04/0"
+        ],
+        "found": [
+          "S04/0"
+        ],
+        "findings": [
+          {
+            "file": "CHANGELOG.md",
+            "lines": [
+              3,
+              5
+            ],
+            "rule": "missing-changelog",
+            "message": "CHANGELOG does not record the addition of `create_note_with_tags` helper",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.85,
+            "rationale": "The changelog (lines 3‑5) lists features up to version 0.3.0 but does not mention the new helper for saving notes with tags, leaving the change undocumented for users tracking releases.",
+            "specialist": "docs"
+          },
+          {
+            "file": "README.md",
+            "lines": [
+              13,
+              16
+            ],
+            "rule": "missing-documentation",
+            "message": "README API section does not mention the new `create_note_with_tags` function",
+            "matched": false,
+            "severity": "medium",
+            "confidence": 0.9,
+            "rationale": "The API list in the README (lines 13‑16) only documents `create_note`, `list_notes`, `search`, and `export_notes`. After adding `create_note_with_tags` in the code, the documentation is incomplete, which can mislead users.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              18,
+              25
+            ],
+            "rule": "missing-test",
+            "message": "New function create_note_with_tags is not exercised by any test",
+            "matched": true,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "The diff introduces create_note_with_tags (lines 18-25) which adds new behavior for creating a note together with its tags, but the test suite does not import or call this function, leaving the new functionality untested.",
+            "specialist": "tests"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              21,
+              24
+            ],
+            "rule": "partial-write",
+            "message": "Note may be saved without its tags if tag insertion fails",
+            "matched": true,
+            "severity": "high",
+            "confidence": 0.94,
+            "rationale": "The function creates the note in a separate transaction (create_note uses its own `with conn:` block at line 21) and then opens a new transaction for inserting tags (lines 22‑24). If the `executemany` fails (e.g., due to a constraint violation), the note remains persisted while its tags are not, resulting in inconsistent data.",
+            "specialist": "quality"
+          }
+        ],
+        "true_positives": 2,
+        "partial": false,
+        "found_by": {
+          "S04": [
+            "quality",
+            "tests"
+          ]
+        }
+      },
+      {
+        "id": "S05",
+        "clean": false,
+        "problems": [
+          "S05/0"
+        ],
+        "found": [
+          "S05/0"
+        ],
+        "findings": [
+          {
+            "file": "CHANGELOG.md",
+            "lines": [
+              3,
+              5
+            ],
+            "rule": "documentation-missing",
+            "message": "CHANGELOG does not record the addition of tag display in note listings",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "The PR adds a new feature (list notes with tags) but the CHANGELOG (lines 3‑5) only lists export and search updates, missing an entry for this change.",
+            "specialist": "docs"
+          },
+          {
+            "file": "README.md",
+            "lines": [
+              13,
+              15
+            ],
+            "rule": "documentation-missing",
+            "message": "README API section does not document the new `list_notes_with_tags` function",
+            "matched": false,
+            "severity": "medium",
+            "confidence": 0.9,
+            "rationale": "The diff adds `list_notes_with_tags` (lines 29‑36 in notes_svc/notes.py) but the README's API list (lines 13‑15) only mentions `list_notes` and does not mention the new function, leaving users unaware of the new capability.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              29,
+              36
+            ],
+            "rule": "missing-test",
+            "message": "New function `list_notes_with_tags` is not covered by any test",
+            "matched": true,
+            "severity": "low",
+            "confidence": 1.0,
+            "rationale": "The PR adds `list_notes_with_tags` (lines 29‑36) which returns notes with their tags, but the test suite only imports and exercises `list_notes`, `create_note`, `get_tags`, `search`, etc. No test references `list_notes_with_tags`, leaving the new behaviour untested.",
+            "specialist": "tests"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              32,
+              36
+            ],
+            "rule": "performance",
+            "message": "Introduces N+1 query pattern causing many database round‑trips",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.95,
+            "rationale": "list_notes_with_tags calls list_notes to fetch a page of notes, then iterates over each note and executes a separate SELECT query for its tags (lines 33‑35). For N notes this results in N+1 queries, which can degrade performance especially with larger pages.",
+            "specialist": "quality"
+          }
+        ],
+        "true_positives": 2,
+        "partial": false,
+        "found_by": {
+          "S05": [
+            "quality",
+            "tests"
+          ]
+        }
+      },
+      {
+        "id": "S06",
+        "clean": false,
+        "problems": [
+          "S06/0"
+        ],
+        "found": [
+          "S06/0"
+        ],
+        "findings": [
+          {
+            "file": "CHANGELOG.md",
+            "lines": [
+              3,
+              5
+            ],
+            "rule": "documentation-missing",
+            "message": "CHANGELOG does not record the addition of the \"today's notes\" view",
+            "matched": false,
+            "severity": "low",
+            "confidence": 1.0,
+            "rationale": "The latest changelog entry (lines 3‑5) lists export and search features but does not mention the new `todays_notes` functionality introduced by this PR.",
+            "specialist": "docs"
+          },
+          {
+            "file": "README.md",
+            "lines": [
+              13,
+              15
+            ],
+            "rule": "documentation-missing",
+            "message": "README API section omits the new `todays_notes` function",
+            "matched": false,
+            "severity": "medium",
+            "confidence": 1.0,
+            "rationale": "The API list (lines 13‑15) documents `create_note`, `list_notes`, `search`, and `export_notes` but does not mention the newly added `todays_notes` function, leaving users unaware of its existence.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              1,
+              1
+            ],
+            "rule": "documentation-missing",
+            "message": "Module docstring does not list the newly added `todays_notes` function",
+            "matched": false,
+            "severity": "medium",
+            "confidence": 1.0,
+            "rationale": "The top‑level docstring only mentions \"create, list, search, tag\" (line 1) but the PR adds a `todays_notes` function, so the documentation is incomplete.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              30,
+              37
+            ],
+            "rule": "missing-test",
+            "message": "New function `todays_notes` is not exercised by any test",
+            "matched": true,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "The diff introduces `todays_notes` (lines 30‑37) which provides a new public API for retrieving notes created today, but the test suite contains no test that calls or validates this function.",
+            "specialist": "tests"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              30,
+              37
+            ],
+            "rule": "timezone-mismatch",
+            "message": "Using local date for filtering UTC timestamps can miss notes created today in UTC",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.85,
+            "rationale": "The function `todays_notes` computes `today` with `date.today().isoformat()` (local date) on line 32, then uses it in a LIKE pattern on the `created_at` column, which stores UTC ISO‑8601 timestamps via `utc_now()` (see notes_svc/db.py). If the server's local timezone differs from UTC, notes created on the current UTC day may be excluded, causing incorrect results.",
+            "specialist": "quality"
+          }
+        ],
+        "true_positives": 2,
+        "partial": false,
+        "found_by": {
+          "S06": [
+            "quality",
+            "tests"
+          ]
+        }
+      },
+      {
+        "id": "S07",
+        "clean": false,
+        "problems": [
+          "S07/0"
+        ],
+        "found": [
+          "S07/0"
+        ],
+        "findings": [
+          {
+            "file": "CHANGELOG.md",
+            "lines": [
+              3,
+              5
+            ],
+            "rule": "documentation-missing",
+            "message": "CHANGELOG does not mention the new note archiving feature",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.95,
+            "rationale": "The changelog (lines 3‑5) records the export and search features for version 0.3.0, but the newly added archive_note functionality is omitted, so release notes are incomplete.",
+            "specialist": "docs"
+          },
+          {
+            "file": "README.md",
+            "lines": [
+              13,
+              16
+            ],
+            "rule": "documentation-missing",
+            "message": "README API list does not include the newly added archive_note function",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.95,
+            "rationale": "The API section (lines 13‑16) lists create_note, list_notes, search, and export_notes, but the new archive_note function introduced in notes_svc/notes.py is not documented, leaving users unaware of the new capability.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              18,
+              25
+            ],
+            "rule": "missing-test",
+            "message": "New archive_note function is not exercised by any test",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.9,
+            "rationale": "Lines 18‑25 introduce archive_note, a new behavior that should hide notes from list_notes, but the test suite contains no reference to archive_note, so this functionality is untested.",
+            "specialist": "tests"
+          },
+          {
+            "file": "notes_svc/notes.py",
+            "lines": [
+              21,
+              24
+            ],
+            "rule": "duplicate-data",
+            "message": "archive_note can insert duplicate 'archived' tags for the same note",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.92,
+            "rationale": "The INSERT statement (lines 21-24) adds a row to the tags table without checking whether an 'archived' tag already exists for the note. Since the tags table has no uniqueness constraint, repeated calls will create duplicate rows, leading to duplicate tags in get_tags and potential logic errors elsewhere.",
+            "specialist": "quality"
+          }
+        ],
+        "true_positives": 2,
+        "partial": false,
+        "found_by": {
+          "S07": [
+            "quality",
+            "tests"
+          ]
+        }
+      },
+      {
+        "id": "S08",
+        "clean": false,
+        "problems": [
+          "S08/0"
+        ],
+        "found": [
+          "S08/0"
+        ],
+        "findings": [
+          {
+            "file": "tests/test_notes.py",
+            "lines": [
+              28,
+              28
+            ],
+            "rule": "missing-assertion",
+            "message": "Test no longer verifies search results, allowing regressions to go unnoticed",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.95,
+            "rationale": "The original test asserted that searching for \"milk\" returns the expected titles (lines 25-27). The change replaces the assertion with a bare call to `search(conn, 1, \"milk\")` (line 28), removing verification of the function's output. This means failures in `search` will not be caught by the test suite, compromising correctness validation.",
+            "specialist": "quality"
+          },
+          {
+            "file": "tests/test_notes.py",
+            "lines": [
+              28,
+              28
+            ],
+            "rule": "test-weakening",
+            "message": "test_search_matches_title_or_body no longer asserts search results",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.95,
+            "rationale": "The original test asserted that searching for \"milk\" returned the titles \"groceries\" and \"work\" (line with assert). The change replaces the assertion with a bare call to search, removing any verification of behavior, so the test can pass even if search is broken.",
+            "specialist": "tests"
+          }
+        ],
+        "true_positives": 2,
+        "partial": false,
+        "found_by": {
+          "S08": [
+            "quality",
+            "tests"
+          ]
+        }
+      },
+      {
+        "id": "S09",
+        "clean": false,
+        "problems": [
+          "S09/0"
+        ],
+        "found": [
+          "S09/0"
+        ],
+        "findings": [
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              12,
+              13
+            ],
+            "rule": "docstring-missing-parameter",
+            "message": "The docstring for export_notes does not document the new fmt parameter",
+            "matched": true,
+            "severity": "low",
+            "confidence": 0.95,
+            "rationale": "The function signature now includes a fmt argument (line 12) with a default of \"json\", but the docstring (line 13) only mentions writing to exports/<name>.<fmt> without describing the purpose, accepted values, or default behavior of fmt, leaving the documentation incomplete for users.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              12,
+              22
+            ],
+            "rule": "missing-test",
+            "message": "Default JSON export format is not exercised by any test",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.95,
+            "rationale": "The function export_notes now defaults to fmt=\"json\" and includes JSON serialization logic (lines 12-22). However, the test suite only calls export_notes with fmt=\"txt\" (see tests/test_export.py line 14) and does not verify the default JSON behavior, leaving the new functionality untested.",
+            "specialist": "tests"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              12,
+              24
+            ],
+            "rule": "path-traversal",
+            "message": "Unvalidated `fmt` parameter can be used to traverse directories and write files outside the intended export directory",
+            "matched": true,
+            "severity": "high",
+            "confidence": 1.0,
+            "rationale": "The function `export_notes` accepts a user-controlled `fmt` argument (line 12) and constructs the output path using `path = EXPORT_DIR / f\"{name}.{fmt}\"` (line 20) without validating `fmt`. If `fmt` contains path separators (e.g., \"../evil\"), the resulting path can escape the `EXPORT_DIR` and allow arbitrary file writes.",
+            "specialist": "security"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              12,
+              13
+            ],
+            "rule": "regression-cli-behavior",
+            "message": "Default export format changed to JSON breaks CLI expectation of .txt files",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.85,
+            "rationale": "The function now defaults to fmt=\"json\" (line 12), but the CLI (notes_svc/cli.py line 17) still calls export_notes without specifying fmt, assuming the original .txt default. This results in the CLI creating a .json file instead of the documented .txt file, a regression in existing behavior.",
+            "specialist": "quality"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              20,
+              24
+            ],
+            "rule": "security-path-traversal",
+            "message": "Unvalidated fmt parameter can create arbitrary file paths",
+            "matched": false,
+            "severity": "high",
+            "confidence": 0.93,
+            "rationale": "The export path is built directly from the user‑supplied fmt value (line 20) without any validation, and only \"json\" is treated specially (line 21). Supplying a fmt containing path separators (e.g., \"sub/file\") would cause the export to write outside the intended filename pattern, potentially leading to path traversal or unexpected file locations.",
+            "specialist": "quality"
+          }
+        ],
+        "true_positives": 4,
+        "partial": false,
+        "found_by": {
+          "S09": [
+            "docs",
+            "quality",
+            "security",
+            "tests"
+          ]
+        }
+      },
+      {
+        "id": "S10",
+        "clean": false,
+        "problems": [
+          "S10/0"
+        ],
+        "found": [
+          "S10/0"
+        ],
+        "findings": [
+          {
+            "file": "CHANGELOG.md",
+            "lines": [
+              4,
+              4
+            ],
+            "rule": "changelog",
+            "message": "CHANGELOG does not record addition of JSON export format",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "Entry at line 4 only mentions exporting to a text file; the new JSON format introduced by this PR is not documented.",
+            "specialist": "docs"
+          },
+          {
+            "file": "README.md",
+            "lines": [
+              7,
+              10
+            ],
+            "rule": "readme",
+            "message": "README still describes only txt export and does not mention JSON format",
+            "matched": false,
+            "severity": "medium",
+            "confidence": 0.93,
+            "rationale": "Lines 7‑10 show usage example and description that only reference `exports/mynotes.txt` and plain‑text format, while the CLI now supports `--format json`.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/cli.py",
+            "lines": [
+              12,
+              12
+            ],
+            "rule": "cli-help",
+            "message": "CLI help text still mentions only .txt export despite new JSON format support",
+            "matched": false,
+            "severity": "high",
+            "confidence": 0.96,
+            "rationale": "The subparser help string at line 12 still says \"export a user's notes to exports/<file>.txt\" even though the CLI now supports a \"--format\" option with JSON output, making the help misleading.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/cli.py",
+            "lines": [
+              16,
+              16
+            ],
+            "rule": "cli-argument-help",
+            "message": "New \"--format\" argument lacks a help description",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.94,
+            "rationale": "The added argument at line 16 (`exp.add_argument(\"--format\", default=\"txt\", choices=[\"txt\", \"json\"])`) does not provide a `help=` parameter, leaving users without guidance on its purpose.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              12,
+              24
+            ],
+            "rule": "missing-test",
+            "message": "JSON export format added but not covered by any test",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "The diff introduces a new `fmt` parameter with a \"json\" choice and implements JSON serialization (lines 12-24). No existing tests exercise this new format, leaving the behavior untested.",
+            "specialist": "tests"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              13,
+              13
+            ],
+            "rule": "docstring",
+            "message": "export_notes docstring only mentions .txt output, ignoring new format option",
+            "matched": false,
+            "severity": "high",
+            "confidence": 0.97,
+            "rationale": "The docstring at line 13 still reads \"Write the user's notes to exports/<name>.txt and return the path.\" but the function now accepts a `fmt` parameter and can produce JSON files.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              20,
+              20
+            ],
+            "rule": "path-traversal",
+            "message": "Unvalidated format parameter can lead to path traversal when constructing export file path",
+            "matched": false,
+            "severity": "medium",
+            "confidence": 0.94,
+            "rationale": "The function export_notes builds the output file path using the user‑controlled 'fmt' argument without validation: `path = EXPORT_DIR / f\"{name}.{fmt}\"` (line 20). While 'name' is safely validated, 'fmt' can contain path separators or '..' sequences, allowing an attacker to craft a format like \"../evil\" to escape the intended exports directory and write files elsewhere.",
+            "specialist": "security"
+          }
+        ],
+        "true_positives": 1,
+        "partial": false,
+        "found_by": {
+          "S10": [
+            "docs"
+          ]
+        }
+      },
+      {
+        "id": "C01",
+        "clean": true,
+        "problems": [],
+        "found": [],
+        "findings": [
+          {
+            "file": "README.md",
+            "lines": [
+              13,
+              16
+            ],
+            "rule": "missing-doc",
+            "message": "README API list omits the newly re-exported get_tags function",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.95,
+            "rationale": "The PR moved get_tags to a separate module and re-exported it from notes.py, but the README's API section (lines 13‑16) still lists only create_note, list_notes, search, and export_notes, leaving out get_tags, so users are not informed about this available function.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/tags.py",
+            "lines": [
+              1,
+              15
+            ],
+            "rule": "missing-test",
+            "message": "No test covers the new tags.get_tags public API",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "The PR introduces a new module `notes_svc.tags` exposing `get_tags` (lines 1‑15). The function is re‑exported in `notes_svc.notes` (line 6), but the test suite only imports `get_tags` from `notes_svc.notes` (see tests/test_notes.py line 2). There is no test that imports `get_tags` directly from the new module, so the new public entry point is untested.",
+            "specialist": "tests"
+          }
+        ],
+        "true_positives": 0,
+        "partial": false,
+        "found_by": {}
+      },
+      {
+        "id": "C02",
+        "clean": true,
+        "problems": [],
+        "found": [],
+        "findings": [],
+        "true_positives": 0,
+        "partial": false,
+        "found_by": {}
+      },
+      {
+        "id": "C03",
+        "clean": true,
+        "problems": [],
+        "found": [],
+        "findings": [
+          {
+            "file": "README.md",
+            "lines": [
+              9,
+              10
+            ],
+            "rule": "missing-doc",
+            "message": "README does not document new retry/backoff behavior for exports",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "The README section describing exports (lines 9‑10) only mentions that a file is written, but does not mention that the export now includes automatic retries with exponential backoff.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/cli.py",
+            "lines": [
+              12,
+              12
+            ],
+            "rule": "missing-doc",
+            "message": "CLI help text does not mention that export may retry on failure",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.9,
+            "rationale": "The subparser help at line 12 reads \"export a user's notes to exports/<file>.txt\" but after the change the export operation includes retry/backoff logic, which is not reflected in the help text.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              15,
+              15
+            ],
+            "rule": "missing-doc",
+            "message": "export_notes docstring does not mention retry behavior or possible OSError after max attempts",
+            "matched": false,
+            "severity": "low",
+            "confidence": 0.95,
+            "rationale": "The docstring at line 15 only says \"Write the user's notes to exports/<name>.txt and return the path.\" after the change the function now retries on OSError up to MAX_ATTEMPTS and may raise OSError, which is not documented.",
+            "specialist": "docs"
+          },
+          {
+            "file": "notes_svc/export.py",
+            "lines": [
+              24,
+              32
+            ],
+            "rule": "resource-leak",
+            "message": "Partial file may remain on persistent OSError after all retries",
+            "matched": false,
+            "severity": "medium",
+            "confidence": 0.85,
+            "rationale": "The retry loop (lines 24‑31) catches OSError and retries, but if all attempts fail the function raises the exception without cleaning up the file that may have been partially written by a previous failed write_text call. This can leave a corrupted export file on disk.",
+            "specialist": "quality"
+          }
+        ],
+        "true_positives": 0,
+        "partial": false,
+        "found_by": {}
+      },
+      {
+        "id": "C04",
+        "clean": true,
+        "problems": [],
+        "found": [],
+        "findings": [],
+        "true_positives": 0,
+        "partial": false,
+        "found_by": {}
+      }
+    ],
+    "totals": {
+      "findings": 50,
+      "true_positives": 23,
+      "false_alarms": 27,
+      "false_alarms_on_clean_prs": 6,
+      "precision": 0.46,
+      "problems": 10,
+      "problems_found": 10,
+      "recall": 1.0
+    }
+  },
+  "real": {
+    "reporting": "per-PR",
+    "prs": [
+      {
+        "id": "R1",
+        "clean": false,
+        "problems": [
+          "R1/fix#3653"
+        ],
+        "found": [
+          "R1/fix#3653"
+        ],
+        "findings": [
+          {
+            "file": "src/click/termui.py",
+            "lines": [
+              62,
+              79
+            ],
+            "rule": "missing-test-coverage",
+            "message": "The new err handling path in _readline_prompt (redirecting stdout to stderr) is not exercised by existing tests",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.78,
+            "rationale": "Lines 62‑79 introduce a redirect of stdout to sys.stderr when err is True. No test in the repository calls _readline_prompt with err=True, nor verifies that the prompt is written to stderr. This new behavior is therefore untested.",
+            "specialist": "tests"
+          },
+          {
+            "file": "src/click/termui.py",
+            "lines": [
+              172,
+              173
+            ],
+            "rule": "test-regression",
+            "message": "Existing tests that expect the prompt to be printed to stderr when err=True may now fail because the output is redirected via redirect_stdout",
+            "matched": false,
+            "severity": "high",
+            "confidence": 0.71,
+            "rationale": "The prompt implementation now calls _readline_prompt (line 172) which redirects stdout to stderr for err=True (see lines 62‑79). Previously the prompt text was printed to stderr directly via echo. Tests that capture stdout for err=True will no longer see the prompt, causing failures.",
+            "specialist": "tests"
+          }
+        ],
+        "true_positives": 1,
+        "partial": false,
+        "found_by": {
+          "R1/fix#3653": [
+            "tests"
+          ]
+        }
+      },
+      {
+        "id": "R2",
+        "clean": false,
+        "problems": [
+          "R2/fix#3739",
+          "R2/fix#3764"
+        ],
+        "found": [],
+        "findings": [],
+        "true_positives": 0,
+        "partial": true,
+        "found_by": {
+          "R2/fix#3739": [],
+          "R2/fix#3764": []
+        }
+      },
+      {
+        "id": "R3",
+        "clean": false,
+        "problems": [
+          "R3/fix#3504"
+        ],
+        "found": [
+          "R3/fix#3504"
+        ],
+        "findings": [
+          {
+            "file": "src/click/shell_completion.py",
+            "lines": [
+              423,
+              436
+            ],
+            "rule": "documentation",
+            "message": "Docstring for FishComplete.format_completion does not document the changed output format (now newline‑separated fields)",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.94,
+            "rationale": "The method previously returned a comma‑separated string (\"type,value\\thelp\") as shown by the removed lines. The new implementation (lines 433‑436) returns a newline‑separated string (\"type\\nvalue\\nhelp\"). The docstring added in lines 424‑432 only mentions escaping newlines but never states that the overall format has changed, leaving users unaware of the new delimiter and placeholder behavior.",
+            "specialist": "docs"
+          }
+        ],
+        "true_positives": 1,
+        "partial": false,
+        "found_by": {
+          "R3/fix#3504": [
+            "docs"
+          ]
+        }
+      },
+      {
+        "id": "R4",
+        "clean": false,
+        "problems": [
+          "R4/fix#2940"
+        ],
+        "found": [
+          "R4/fix#2940"
+        ],
+        "findings": [
+          {
+            "file": "src/click/testing.py",
+            "lines": [
+              119,
+              124
+            ],
+            "rule": "missing-test",
+            "message": "New EOFError on end of input in _NamedTextIOWrapper is not exercised by any test",
+            "matched": true,
+            "severity": "medium",
+            "confidence": 0.92,
+            "rationale": "The diff adds a __next__ implementation that converts StopIteration into EOFError (lines 119‑124). This changes the behavior of sys.stdin reads in CliRunner, but no test in the repository asserts that EOFError is raised when the input stream is exhausted, leaving the new behavior untested.",
+            "specialist": "tests"
+          }
+        ],
+        "true_positives": 1,
+        "partial": false,
+        "found_by": {
+          "R4/fix#2940": []
+        }
+      },
+      {
+        "id": "R5",
+        "clean": false,
+        "problems": [
+          "R5/fix#3391"
+        ],
+        "found": [
+          "R5/fix#3391"
+        ],
+        "findings": [
+          {
+            "file": "src/click/testing.py",
+            "lines": [
+              139,
+              152
+            ],
+            "rule": "missing-test",
+            "message": "New fileno() method on _NamedTextIOWrapper is not exercised by any test",
+            "matched": true,
+            "severity": "low",
+            "confidence": 0.95,
+            "rationale": "The PR adds an original_fd parameter and overrides fileno() (lines 139‑152) to return the preserved descriptor. No existing test in the suite calls fileno() on a _NamedTextIOWrapper instance, so this new behaviour is untested.",
+            "specialist": "tests"
+          }
+        ],
+        "true_positives": 1,
+        "partial": false,
+        "found_by": {
+          "R5/fix#3391": []
+        }
+      }
+    ],
+    "skipped": false
+  },
+  "trace": [
+    {
+      "pr": "S01",
+      "part": "seeded",
+      "index_refresh": {
+        "embedded": 32,
+        "reused": 0,
+        "s": 1.61
+      },
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "user_id"
+        ],
+        "hits": [
+          "notes_svc/export.py:11-22",
+          "README.md:1-16",
+          "notes_svc/db.py:1-16",
+          "notes_svc/auth.py:7-12",
+          "tests/test_notes.py:24-28",
+          "tests/test_notes.py:1-2",
+          "notes_svc/cli.py:9-19",
+          "notes_svc/export.py:1-8",
+          "tests/test_notes.py:31-34",
+          "notes_svc/cli.py:1-6",
+          "tests/test_notes.py:11-14",
+          "tests/test_notes.py:17-21",
+          "notes_svc/report.py:1-5",
+          "CHANGELOG.md:1-5",
+          "tests/test_export.py:18-21",
+          "tests/conftest.py:6-10"
+        ],
+        "dropped_changed_file": 4,
+        "dropped_in_diff": 1,
+        "didnt_fit": [
+          "notes_svc/report.py:8-13",
+          "tests/test_export.py:12-15",
+          "tests/test_export.py:1-4",
+          "notes_svc/auth.py:1-4",
+          "tests/conftest.py:1-3",
+          "notes_svc/__init__.py:1-1",
+          "notes_svc/db.py:19-23",
+          "tests/test_notes.py:5-8",
+          "tests/test_export.py:7-9"
+        ],
+        "tokens": 1169,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [
+        {
+          "kept": "security:notes_svc/notes.py:31",
+          "dropped": "quality:notes_svc/notes.py:31",
+          "category": "sql-injection"
+        }
+      ],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": false,
+          "est_tokens": 2669,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2677,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": false,
+          "est_tokens": 2654,
+          "waited_s": 60.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2676,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S02",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "compare_digest"
+        ],
+        "hits": [
+          "tests/test_notes.py:5-8",
+          "tests/test_notes.py:1-2",
+          "tests/test_notes.py:24-28",
+          "tests/test_notes.py:11-14",
+          "tests/test_notes.py:17-21",
+          "notes_svc/db.py:1-16",
+          "tests/test_notes.py:31-34",
+          "notes_svc/notes.py:29-36",
+          "tests/conftest.py:6-10",
+          "notes_svc/cli.py:22-23",
+          "README.md:1-16",
+          "notes_svc/cli.py:9-19",
+          "tests/test_export.py:12-15",
+          "notes_svc/notes.py:1-5",
+          "notes_svc/cli.py:1-6",
+          "notes_svc/export.py:1-8",
+          "notes_svc/report.py:1-5",
+          "tests/test_export.py:18-21",
+          "notes_svc/notes.py:8-15",
+          "notes_svc/export.py:11-22",
+          "notes_svc/db.py:19-23",
+          "notes_svc/report.py:8-13",
+          "notes_svc/db.py:26-27"
+        ],
+        "dropped_changed_file": 0,
+        "dropped_in_diff": 2,
+        "didnt_fit": [
+          "notes_svc/notes.py:39-48",
+          "notes_svc/notes.py:18-26",
+          "tests/test_export.py:1-4",
+          "tests/conftest.py:1-3",
+          "CHANGELOG.md:1-5"
+        ],
+        "tokens": 1491,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2714,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2721,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2698,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2720,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S03",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "test_export_rejects_unsafe_names",
+          "_SAFE_NAME",
+          "EXPORT_DIR",
+          "export_mod",
+          "export_notes",
+          "conn"
+        ],
+        "hits": [
+          "notes_svc/cli.py:9-19",
+          "notes_svc/cli.py:1-6",
+          "README.md:1-16",
+          "tests/conftest.py:6-10",
+          "tests/test_notes.py:11-14",
+          "tests/test_notes.py:24-28",
+          "tests/test_notes.py:5-8",
+          "tests/test_notes.py:31-34",
+          "tests/test_notes.py:17-21",
+          "notes_svc/db.py:19-23",
+          "notes_svc/notes.py:8-15",
+          "notes_svc/notes.py:29-36",
+          "notes_svc/notes.py:18-26",
+          "notes_svc/notes.py:39-48",
+          "notes_svc/auth.py:7-12",
+          "CHANGELOG.md:1-5",
+          "tests/conftest.py:1-3",
+          "tests/test_notes.py:1-2",
+          "notes_svc/cli.py:22-23",
+          "notes_svc/report.py:8-13",
+          "notes_svc/notes.py:1-5",
+          "notes_svc/auth.py:1-4",
+          "notes_svc/__init__.py:1-1",
+          "notes_svc/report.py:1-5"
+        ],
+        "dropped_changed_file": 2,
+        "dropped_in_diff": 4,
+        "didnt_fit": [
+          "notes_svc/db.py:1-16"
+        ],
+        "tokens": 1402,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [
+        {
+          "kept": "security:notes_svc/export.py:15",
+          "dropped": "quality:notes_svc/export.py:15",
+          "category": "path-traversal"
+        }
+      ],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3095,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3102,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 3,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3080,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": [
+            {
+              "reason": "ungrounded: cites lines the reviewer was not shown",
+              "item": {
+                "severity": "medium",
+                "category": "test-coverage",
+                "summary": "Removed test for unsafe export names, leaving new behavior untested",
+                "file_path": "tests/test_export.py",
+                "line_start": 13,
+                "line_end": 16,
+                "confidence": 0.95,
+                "rationale": "The diff deletes the parametrized test that verified export_names are rejected when unsafe (e.g., \"../x\", \"a/b\", \"\", overly long, or containing spaces). After the change, export_notes no longer validates names, so this behavior is no longer exercised by any test, reducing test coverage for security-related validation.",
+                "suggestion": "Add a new test that checks export_notes either safely handles or sanitizes unsafe path inputs, or explicitly documents that unsafe names are now allowed and adjust expectations accordingly.",
+                "evidence": [
+                  {
+                    "file_path": "tests/test_export.py",
+                    "line_start": 13,
+                    "line_end": 16
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3102,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 4,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S04",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "note_id",
+          "user_id",
+          "create_note",
+          "sqlite3",
+          "conn"
+        ],
+        "hits": [
+          "README.md:1-16",
+          "notes_svc/db.py:1-16",
+          "notes_svc/export.py:11-22",
+          "tests/test_notes.py:31-34",
+          "tests/test_notes.py:1-2",
+          "tests/test_notes.py:11-14",
+          "tests/conftest.py:6-10",
+          "tests/test_export.py:1-4",
+          "tests/test_notes.py:24-28",
+          "notes_svc/auth.py:7-12",
+          "tests/test_export.py:12-15",
+          "notes_svc/export.py:1-8",
+          "notes_svc/report.py:1-5",
+          "tests/test_notes.py:17-21",
+          "notes_svc/auth.py:1-4",
+          "notes_svc/db.py:19-23",
+          "notes_svc/report.py:8-13",
+          "tests/test_export.py:18-21",
+          "tests/test_notes.py:5-8",
+          "notes_svc/cli.py:1-6",
+          "tests/conftest.py:1-3",
+          "CHANGELOG.md:1-5"
+        ],
+        "dropped_changed_file": 3,
+        "dropped_in_diff": 2,
+        "didnt_fit": [
+          "notes_svc/cli.py:9-19",
+          "notes_svc/__init__.py:1-1",
+          "tests/test_export.py:7-9"
+        ],
+        "tokens": 1258,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3014,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3021,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2998,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3020,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 2,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S05",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "note_id",
+          "per_page",
+          "list_notes",
+          "user_id",
+          "sqlite3",
+          "conn"
+        ],
+        "hits": [
+          "tests/test_notes.py:17-21",
+          "README.md:1-16",
+          "tests/test_notes.py:1-2",
+          "notes_svc/export.py:11-22",
+          "tests/test_notes.py:11-14",
+          "notes_svc/db.py:1-16",
+          "notes_svc/report.py:1-5",
+          "tests/conftest.py:6-10",
+          "tests/test_notes.py:31-34",
+          "notes_svc/export.py:1-8",
+          "notes_svc/auth.py:7-12",
+          "notes_svc/report.py:8-13",
+          "tests/test_notes.py:24-28",
+          "notes_svc/auth.py:1-4",
+          "notes_svc/db.py:19-23",
+          "tests/test_export.py:18-21",
+          "tests/test_export.py:12-15",
+          "tests/test_notes.py:5-8",
+          "notes_svc/cli.py:1-6",
+          "CHANGELOG.md:1-5",
+          "tests/test_export.py:1-4",
+          "tests/conftest.py:1-3",
+          "notes_svc/__init__.py:1-1"
+        ],
+        "dropped_changed_file": 3,
+        "dropped_in_diff": 2,
+        "didnt_fit": [
+          "notes_svc/cli.py:9-19"
+        ],
+        "tokens": 1279,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3048,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3055,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3032,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3054,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 2,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S06",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "created_at",
+          "user_id",
+          "sqlite3",
+          "conn"
+        ],
+        "hits": [
+          "notes_svc/db.py:1-16",
+          "notes_svc/export.py:11-22",
+          "README.md:1-16",
+          "notes_svc/report.py:1-5",
+          "notes_svc/export.py:1-8",
+          "tests/conftest.py:6-10",
+          "notes_svc/report.py:8-13",
+          "notes_svc/auth.py:7-12",
+          "tests/test_notes.py:11-14",
+          "notes_svc/auth.py:1-4",
+          "tests/test_notes.py:31-34",
+          "notes_svc/db.py:19-23",
+          "tests/test_notes.py:24-28",
+          "tests/test_export.py:18-21",
+          "tests/test_export.py:12-15",
+          "tests/test_notes.py:17-21",
+          "tests/test_notes.py:1-2",
+          "notes_svc/cli.py:9-19",
+          "CHANGELOG.md:1-5"
+        ],
+        "dropped_changed_file": 2,
+        "dropped_in_diff": 3,
+        "didnt_fit": [
+          "notes_svc/cli.py:1-6",
+          "tests/test_notes.py:5-8",
+          "tests/test_export.py:1-4",
+          "tests/conftest.py:1-3",
+          "notes_svc/db.py:26-27",
+          "notes_svc/__init__.py:1-1",
+          "notes_svc/cli.py:22-23"
+        ],
+        "tokens": 1293,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3004,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3012,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2989,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3011,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 3,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S07",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "note_id",
+          "user_id",
+          "sqlite3",
+          "conn"
+        ],
+        "hits": [
+          "notes_svc/export.py:11-22",
+          "notes_svc/db.py:1-16",
+          "README.md:1-16",
+          "notes_svc/report.py:1-5",
+          "notes_svc/auth.py:7-12",
+          "notes_svc/export.py:1-8",
+          "tests/conftest.py:6-10",
+          "tests/test_notes.py:11-14",
+          "notes_svc/auth.py:1-4",
+          "tests/test_notes.py:31-34",
+          "notes_svc/report.py:8-13",
+          "tests/test_notes.py:17-21",
+          "notes_svc/db.py:19-23",
+          "tests/test_notes.py:24-28",
+          "tests/test_export.py:12-15",
+          "tests/test_notes.py:5-8",
+          "tests/test_export.py:18-21",
+          "tests/test_notes.py:1-2",
+          "notes_svc/cli.py:1-6",
+          "notes_svc/__init__.py:1-1",
+          "CHANGELOG.md:1-5",
+          "tests/test_export.py:1-4"
+        ],
+        "dropped_changed_file": 3,
+        "dropped_in_diff": 2,
+        "didnt_fit": [
+          "notes_svc/cli.py:9-19",
+          "tests/conftest.py:1-3",
+          "notes_svc/db.py:26-27"
+        ],
+        "tokens": 1268,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2998,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3006,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2983,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3005,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 2,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S08",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "search",
+          "conn"
+        ],
+        "hits": [
+          "notes_svc/notes.py:29-36",
+          "tests/conftest.py:6-10",
+          "CHANGELOG.md:1-5",
+          "tests/test_export.py:18-21",
+          "tests/test_export.py:12-15",
+          "notes_svc/notes.py:1-5",
+          "notes_svc/report.py:8-13",
+          "notes_svc/auth.py:7-12",
+          "notes_svc/notes.py:39-48",
+          "notes_svc/db.py:19-23",
+          "README.md:1-16",
+          "notes_svc/notes.py:8-15",
+          "notes_svc/export.py:11-22",
+          "notes_svc/notes.py:18-26",
+          "notes_svc/cli.py:22-23",
+          "notes_svc/cli.py:9-19",
+          "notes_svc/export.py:1-8",
+          "notes_svc/auth.py:1-4"
+        ],
+        "dropped_changed_file": 4,
+        "dropped_in_diff": 2,
+        "didnt_fit": [
+          "tests/test_export.py:7-9",
+          "notes_svc/cli.py:1-6",
+          "notes_svc/report.py:1-5",
+          "notes_svc/db.py:1-16",
+          "notes_svc/__init__.py:1-1",
+          "tests/test_export.py:1-4"
+        ],
+        "tokens": 1298,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2644,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2652,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2629,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2651,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S09",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "EXPORT_DIR",
+          "created_at",
+          "export_mod",
+          "export_notes",
+          "user_id",
+          "sqlite3",
+          "conn"
+        ],
+        "hits": [
+          "notes_svc/notes.py:8-15",
+          "notes_svc/cli.py:1-6",
+          "notes_svc/cli.py:9-19",
+          "notes_svc/notes.py:18-26",
+          "README.md:1-16",
+          "notes_svc/notes.py:1-5",
+          "notes_svc/db.py:1-16",
+          "notes_svc/notes.py:29-36",
+          "tests/conftest.py:6-10",
+          "notes_svc/notes.py:39-48",
+          "notes_svc/report.py:1-5",
+          "notes_svc/auth.py:1-4",
+          "notes_svc/db.py:19-23",
+          "notes_svc/auth.py:7-12",
+          "notes_svc/report.py:8-13",
+          "tests/test_notes.py:11-14",
+          "tests/test_notes.py:31-34",
+          "tests/test_notes.py:24-28",
+          "CHANGELOG.md:1-5",
+          "tests/test_notes.py:1-2",
+          "tests/conftest.py:1-3",
+          "notes_svc/cli.py:22-23"
+        ],
+        "dropped_changed_file": 3,
+        "dropped_in_diff": 3,
+        "didnt_fit": [
+          "tests/test_notes.py:17-21",
+          "tests/test_notes.py:5-8",
+          "notes_svc/__init__.py:1-1"
+        ],
+        "tokens": 1389,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3265,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3273,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 2,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3250,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3272,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "S10",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "add_argument",
+          "EXPORT_DIR",
+          "created_at",
+          "connect",
+          "export_notes",
+          "user_id",
+          "sqlite3",
+          "conn"
+        ],
+        "hits": [
+          "notes_svc/notes.py:8-15",
+          "tests/test_export.py:12-15",
+          "notes_svc/db.py:19-23",
+          "notes_svc/notes.py:18-26",
+          "README.md:1-16",
+          "tests/test_export.py:18-21",
+          "notes_svc/db.py:1-16",
+          "notes_svc/notes.py:1-5",
+          "tests/conftest.py:6-10",
+          "tests/conftest.py:1-3",
+          "notes_svc/notes.py:29-36",
+          "tests/test_export.py:7-9",
+          "notes_svc/report.py:1-5",
+          "notes_svc/notes.py:39-48",
+          "notes_svc/auth.py:1-4",
+          "tests/test_notes.py:11-14",
+          "notes_svc/auth.py:7-12",
+          "notes_svc/report.py:8-13",
+          "tests/test_notes.py:24-28",
+          "tests/test_notes.py:31-34",
+          "tests/test_notes.py:17-21",
+          "CHANGELOG.md:1-5",
+          "tests/test_export.py:1-4",
+          "tests/test_notes.py:1-2",
+          "notes_svc/__init__.py:1-1"
+        ],
+        "dropped_changed_file": 1,
+        "dropped_in_diff": 3,
+        "didnt_fit": [
+          "tests/test_notes.py:5-8",
+          "notes_svc/cli.py:22-23"
+        ],
+        "tokens": 1447,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3464,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3471,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3449,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3471,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 5,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "C01",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "note_ids",
+          "note_id",
+          "get_tags",
+          "notes_svc",
+          "sqlite3",
+          "conn"
+        ],
+        "hits": [
+          "tests/test_notes.py:1-2",
+          "tests/test_notes.py:31-34",
+          "README.md:1-16",
+          "notes_svc/db.py:1-16",
+          "tests/conftest.py:1-3",
+          "notes_svc/cli.py:1-6",
+          "notes_svc/cli.py:9-19",
+          "tests/test_export.py:1-4",
+          "notes_svc/report.py:1-5",
+          "tests/conftest.py:6-10",
+          "notes_svc/export.py:1-8",
+          "notes_svc/export.py:11-22",
+          "notes_svc/report.py:8-13",
+          "notes_svc/auth.py:1-4",
+          "notes_svc/db.py:19-23",
+          "tests/test_notes.py:11-14",
+          "notes_svc/auth.py:7-12",
+          "tests/test_notes.py:24-28",
+          "tests/test_notes.py:17-21",
+          "tests/test_export.py:18-21",
+          "tests/test_export.py:12-15",
+          "tests/test_notes.py:5-8"
+        ],
+        "dropped_changed_file": 1,
+        "dropped_in_diff": 4,
+        "didnt_fit": [
+          "CHANGELOG.md:1-5",
+          "notes_svc/__init__.py:1-1",
+          "tests/test_export.py:7-9"
+        ],
+        "tokens": 1386,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3255,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3262,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3240,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3261,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "C02",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "read_text",
+          "export_mod",
+          "export_notes",
+          "create_note",
+          "conn"
+        ],
+        "hits": [
+          "notes_svc/export.py:11-22",
+          "notes_svc/notes.py:8-15",
+          "notes_svc/cli.py:9-19",
+          "tests/test_notes.py:24-28",
+          "notes_svc/cli.py:1-6",
+          "README.md:1-16",
+          "tests/test_notes.py:11-14",
+          "tests/conftest.py:6-10",
+          "tests/test_notes.py:31-34",
+          "tests/test_notes.py:1-2",
+          "tests/test_notes.py:17-21",
+          "tests/test_notes.py:5-8",
+          "notes_svc/notes.py:29-36",
+          "notes_svc/db.py:19-23",
+          "notes_svc/notes.py:18-26",
+          "notes_svc/notes.py:39-48",
+          "notes_svc/auth.py:7-12",
+          "CHANGELOG.md:1-5",
+          "notes_svc/notes.py:1-5",
+          "notes_svc/__init__.py:1-1"
+        ],
+        "dropped_changed_file": 2,
+        "dropped_in_diff": 2,
+        "didnt_fit": [
+          "notes_svc/export.py:1-8",
+          "notes_svc/report.py:8-13",
+          "notes_svc/db.py:1-16",
+          "tests/conftest.py:1-3",
+          "notes_svc/auth.py:1-4",
+          "notes_svc/cli.py:22-23",
+          "notes_svc/report.py:1-5"
+        ],
+        "tokens": 1439,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2847,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2855,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2832,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2854,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "C03",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "write_text",
+          "export_mod",
+          "export_notes",
+          "create_note",
+          "conn"
+        ],
+        "hits": [
+          "notes_svc/notes.py:8-15",
+          "notes_svc/cli.py:1-6",
+          "notes_svc/cli.py:9-19",
+          "README.md:1-16",
+          "tests/test_notes.py:11-14",
+          "tests/conftest.py:6-10",
+          "tests/test_notes.py:1-2",
+          "tests/test_notes.py:17-21",
+          "tests/test_notes.py:24-28",
+          "tests/test_notes.py:31-34",
+          "tests/test_notes.py:5-8",
+          "notes_svc/db.py:19-23",
+          "notes_svc/report.py:8-13",
+          "notes_svc/notes.py:18-26",
+          "notes_svc/notes.py:29-36",
+          "CHANGELOG.md:1-5",
+          "notes_svc/notes.py:1-5",
+          "tests/conftest.py:1-3",
+          "notes_svc/cli.py:22-23",
+          "notes_svc/auth.py:7-12",
+          "notes_svc/db.py:1-16",
+          "notes_svc/__init__.py:1-1",
+          "notes_svc/auth.py:1-4",
+          "notes_svc/db.py:26-27"
+        ],
+        "dropped_changed_file": 2,
+        "dropped_in_diff": 4,
+        "didnt_fit": [
+          "notes_svc/notes.py:39-48",
+          "notes_svc/report.py:1-5"
+        ],
+        "tokens": 1418,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3807,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3815,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3792,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3814,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 3,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "C04",
+      "part": "seeded",
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "table_counts",
+          "_TABLES",
+          "notes_svc",
+          "create_note",
+          "conn"
+        ],
+        "hits": [
+          "notes_svc/notes.py:8-15",
+          "notes_svc/notes.py:1-5",
+          "notes_svc/cli.py:9-19",
+          "tests/test_notes.py:1-2",
+          "README.md:1-16",
+          "tests/conftest.py:6-10",
+          "notes_svc/cli.py:1-6",
+          "notes_svc/notes.py:29-36",
+          "notes_svc/notes.py:39-48",
+          "tests/conftest.py:1-3",
+          "tests/test_export.py:1-4",
+          "notes_svc/notes.py:18-26",
+          "tests/test_notes.py:11-14",
+          "tests/test_notes.py:31-34",
+          "notes_svc/export.py:11-22",
+          "tests/test_notes.py:17-21",
+          "tests/test_notes.py:24-28",
+          "tests/test_export.py:12-15",
+          "tests/test_export.py:18-21",
+          "notes_svc/db.py:19-23",
+          "notes_svc/auth.py:7-12"
+        ],
+        "dropped_changed_file": 0,
+        "dropped_in_diff": 2,
+        "didnt_fit": [
+          "tests/test_notes.py:5-8",
+          "notes_svc/export.py:1-8",
+          "notes_svc/db.py:1-16",
+          "CHANGELOG.md:1-5",
+          "notes_svc/__init__.py:1-1",
+          "notes_svc/auth.py:1-4",
+          "notes_svc/cli.py:22-23"
+        ],
+        "tokens": 1488,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2891,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2898,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2876,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 2898,
+          "waited_s": 0.0,
+          "context_mode": "whole-files",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "R1",
+      "part": "real",
+      "index_refresh": {
+        "embedded": 1268,
+        "reused": 10,
+        "s": 310.97
+      },
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "readline",
+          "visible_prompt_func",
+          "_compat",
+          "clear",
+          "stderr",
+          "prompt",
+          "stdout",
+          "function",
+          "func",
+          "echo"
+        ],
+        "hits": [
+          "src/click/testing.py:411-470",
+          "src/click/utils.py:225-325",
+          "examples/termui/termui.py:132-135"
+        ],
+        "dropped_changed_file": 0,
+        "dropped_in_diff": 3,
+        "didnt_fit": [
+          "src/click/testing.py:511-523",
+          "tests/test_utils.py:231-241",
+          "CHANGES.rst:751-810",
+          "src/click/testing.py:26-57",
+          "docs/utils.md:1-60",
+          "docs/utils.md:51-110",
+          "src/click/termui.py:501-512",
+          "src/click/testing.py:183-258",
+          "tests/test_utils.py:459-534",
+          "src/click/core.py:1762-1805",
+          "src/click/_compat.py:509-565",
+          "src/click/_compat.py:579-604",
+          "docs/utils.md:151-210",
+          "docs/utils.md:101-160",
+          "src/click/_termui_impl.py:778-837",
+          "tests/test_testing.py:50-87",
+          "docs/testing.md:151-210",
+          "src/click/testing.py:461-520",
+          "src/click/testing.py:525-636",
+          "src/click/_compat.py:607-622",
+          "src/click/_winconsole.py:1-60",
+          "src/click/_termui_impl.py:369-411",
+          "tests/test_utils.py:330-389",
+          "tests/test_compat.py:19-55",
+          "tests/test_termui.py:347-354",
+          "src/click/testing.py:361-420",
+          "CHANGES.rst:1101-1160",
+          "tests/test_stream_lifecycle.py:449-464",
+          "docs/api.md:51-110",
+          "docs/utils.md:251-310",
+          "src/click/exceptions.py:1-16",
+          "docs/wincmd.md:1-47",
+          "tests/test_utils.py:280-339",
+          "docs/quickstart.md:51-110",
+          "src/click/utils.py:1-29",
+          "tests/test_utils.py:267-277",
+          "examples/colors/colors.py:24-39",
+          "tests/test_testing.py:456-473",
+          "docs/testing.md:201-253",
+          "tests/test_testing.py:346-370",
+          "tests/test_stream_lifecycle.py:467-480",
+          "tests/test_termui.py:372-381",
+          "examples/inout/inout.py:4-30",
+          "tests/test_utils.py:100-106",
+          "src/click/_termui_impl.py:414-515",
+          "tests/test_utils.py:380-415"
+        ],
+        "tokens": 1449,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": false,
+          "est_tokens": 3973,
+          "waited_s": 0.0,
+          "context_mode": "window-10",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3980,
+          "waited_s": 0.0,
+          "context_mode": "window-10",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3957,
+          "waited_s": 0.0,
+          "context_mode": "window-10",
+          "error": "",
+          "parse_error": "",
+          "findings": 2,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3979,
+          "waited_s": 0.0,
+          "context_mode": "window-10",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "R2",
+      "part": "real",
+      "index_refresh": {
+        "embedded": 37,
+        "reused": 90,
+        "s": 15.87
+      },
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "pager_cmd_parts",
+          "os2",
+          "text_generator",
+          "_nullpager",
+          "_tempfilepager",
+          "_pipepager",
+          "cmd_parts",
+          "NamedTemporaryFile",
+          "cmd_path",
+          "delete",
+          "TextIOWrapper",
+          "get_best_encoding",
+          "_default_text_stdout",
+          "open_stream",
+          "resolve_color_default",
+          "strip_ansi",
+          "StringIO",
+          "ContextManager",
+          "generator",
+          "_compat"
+        ],
+        "hits": [
+          "src/click/utils.py:1-29",
+          "src/click/exceptions.py:1-16",
+          "examples/repo/repo.py:88-97",
+          "src/click/globals.py:54-67",
+          "examples/termui/termui.py:22-28"
+        ],
+        "dropped_changed_file": 6,
+        "dropped_in_diff": 8,
+        "didnt_fit": [
+          "src/click/_compat.py:371-449",
+          "tests/test_compat.py:19-55",
+          "CHANGES.rst:251-310",
+          "examples/imagepipe/imagepipe.py:56-66",
+          "tests/test_utils.py:361-420",
+          "docs/utils.md:51-110",
+          "CHANGES.rst:51-110",
+          "tests/test_utils.py:411-446",
+          "CHANGES.rst:801-860",
+          "tests/test_utils.py:1-19",
+          "src/click/testing.py:411-470",
+          "src/click/formatting.py:1-11",
+          "examples/colors/colors.py:24-39",
+          "src/click/_termui_impl.py:827-869",
+          "src/click/types.py:1-29",
+          "src/click/utils.py:225-325",
+          "tests/test_utils.py:311-370",
+          "src/click/__init__.py:51-72",
+          "tests/test_utils.py:449-480",
+          "examples/termui/termui.py:14-19",
+          "src/click/testing.py:361-420",
+          "tests/test_utils.py:94-97",
+          "src/click/_compat.py:19-37",
+          "src/click/testing.py:511-523",
+          "CHANGES.rst:1201-1260",
+          "tests/test_utils.py:483-487",
+          "src/click/_termui_impl.py:44-113",
+          "tests/test_utils.py:154-156",
+          "src/click/_textwrap.py:1-5",
+          "src/click/termui.py:638-664",
+          "src/click/_textwrap.py:8-51",
+          "src/click/formatting.py:269-276"
+        ],
+        "tokens": 495,
+        "note": ""
+      },
+      "partial": true,
+      "completed": [],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": false,
+          "cached": false,
+          "est_tokens": 0,
+          "waited_s": 0.0,
+          "context_mode": "",
+          "error": "PR R2 does not fit 5000 tokens even with ±10 lines; not sent (S1)",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": false,
+          "cached": false,
+          "est_tokens": 0,
+          "waited_s": 0.0,
+          "context_mode": "",
+          "error": "PR R2 does not fit 5000 tokens even with ±10 lines; not sent (S1)",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "tests": {
+          "ok": false,
+          "cached": false,
+          "est_tokens": 0,
+          "waited_s": 0.0,
+          "context_mode": "",
+          "error": "PR R2 does not fit 5000 tokens even with ±10 lines; not sent (S1)",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "docs": {
+          "ok": false,
+          "cached": false,
+          "est_tokens": 0,
+          "waited_s": 0.0,
+          "context_mode": "",
+          "error": "PR R2 does not fit 5000 tokens even with ±10 lines; not sent (S1)",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "R3",
+      "part": "real",
+      "index_refresh": {
+        "embedded": 48,
+        "reused": 95,
+        "s": 20.01
+      },
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "help_",
+          "echo",
+          "test"
+        ],
+        "hits": [
+          "src/click/utils.py:225-325",
+          "tests/test_utils.py:262-272",
+          "tests/test_commands.py:24-41",
+          "tests/test_commands.py:507-517"
+        ],
+        "dropped_changed_file": 1,
+        "dropped_in_diff": 3,
+        "didnt_fit": [
+          "CHANGES.rst:851-910",
+          "docs/shell-completion.md:101-160",
+          "tests/test_context.py:17-36",
+          "src/click/shell_completion.py:57-91",
+          "tests/test_context.py:39-59",
+          "src/click/core.py:3070-3113",
+          "tests/test_context.py:62-82",
+          "tests/test_context.py:85-107",
+          "CHANGES.rst:651-710",
+          "tests/test_context.py:320-333",
+          "CHANGES.rst:951-1010",
+          "tests/test_formatting.py:124-144",
+          "tests/test_testing.py:14-29",
+          "docs/shell-completion.md:201-249",
+          "tests/test_testing.py:32-47",
+          "tests/test_testing.py:90-110",
+          "CHANGES.rst:751-810",
+          "docs/documentation.md:201-260",
+          "tests/test_testing.py:113-132",
+          "tests/test_formatting.py:251-313",
+          "tests/test_utils.py:167-204",
+          "tests/test_shell_completion.py:353-370",
+          "tests/test_utils.py:287-290",
+          "src/click/core.py:2572-2631",
+          "tests/test_utils.py:94-97",
+          "src/click/utils.py:59-109",
+          "tests/test_utils.py:574-577",
+          "examples/completion/README:1-33",
+          "tests/test_utils.py:100-106",
+          "tests/test_utils.py:298-308",
+          "tests/test_utils.py:749-782",
+          "tests/test_formatting.py:220-232",
+          "tests/test_testing.py:50-87",
+          "tests/test_options.py:708-716",
+          "tests/test_options.py:844-874",
+          "src/click/core.py:1117-1124",
+          "tests/test_arguments.py:287-295",
+          "tests/test_utils.py:361-420",
+          "docs/api.md:301-357",
+          "tests/test_arguments.py:248-284",
+          "tests/test_testing.py:135-162",
+          "tests/test_command_decorators.py:6-13",
+          "tests/test_formatting.py:235-248",
+          "tests/test_arguments.py:500-506",
+          "CHANGES.rst:151-210",
+          "tests/test_context.py:336-354",
+          "CHANGES.rst:451-510",
+          "tests/test_context.py:357-377",
+          "tests/test_shell_completion.py:373-443",
+          "src/click/core.py:1166-1188",
+          "tests/test_normalization.py:53-63"
+        ],
+        "tokens": 1155,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3733,
+          "waited_s": 0.0,
+          "context_mode": "window-30",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3740,
+          "waited_s": 0.0,
+          "context_mode": "window-30",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3718,
+          "waited_s": 0.0,
+          "context_mode": "window-30",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3740,
+          "waited_s": 0.0,
+          "context_mode": "window-30",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "R4",
+      "part": "real",
+      "index_refresh": {
+        "embedded": 313,
+        "reused": 597,
+        "s": 116.69
+      },
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "__next__",
+          "text_input",
+          "readline"
+        ],
+        "hits": [
+          "src/click/_termui_impl.py:135-141",
+          "src/click/termui.py:194-252",
+          "src/click/_textwrap.py:8-51",
+          "tests/test_termui.py:45-72",
+          "src/click/_termui_impl.py:734-744",
+          "src/click/parser.py:112-118",
+          "src/click/types.py:374-375"
+        ],
+        "dropped_changed_file": 1,
+        "dropped_in_diff": 1,
+        "didnt_fit": [
+          "src/click/core.py:1067-1088",
+          "src/click/core.py:2683-2736",
+          "src/click/testing.py:268-327",
+          "src/click/types.py:207-230",
+          "CHANGES.rst:301-360",
+          "CHANGES.rst:551-610",
+          "tests/test_utils.py:625-658",
+          "src/click/termui.py:83-191",
+          "tests/test_testing.py:133-160",
+          "tests/test_parser.py:8-19",
+          "tests/test_options.py:949-977",
+          "src/click/_winconsole.py:194-223",
+          "tests/test_formatting.py:52-84",
+          "src/click/parser.py:391-429",
+          "src/click/_compat.py:337-341",
+          "src/click/_winconsole.py:226-233",
+          "tests/test_shell_completion.py:43-70",
+          "src/click/_termui_impl.py:182-186",
+          "src/click/shell_completion.py:444-478",
+          "tests/test_termui.py:417-446",
+          "tests/test_shell_completion.py:338-354",
+          "src/click/formatting.py:31-101",
+          "tests/test_chain.py:127-167",
+          "src/click/_compat.py:351-355",
+          "src/click/_winconsole.py:246-253",
+          "tests/test_basic.py:109-131"
+        ],
+        "tokens": 1252,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3744,
+          "waited_s": 0.0,
+          "context_mode": "window-30",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3751,
+          "waited_s": 0.0,
+          "context_mode": "window-30",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3729,
+          "waited_s": 0.0,
+          "context_mode": "window-30",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 3751,
+          "waited_s": 0.0,
+          "context_mode": "window-30",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        }
+      }
+    },
+    {
+      "pr": "R5",
+      "part": "real",
+      "index_refresh": {
+        "embedded": 98,
+        "reused": 820,
+        "s": 42.85
+      },
+      "retrieval": {
+        "mode": "hybrid",
+        "names": [
+          "UnsupportedOperation",
+          "old_stdout",
+          "old_stderr",
+          "stream_mixer",
+          "TextIOWrapper",
+          "__del__",
+          "BinaryIO",
+          "close",
+          "time",
+          "custom",
+          "CliRunner",
+          "stdout",
+          "mode",
+          "name"
+        ],
+        "hits": [
+          "src/click/_compat.py:56-79",
+          "src/click/_compat.py:452-485",
+          "tests/test_stream_lifecycle.py:101-105",
+          "src/click/utils.py:109-194",
+          "tests/test_stream_lifecycle.py:73-82",
+          "tests/test_stream_lifecycle.py:62-70",
+          "src/click/_winconsole.py:236-243",
+          "src/click/core.py:616-621"
+        ],
+        "dropped_changed_file": 0,
+        "dropped_in_diff": 3,
+        "didnt_fit": [
+          "tests/test_stream_lifecycle.py:85-98",
+          "tests/test_stream_lifecycle.py:449-464",
+          "src/click/_compat.py:371-449",
+          "tests/test_utils.py:619-634",
+          "tests/test_termui.py:16-24",
+          "src/click/testing.py:89-100",
+          "tests/test_shell_completion.py:236-249",
+          "src/click/testing.py:227-248",
+          "tests/test_stream_lifecycle.py:1-59",
+          "CHANGES.rst:301-360",
+          "src/click/testing.py:149-224",
+          "src/click/_winconsole.py:194-223",
+          "src/click/utils.py:498-520",
+          "src/click/testing.py:70-86",
+          "src/click/types.py:1060-1109",
+          "docs/testing.md:101-160",
+          "src/click/_winconsole.py:51-110",
+          "src/click/testing.py:427-473",
+          "src/click/_compat.py:82-148",
+          "src/click/_winconsole.py:263-273",
+          "tests/test_stream_lifecycle.py:220-239",
+          "src/click/utils.py:197-219",
+          "tests/test_testing.py:493-507",
+          "CHANGES.rst:1-60",
+          "src/click/_compat.py:323-327",
+          "tests/test_termui.py:389-407",
+          "tests/test_types.py:159-216",
+          "src/click/_winconsole.py:256-260",
+          "tests/test_stream_lifecycle.py:113-135",
+          "docs/testing.md:151-198",
+          "src/click/utils.py:325-334",
+          "src/click/_compat.py:607-622",
+          "src/click/testing.py:377-436",
+          "tests/test_testing.py:405-415",
+          "src/click/_winconsole.py:276-296",
+          "tests/test_stream_lifecycle.py:467-480",
+          "src/click/utils.py:358-404",
+          "src/click/_compat.py:19-37"
+        ],
+        "tokens": 1494,
+        "note": ""
+      },
+      "partial": false,
+      "completed": [
+        "security",
+        "quality",
+        "tests",
+        "docs"
+      ],
+      "merges": [],
+      "specialists": {
+        "security": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 4611,
+          "waited_s": 0.0,
+          "context_mode": "window-10",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "quality": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 4618,
+          "waited_s": 0.0,
+          "context_mode": "window-10",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        },
+        "tests": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 4596,
+          "waited_s": 0.0,
+          "context_mode": "window-10",
+          "error": "",
+          "parse_error": "",
+          "findings": 1,
+          "dropped": []
+        },
+        "docs": {
+          "ok": true,
+          "cached": true,
+          "est_tokens": 4617,
+          "waited_s": 0.0,
+          "context_mode": "window-10",
+          "error": "",
+          "parse_error": "",
+          "findings": 0,
+          "dropped": []
+        }
+      }
+    }
+  ],
+  "stopped": "",
+  "embedder": "BAAI/bge-small-en-v1.5@5c38ec7c405ec4b44b94cc5a9bb96e735b38267a"
+}

@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "5c1adc3e4756d863",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-test\",\n      \"summary\": \"New function `list_notes_with_tags` is not covered by any test\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 29,\n      \"line_end\": 36,\n      \"confidence\": 1.0,\n      \"rationale\": \"The PR adds `list_notes_with_tags` (lines 29‑36) which returns notes with their tags, but the test suite only imports and exercises `list_notes`, `create_note`, `get_tags`, `search`, etc. No test references `list_notes_with_tags`, leaving the new behaviour untested.\",\n      \"suggestion\": \"Add tests that verify `list_notes_with_tags` returns notes with correct `tags` field, including cases with multiple tags, no tags, and pagination.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 29,\n          \"line_end\": 36\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.68,
+  "http_requests": 1
+}

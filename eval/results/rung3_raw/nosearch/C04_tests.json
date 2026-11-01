@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "75ebc62f22a751aa",
+  "ok": true,
+  "raw": "{\n  \"findings\": []\n}",
+  "error": "",
+  "latency_s": 1.37,
+  "http_requests": 2
+}

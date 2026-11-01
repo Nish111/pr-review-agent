@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "289992d59562456e",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"duplicate-data\",\n      \"summary\": \"archive_note can insert duplicate 'archived' tags for the same note\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 21,\n      \"line_end\": 24,\n      \"confidence\": 0.92,\n      \"rationale\": \"The INSERT statement (lines 21-24) adds a row to the tags table without checking whether an 'archived' tag already exists for the note. Since the tags table has no uniqueness constraint, repeated calls will create duplicate rows, leading to duplicate tags in get_tags and potential logic errors elsewhere.\",\n      \"suggestion\": \"Add a check to ensure the 'archived' tag does not already exist for the note before inserting, e.g., using INSERT OR IGNORE with a UNIQUE constraint on (note_id, tag) or performing a SELECT to verify absence.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 21,\n          \"line_end\": 24\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.46,
+  "http_requests": 1
+}

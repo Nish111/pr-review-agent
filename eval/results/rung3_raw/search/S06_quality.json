@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "0289b86d1c211b71",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"timezone-mismatch\",\n      \"summary\": \"Using local date for filtering UTC timestamps can miss notes created today in UTC\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 30,\n      \"line_end\": 37,\n      \"confidence\": 0.85,\n      \"rationale\": \"The function `todays_notes` computes `today` with `date.today().isoformat()` (local date) on line 32, then uses it in a LIKE pattern on the `created_at` column, which stores UTC ISO‑8601 timestamps via `utc_now()` (see notes_svc/db.py). If the server's local timezone differs from UTC, notes created on the current UTC day may be excluded, causing incorrect results.\",\n      \"suggestion\": \"Compute the date in UTC, e.g., `today = datetime.now(timezone.utc).date().isoformat()` or compare using UTC-aware datetime range instead of string LIKE.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 32,\n          \"line_end\": 35\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.08,
+  "http_requests": 1
+}

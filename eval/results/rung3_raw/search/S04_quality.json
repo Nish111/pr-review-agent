@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "c20ebb161ee001fb",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"partial-write\",\n      \"summary\": \"Note may be saved without its tags if tag insertion fails\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 21,\n      \"line_end\": 24,\n      \"confidence\": 0.94,\n      \"rationale\": \"The function creates the note in a separate transaction (create_note uses its own `with conn:` block at line 21) and then opens a new transaction for inserting tags (lines 22‑24). If the `executemany` fails (e.g., due to a constraint violation), the note remains persisted while its tags are not, resulting in inconsistent data.\",\n      \"suggestion\": \"Wrap both the note creation and tag insertion in a single transaction, e.g., `with conn:` block that calls `create_note` and then `executemany`, or use `conn.execute('BEGIN')` before both operations and commit after.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 21,\n          \"line_end\": 24\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.35,
+  "http_requests": 1
+}

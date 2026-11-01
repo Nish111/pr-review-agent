@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "d7b4ec981b8a7667",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"non-atomic-transaction\",\n      \"summary\": \"create_note_with_tags inserts note and tags in separate transactions, risking orphan notes on tag insertion failure\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 21,\n      \"line_end\": 24,\n      \"confidence\": 0.85,\n      \"rationale\": \"The function first calls create_note (which commits its own transaction) on line 21, then opens a new transaction block on line 22 to insert tags. If the INSERT into tags fails, the note has already been committed, leaving an orphan note without tags. This behavior is not atomic and is not covered by existing tests.\",\n      \"suggestion\": \"Wrap both the note creation and tag insertion in a single transaction, e.g., use a single `with conn:` block that calls `create_note` without its own commit, or restructure to use `conn.execute` for the note insert followed by `executemany` before committing.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 21,\n          \"line_end\": 24\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.26,
+  "http_requests": 1
+}

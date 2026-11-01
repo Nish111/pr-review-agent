@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "5c71f76f5065fa37",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-parameter-doc\",\n      \"summary\": \"The new `fmt` parameter is not documented in the function docstring\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 12,\n      \"line_end\": 13,\n      \"confidence\": 0.9,\n      \"rationale\": \"The function signature now includes a `fmt: str = \\\"json\\\"` argument, but the docstring only mentions the output path format and does not describe the purpose, allowed values, or default behavior of the `fmt` parameter. This omission can lead to user confusion about how to request different export formats.\",\n      \"suggestion\": \"Extend the docstring to describe the `fmt` parameter, e.g., \\\"fmt: Export format, either 'json' (default) or 'txt'.\\\"\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 12,\n          \"line_end\": 13\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.11,
+  "http_requests": 1
+}

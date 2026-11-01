@@ -214,3 +214,12 @@ def test_superseded_answer_is_kept(tmp_path):
     _ask(cache, {"input_sha": "bbb"}, "p2", "x", "m", lambda *a: "second")
     kept = tmp_path / "superseded" / "S01_security.aaa.json"
     assert json.loads(kept.read_text())["raw"] == "first" and json.loads(cache.read_text())["raw"] == "second"
+
+
+def test_handcheck_blank_answers_do_not_swallow_entries(tmp_path):
+    from pr_review.evaluation.right_reason import read_handcheck
+    (tmp_path / "eval").mkdir()
+    body = "".join(f"## M{i} · PR S01 · `a.py:1`\n\n- **Your answer:** {a}\n\n" for i, a in
+                   enumerate(["", "yes", "", "no, other bug"], 1))
+    (tmp_path / "eval" / "HANDCHECK_RUNGx.md").write_text(body)
+    assert read_handcheck(tmp_path, "x") == {"M1": None, "M2": True, "M3": None, "M4": False}

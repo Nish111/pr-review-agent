@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "97f82a1e3926",
+  "input_sha": "11ca7140241a60b4",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"path-traversal\",\n      \"summary\": \"User-controlled filename is written to the filesystem without validation, allowing path traversal\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 15,\n      \"line_end\": 15,\n      \"confidence\": 0.98,\n      \"rationale\": \"The function now builds the output path directly from the untrusted `name` argument (line 15: `path = EXPORT_DIR / name`). The previous validation that restricted `name` to a safe pattern and raised ValueError has been removed (lines removed: the regex definition and the `if not _SAFE_NAME.match(name): raise ValueError` block). This permits strings such as \\\"../evil.txt\\\" or absolute paths, causing the service to write files outside the intended `exports/` directory.\",\n      \"suggestion\": \"Re‑introduce strict validation of `name` (e.g., allow only alphanumeric, underscore, hyphen, and enforce a .txt extension) or sanitize the path and verify that the resolved path is a descendant of `EXPORT_DIR` before writing.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 15,\n          \"line_end\": 15\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.35,
+  "http_requests": 1
+}

@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "81dd0369959b45bb",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"resource-leak\",\n      \"summary\": \"Partial file may remain on persistent OSError after all retries\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 24,\n      \"line_end\": 32,\n      \"confidence\": 0.85,\n      \"rationale\": \"The retry loop (lines 24‑31) catches OSError and retries, but if all attempts fail the function raises the exception without cleaning up the file that may have been partially written by a previous failed write_text call. This can leave a corrupted export file on disk.\",\n      \"suggestion\": \"On final failure, delete the target file before re‑raising, e.g., inside the `if attempt == MAX_ATTEMPTS:` block call `path.unlink(missing_ok=True)` before `raise`.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 24,\n          \"line_end\": 32\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.88,
+  "http_requests": 1
+}

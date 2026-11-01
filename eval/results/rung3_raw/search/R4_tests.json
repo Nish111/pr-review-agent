@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "e2f7c3691eb8abd8",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"missing-test\",\n      \"summary\": \"New EOFError on end of input in _NamedTextIOWrapper is not exercised by any test\",\n      \"file_path\": \"src/click/testing.py\",\n      \"line_start\": 119,\n      \"line_end\": 124,\n      \"confidence\": 0.92,\n      \"rationale\": \"The diff adds a __next__ implementation that converts StopIteration into EOFError (lines 119‑124). This changes the behavior of sys.stdin reads in CliRunner, but no test in the repository asserts that EOFError is raised when the input stream is exhausted, leaving the new behavior untested.\",\n      \"suggestion\": \"Add a test that invokes a command using CliRunner with no input and verifies that an EOFError (or Abort) is raised when the command attempts to read from stdin.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/testing.py\",\n          \"line_start\": 119,\n          \"line_end\": 124\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.9,
+  "http_requests": 1
+}

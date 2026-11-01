@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "e8263da739398c7d",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"missing-test\",\n      \"summary\": \"Direct string interpolation in search introduces SQL injection risk that is not covered by tests\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 31,\n      \"line_end\": 34,\n      \"confidence\": 0.97,\n      \"rationale\": \"The search function now builds the SQL query with f-strings (lines 31‑34) instead of using parameterized queries, allowing malicious keywords to alter the query. No test verifies that the function safely handles special characters or injection attempts, so this new behaviour is untested.\",\n      \"suggestion\": \"Add tests that pass keywords containing quotes, semicolons, or SQL keywords (e.g., \\\"x' OR 1=1 --\\\") and assert that the function either raises an error or safely returns no unintended rows. Consider reverting to parameterized queries to avoid injection.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 31,\n          \"line_end\": 34\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.28,
+  "http_requests": 2
+}

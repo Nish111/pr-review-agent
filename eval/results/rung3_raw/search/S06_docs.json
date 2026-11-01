@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "46057d1e62b0a9fe",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"documentation-missing\",\n      \"summary\": \"Module docstring does not list the newly added `todays_notes` function\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 1,\n      \"line_end\": 1,\n      \"confidence\": 1.0,\n      \"rationale\": \"The top‑level docstring only mentions \\\"create, list, search, tag\\\" (line 1) but the PR adds a `todays_notes` function, so the documentation is incomplete.\",\n      \"suggestion\": \"Update the module docstring to include `todays_notes` in the list of provided operations.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 1,\n          \"line_end\": 1\n        }\n      ]\n    },\n    {\n      \"severity\": \"medium\",\n      \"category\": \"documentation-missing\",\n      \"summary\": \"README API section omits the new `todays_notes` function\",\n      \"file_path\": \"README.md\",\n      \"line_start\": 13,\n      \"line_end\": 15,\n      \"confidence\": 1.0,\n      \"rationale\": \"The API list (lines 13‑15) documents `create_note`, `list_notes`, `search`, and `export_notes` but does not mention the newly added `todays_notes` function, leaving users unaware of its existence.\",\n      \"suggestion\": \"Add a bullet for `todays_notes(conn, user_id)` to the API section of the README.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"README.md\",\n          \"line_start\": 13,\n          \"line_end\": 15\n        }\n      ]\n    },\n    {\n      \"severity\": \"low\",\n      \"category\": \"documentation-missing\",\n      \"summary\": \"CHANGELOG does not record the addition of the \\\"today's notes\\\" view\",\n      \"file_path\": \"CHANGELOG.md\",\n      \"line_start\": 3,\n      \"line_end\": 5,\n      \"confidence\": 1.0,\n      \"rationale\": \"The latest changelog entry (lines 3‑5) lists export and search features but does not mention the new `todays_notes` functionality introduced by this PR.\",\n      \"suggestion\": \"Add an entry for the new `todays_notes` feature to the changelog.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"CHANGELOG.md\",\n          \"line_start\": 3,\n          \"line_end\": 5\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.37,
+  "http_requests": 1
+}

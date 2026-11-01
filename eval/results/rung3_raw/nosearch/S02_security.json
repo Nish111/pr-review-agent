@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "97f82a1e3926",
+  "input_sha": "af8b65aecb70a54a",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"insecure-token-comparison\",\n      \"summary\": \"Plain equality is used to compare authentication tokens, enabling timing attacks\",\n      \"file_path\": \"notes_svc/auth.py\",\n      \"line_start\": 11,\n      \"line_end\": 11,\n      \"confidence\": 0.98,\n      \"rationale\": \"The function `check_token` now returns `row[\\\"token\\\"] == token` (line 11) instead of the constant‑time `hmac.compare_digest` that was previously used. Direct string comparison can leak timing information about the secret token, allowing an attacker to perform a brute‑force or timing attack.\",\n      \"suggestion\": \"Restore constant‑time comparison, e.g., `return hmac.compare_digest(row[\\\"token\\\"], token)` or use a dedicated constant‑time utility.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/auth.py\",\n          \"line_start\": 11,\n          \"line_end\": 11\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.36,
+  "http_requests": 1
+}

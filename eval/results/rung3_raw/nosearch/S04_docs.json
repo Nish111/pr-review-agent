@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "81b245a3908e531d",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-documentation\",\n      \"summary\": \"Module docstring does not mention the newly added create_note_with_tags function\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 1,\n      \"line_end\": 1,\n      \"confidence\": 0.9,\n      \"rationale\": \"The top-level module docstring (line 1) lists the provided functionalities as \\\"create, list, search, tag\\\" but does not include the newly added create_note_with_tags helper, leaving the documentation incomplete for this change.\",\n      \"suggestion\": \"Update the module docstring to include create_note_with_tags, e.g., \\\"Notes: create, create_note_with_tags, list, search, tag.\\\"\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 1,\n          \"line_end\": 1\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.98,
+  "http_requests": 1
+}

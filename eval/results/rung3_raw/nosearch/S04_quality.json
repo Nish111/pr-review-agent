@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "320f13dbf6aed48c",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"partial-write\",\n      \"summary\": \"Note and its tags are saved in separate transactions, causing possible orphan notes if tag insertion fails\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 21,\n      \"line_end\": 24,\n      \"confidence\": 0.93,\n      \"rationale\": \"The function `create_note_with_tags` first calls `create_note`, which commits its INSERT inside its own `with conn:` block (lines 21-22). It then opens a second `with conn:` block to insert tags (lines 22-24). If the tag insertion raises an exception, the note remains persisted while its tags are not, leading to inconsistent data.\",\n      \"suggestion\": \"Wrap both the note creation and tag insertion in a single transaction, e.g., use one `with conn:` block encompassing both operations, or use `conn.execute('BEGIN')` before the first insert and commit after the tags are inserted.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 21,\n          \"line_end\": 24\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.86,
+  "http_requests": 1
+}

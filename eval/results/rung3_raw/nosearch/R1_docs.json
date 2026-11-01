@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "783d0e71f4285a0c",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"documentation-missing-behavior\",\n      \"summary\": \"Docstring does not mention that on non-Windows the full prompt string is now passed to the prompt function\",\n      \"file_path\": \"src/click/termui.py\",\n      \"line_start\": 148,\n      \"line_end\": 166,\n      \"confidence\": 0.92,\n      \"rationale\": \"The change introduces _readline_prompt which passes the full prompt on non-Windows platforms (see lines 62‑68) and prompt now calls this helper (line 172). The existing docstring for prompt (lines 148‑166) does not document this altered behavior, which could affect users who override visible_prompt_func expecting only the last character.\",\n      \"suggestion\": \"Update the prompt function docstring to note that on non-Windows the complete prompt string is passed to the prompt callable, while on Windows only the last character is passed after echoing the rest.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/termui.py\",\n          \"line_start\": 62,\n          \"line_end\": 68\n        },\n        {\n          \"file_path\": \"src/click/termui.py\",\n          \"line_start\": 172,\n          \"line_end\": 173\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 3.04,
+  "http_requests": 1
+}

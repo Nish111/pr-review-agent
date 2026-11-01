@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "f3d4cc0cd94574ed",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-test\",\n      \"summary\": \"New EOFError on end of input is not exercised by any test\",\n      \"file_path\": \"src/click/testing.py\",\n      \"line_start\": 119,\n      \"line_end\": 124,\n      \"confidence\": 0.97,\n      \"rationale\": \"The added __next__ method now raises EOFError when the underlying stream is exhausted (lines 119‑124). This changes the observable behavior of input handling, but the test suite does not contain any test that verifies that EOFError is raised on end‑of‑input, nor that the CLI runner now propagates this exception. Consequently the new behavior is untested.\",\n      \"suggestion\": \"Add a test that invokes a Click command with an empty input stream and asserts that EOFError is raised (or that the command handles it appropriately).\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/testing.py\",\n          \"line_start\": 119,\n          \"line_end\": 124\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.65,
+  "http_requests": 1
+}

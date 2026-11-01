@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "01f663d57b90be5b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"missing-documentation\",\n      \"summary\": \"README API section does not mention the new `create_note_with_tags` function\",\n      \"file_path\": \"README.md\",\n      \"line_start\": 13,\n      \"line_end\": 16,\n      \"confidence\": 0.9,\n      \"rationale\": \"The API list in the README (lines 13‑16) only documents `create_note`, `list_notes`, `search`, and `export_notes`. After adding `create_note_with_tags` in the code, the documentation is incomplete, which can mislead users.\",\n      \"suggestion\": \"Add an entry for `create_note_with_tags(conn, user_id, title, body, tags)` to the API list in the README.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"README.md\",\n          \"line_start\": 13,\n          \"line_end\": 16\n        }\n      ]\n    },\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-changelog\",\n      \"summary\": \"CHANGELOG does not record the addition of `create_note_with_tags` helper\",\n      \"file_path\": \"CHANGELOG.md\",\n      \"line_start\": 3,\n      \"line_end\": 5,\n      \"confidence\": 0.85,\n      \"rationale\": \"The changelog (lines 3‑5) lists features up to version 0.3.0 but does not mention the new helper for saving notes with tags, leaving the change undocumented for users tracking releases.\",\n      \"suggestion\": \"Add a new entry (e.g., under a new version) describing the `create_note_with_tags` function.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"CHANGELOG.md\",\n          \"line_start\": 3,\n          \"line_end\": 5\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 3.02,
+  "http_requests": 1
+}

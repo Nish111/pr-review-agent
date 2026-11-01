@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "97f82a1e3926",
+  "input_sha": "0acdb0ceaf33b389",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"path-traversal\",\n      \"summary\": \"Unvalidated format string allows path traversal when constructing export file path\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 20,\n      \"line_end\": 24,\n      \"confidence\": 0.95,\n      \"rationale\": \"The function builds the output file path using the user‑controlled `fmt` parameter without any validation: `path = EXPORT_DIR / f\\\"{name}.{fmt}\\\"` (line 20). If `fmt` contains path separators (e.g., \\\"../secret\\\"), the resulting path can escape the intended export directory, leading to arbitrary file writes.\",\n      \"suggestion\": \"Validate `fmt` against an allowlist of supported formats (e.g., \\\"json\\\" and \\\"txt\\\") and reject or sanitize any values containing path separators or other unsafe characters.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 20,\n          \"line_end\": 24\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.31,
+  "http_requests": 2
+}

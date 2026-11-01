@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "ac2f4f82328f8394",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"missing-test\",\n      \"summary\": \"Search now builds SQL via string interpolation, introducing SQL injection risk that is not covered by tests\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 31,\n      \"line_end\": 34,\n      \"confidence\": 0.94,\n      \"rationale\": \"The function `search` directly interpolates `user_id` and `keyword` into the SQL statement (lines 31‑34), removing the previous parameterized query. This changes behaviour (introduces injection vulnerability) but there is no accompanying test to verify safe handling of malicious input.\",\n      \"suggestion\": \"Add tests that pass a crafted `keyword` containing SQL control characters (e.g., \\\"'; DROP TABLE notes; --\\\") and assert that the query does not execute unintended commands, or revert to a parameterized query.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 31,\n          \"line_end\": 34\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.83,
+  "http_requests": 1
+}

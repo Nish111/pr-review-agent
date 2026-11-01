@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "d5941141d84882d2",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-test\",\n      \"summary\": \"New fileno() method on _NamedTextIOWrapper is not exercised by any test\",\n      \"file_path\": \"src/click/testing.py\",\n      \"line_start\": 139,\n      \"line_end\": 152,\n      \"confidence\": 0.95,\n      \"rationale\": \"The PR adds an original_fd parameter and overrides fileno() (lines 139‑152) to return the preserved descriptor. No existing test in the suite calls fileno() on a _NamedTextIOWrapper instance, so this new behaviour is untested.\",\n      \"suggestion\": \"Add a test that constructs a _NamedTextIOWrapper with a known original_fd and asserts that wrapper.fileno() returns that value, and that the default (-1) case falls back to the superclass implementation.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/testing.py\",\n          \"line_start\": 139,\n          \"line_end\": 152\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 3.32,
+  "http_requests": 1
+}

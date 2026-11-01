@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "247652eb60d37a66",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"security-path-traversal\",\n      \"summary\": \"Unvalidated fmt parameter can create arbitrary file paths\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 20,\n      \"line_end\": 24,\n      \"confidence\": 0.93,\n      \"rationale\": \"The export path is built directly from the user‑supplied fmt value (line 20) without any validation, and only \\\"json\\\" is treated specially (line 21). Supplying a fmt containing path separators (e.g., \\\"sub/file\\\") would cause the export to write outside the intended filename pattern, potentially leading to path traversal or unexpected file locations.\",\n      \"suggestion\": \"Validate fmt against an allowlist (e.g., only \\\"json\\\" or \\\"txt\\\") or sanitize it before constructing the path.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 20,\n          \"line_end\": 24\n        }\n      ]\n    },\n    {\n      \"severity\": \"medium\",\n      \"category\": \"regression-cli-behavior\",\n      \"summary\": \"Default export format changed to JSON breaks CLI expectation of .txt files\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 12,\n      \"line_end\": 13,\n      \"confidence\": 0.85,\n      \"rationale\": \"The function now defaults to fmt=\\\"json\\\" (line 12), but the CLI (notes_svc/cli.py line 17) still calls export_notes without specifying fmt, assuming the original .txt default. This results in the CLI creating a .json file instead of the documented .txt file, a regression in existing behavior.\",\n      \"suggestion\": \"Update the CLI (and documentation) to either pass fmt=\\\"txt\\\" explicitly or adjust expectations to the new default, ensuring consistency across the tool.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 12,\n          \"line_end\": 13\n        },\n        {\n          \"file_path\": \"notes_svc/cli.py\",\n          \"line_start\": 17,\n          \"line_end\": 17\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 3.85,
+  "http_requests": 1
+}

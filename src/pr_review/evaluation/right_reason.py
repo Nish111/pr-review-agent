@@ -107,7 +107,9 @@ def write_handcheck(root: Path, rung: int) -> Path:
 def read_handcheck(root: Path, rung: int) -> dict[str, bool | None]:
     text = (root / f"eval/HANDCHECK_RUNG{rung}.md").read_text(encoding="utf-8")
     out = {}
-    for m in re.finditer(r"^## (M\d+) .*?\*\*Your answer:\*\*\s*(\S*)", text, re.MULTILINE | re.DOTALL):
-        ans = m.group(2).strip().lower().strip(".,;:")
+    # [ \t]* not \s*: an EMPTY answer must not swallow the next entry's heading (bug found 31 Oct on blank files)
+    for m in re.finditer(r"^## (M\d+) .*?\*\*Your answer:\*\*[ \t]*([^\n]*)", text, re.MULTILINE | re.DOTALL):
+        words = m.group(2).split()
+        ans = words[0].lower().strip(".,;:") if words else ""
         out[m.group(1)] = True if ans.startswith("y") else False if ans.startswith("n") else None
     return out

@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "3ca5855902b1c749",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"documentation-missing\",\n      \"summary\": \"README API section does not document the new `list_notes_with_tags` function\",\n      \"file_path\": \"README.md\",\n      \"line_start\": 13,\n      \"line_end\": 15,\n      \"confidence\": 0.9,\n      \"rationale\": \"The diff adds `list_notes_with_tags` (lines 29‑36 in notes_svc/notes.py) but the README's API list (lines 13‑15) only mentions `list_notes` and does not mention the new function, leaving users unaware of the new capability.\",\n      \"suggestion\": \"Add an entry for `list_notes_with_tags(conn, user_id, page=1, per_page=20)` to the API section of README, describing that it returns notes with their tags.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"README.md\",\n          \"line_start\": 13,\n          \"line_end\": 15\n        }\n      ]\n    },\n    {\n      \"severity\": \"low\",\n      \"category\": \"documentation-missing\",\n      \"summary\": \"CHANGELOG does not record the addition of tag display in note listings\",\n      \"file_path\": \"CHANGELOG.md\",\n      \"line_start\": 3,\n      \"line_end\": 5,\n      \"confidence\": 0.9,\n      \"rationale\": \"The PR adds a new feature (list notes with tags) but the CHANGELOG (lines 3‑5) only lists export and search updates, missing an entry for this change.\",\n      \"suggestion\": \"Add a bullet point under the appropriate version in CHANGELOG, e.g., \\\"- List notes with their tags (`list_notes_with_tags`).\\\"\",\n      \"evidence\": [\n        {\n          \"file_path\": \"CHANGELOG.md\",\n          \"line_start\": 3,\n          \"line_end\": 5\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.23,
+  "http_requests": 1
+}

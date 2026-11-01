@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "f20a04297aebe76b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"documentation-missing\",\n      \"summary\": \"Module docstring does not mention newly added archive_note functionality\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 1,\n      \"line_end\": 1,\n      \"confidence\": 0.95,\n      \"rationale\": \"The top‑level docstring lists the provided operations as \\\"create, list, search, tag\\\" (line 1). The PR adds a new `archive_note` function (lines 18‑25) but does not update the docstring, leaving it inaccurate.\",\n      \"suggestion\": \"Update the module docstring to include \\\"archive\\\" in the list of supported operations, e.g., \\\"create, list, search, tag, archive\\\".\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 1,\n          \"line_end\": 1\n        },\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 18,\n          \"line_end\": 25\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.82,
+  "http_requests": 1
+}

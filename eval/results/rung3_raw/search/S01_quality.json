@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "56b3c9dc2761f977",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"sql-injection\",\n      \"summary\": \"Unescaped user input in SQL query allows injection and syntax errors\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 31,\n      \"line_end\": 34,\n      \"confidence\": 0.97,\n      \"rationale\": \"The search function builds the SQL statement by interpolating `user_id` and `keyword` directly into the query string (lines 32-33). If `keyword` contains a single quote or malicious SQL, the query will break or be exploitable, unlike the previous parameterized version that safely escaped values.\",\n      \"suggestion\": \"Revert to a parameterized query using placeholders, e.g., `SELECT ... WHERE user_id = ? AND (title LIKE ? OR body LIKE ?)` with parameters `(user_id, f\\\"%{keyword}%\\\", f\\\"%{keyword}%\\\")`.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 31,\n          \"line_end\": 34\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.66,
+  "http_requests": 1
+}

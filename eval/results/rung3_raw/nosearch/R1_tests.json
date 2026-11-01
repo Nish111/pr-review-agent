@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "83736f2c24028ef2",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"test-output-misdirection\",\n      \"summary\": \"Prompt output is redirected to stderr when err=True, causing existing tests that capture stdout to miss the prompt\",\n      \"file_path\": \"src/click/termui.py\",\n      \"line_start\": 76,\n      \"line_end\": 79,\n      \"confidence\": 0.88,\n      \"rationale\": \"The new _readline_prompt function adds a redirect_stdout to sys.stderr when err is true (lines 76‑79). Previously, only the first part of the prompt was sent to stderr via echo, and the rest was printed by the input function to stdout. Tests that capture stdout to assert prompt appearance will no longer see the prompt, weakening their assertions.\",\n      \"suggestion\": \"Update tests that capture stdout for prompts with err=True to also capture stderr, or adjust the implementation to keep the prompt on stdout when err is true if that matches the intended behavior.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/termui.py\",\n          \"line_start\": 76,\n          \"line_end\": 79\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.81,
+  "http_requests": 1
+}

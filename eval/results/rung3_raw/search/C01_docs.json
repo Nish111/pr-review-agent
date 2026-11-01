@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "0b30f03f88edbf1c",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-doc\",\n      \"summary\": \"README API list omits the newly re-exported get_tags function\",\n      \"file_path\": \"README.md\",\n      \"line_start\": 13,\n      \"line_end\": 16,\n      \"confidence\": 0.95,\n      \"rationale\": \"The PR moved get_tags to a separate module and re-exported it from notes.py, but the README's API section (lines 13‑16) still lists only create_note, list_notes, search, and export_notes, leaving out get_tags, so users are not informed about this available function.\",\n      \"suggestion\": \"Add an entry for `get_tags(conn, note_ids)` to the API list in README.md.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"README.md\",\n          \"line_start\": 13,\n          \"line_end\": 16\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 4.46,
+  "http_requests": 1
+}

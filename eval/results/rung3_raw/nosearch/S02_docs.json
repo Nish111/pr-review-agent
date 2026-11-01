@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "1b738ae05deafef6",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"documentation-missing\",\n      \"summary\": \"Docstring no longer mentions that token comparison is not constant-time, misleading about security behavior\",\n      \"file_path\": \"notes_svc/auth.py\",\n      \"line_start\": 7,\n      \"line_end\": 7,\n      \"confidence\": 0.9,\n      \"rationale\": \"The original docstring included \\\"Constant-time comparison.\\\" indicating a security property. After the change, the docstring on line 7 only says \\\"True if `token` is the user's token.\\\", omitting the change in comparison method, which is now a plain equality check and not constant-time.\",\n      \"suggestion\": \"Update the docstring to reflect the new behavior, e.g., \\\"True if `token` is the user's token. Note: comparison is performed with plain equality and is not constant-time.\\\"\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/auth.py\",\n          \"line_start\": 7,\n          \"line_end\": 7\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.74,
+  "http_requests": 1
+}

@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "01b26a04ffaf00cf",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"data-loss\",\n      \"summary\": \"Partial file may remain on disk after exhausting retries\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 24,\n      \"line_end\": 31,\n      \"confidence\": 0.92,\n      \"rationale\": \"The retry loop (lines 24‑31) catches OSError from `path.write_text` but does not remove or clean up the file that may have been partially written before the exception. If all attempts fail, the function raises the OSError (line 30) leaving a possibly corrupted file at the target path.\",\n      \"suggestion\": \"On catching OSError, delete the target file before retrying, or write to a temporary file and rename only after a successful write.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 24,\n          \"line_end\": 31\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.47,
+  "http_requests": 2
+}

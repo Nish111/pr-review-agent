@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "97f82a1e3926",
+  "input_sha": "94b27aefe86c5905",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"insecure-comparison\",\n      \"summary\": \"Plain equality check leaks timing information for token comparison\",\n      \"file_path\": \"notes_svc/auth.py\",\n      \"line_start\": 6,\n      \"line_end\": 11,\n      \"confidence\": 0.98,\n      \"rationale\": \"The diff replaced the constant‑time `hmac.compare_digest` with a plain `==` comparison (line 11). This allows an attacker to perform a timing attack to guess valid tokens, violating secure authentication practices.\",\n      \"suggestion\": \"Restore the use of `hmac.compare_digest` for token comparison or use a dedicated constant‑time comparison function.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/auth.py\",\n          \"line_start\": 6,\n          \"line_end\": 11\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.36,
+  "http_requests": 1
+}

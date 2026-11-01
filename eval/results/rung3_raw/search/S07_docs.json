@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "313b9a6f8e466624",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"documentation-missing\",\n      \"summary\": \"README API list does not include the newly added archive_note function\",\n      \"file_path\": \"README.md\",\n      \"line_start\": 13,\n      \"line_end\": 16,\n      \"confidence\": 0.95,\n      \"rationale\": \"The API section (lines 13‑16) lists create_note, list_notes, search, and export_notes, but the new archive_note function introduced in notes_svc/notes.py is not documented, leaving users unaware of the new capability.\",\n      \"suggestion\": \"Add an entry for `archive_note(conn, user_id, note_id)` to the API list in the README.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"README.md\",\n          \"line_start\": 13,\n          \"line_end\": 16\n        }\n      ]\n    },\n    {\n      \"severity\": \"low\",\n      \"category\": \"documentation-missing\",\n      \"summary\": \"CHANGELOG does not mention the new note archiving feature\",\n      \"file_path\": \"CHANGELOG.md\",\n      \"line_start\": 3,\n      \"line_end\": 5,\n      \"confidence\": 0.95,\n      \"rationale\": \"The changelog (lines 3‑5) records the export and search features for version 0.3.0, but the newly added archive_note functionality is omitted, so release notes are incomplete.\",\n      \"suggestion\": \"Add a bullet point describing the note archiving feature to the appropriate version entry in the CHANGELOG.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"CHANGELOG.md\",\n          \"line_start\": 3,\n          \"line_end\": 5\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.48,
+  "http_requests": 1
+}

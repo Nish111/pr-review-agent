@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "97f82a1e3926",
+  "input_sha": "e11298c2f4b68bae",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"path-traversal\",\n      \"summary\": \"Unvalidated `fmt` parameter can be used to traverse directories and write files outside the intended export directory\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 12,\n      \"line_end\": 24,\n      \"confidence\": 1.0,\n      \"rationale\": \"The function `export_notes` accepts a user-controlled `fmt` argument (line 12) and constructs the output path using `path = EXPORT_DIR / f\\\"{name}.{fmt}\\\"` (line 20) without validating `fmt`. If `fmt` contains path separators (e.g., \\\"../evil\\\"), the resulting path can escape the `EXPORT_DIR` and allow arbitrary file writes.\",\n      \"suggestion\": \"Validate `fmt` against an explicit whitelist of allowed formats (e.g., \\\"json\\\" and \\\"txt\\\") and reject or sanitize any values containing path separators or other unsafe characters before constructing the file path.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 12,\n          \"line_end\": 24\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 3.42,
+  "http_requests": 1
+}

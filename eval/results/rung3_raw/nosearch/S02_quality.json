@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "c50e0b07ef151134",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"security-regression\",\n      \"summary\": \"Removed constant-time token comparison, reintroducing timing attack vulnerability\",\n      \"file_path\": \"notes_svc/auth.py\",\n      \"line_start\": 3,\n      \"line_end\": 11,\n      \"confidence\": 0.92,\n      \"rationale\": \"The diff deletes the `import hmac` statement (line 3) and replaces `hmac.compare_digest(row[\\\"token\\\"], token)` with a plain equality check `row[\\\"token\\\"] == token` (line 11). This eliminates the constant‑time comparison that protected against timing attacks, changing the security behaviour of `check_token`.\",\n      \"suggestion\": \"Restore the use of `hmac.compare_digest` for token comparison, or add a comment explaining why the timing side‑channel is acceptable in this context.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/auth.py\",\n          \"line_start\": 3,\n          \"line_end\": 3\n        },\n        {\n          \"file_path\": \"notes_svc/auth.py\",\n          \"line_start\": 11,\n          \"line_end\": 11\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.11,
+  "http_requests": 2
+}

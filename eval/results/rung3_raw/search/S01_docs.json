@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "2da4eec721112424",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"documentation\",\n      \"summary\": \"Docstring does not warn that `keyword` is interpolated directly into SQL, leading to potential injection or syntax errors\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 29,\n      \"line_end\": 34,\n      \"confidence\": 0.98,\n      \"rationale\": \"The function `search` now builds the SQL query with f-strings (lines 31‑33) inserting `user_id` and `keyword` directly, removing the previous parameterized query. The existing docstring (line 30) still only says \\\"Notes whose title or body contains `keyword`.\\\" and does not mention the new requirement that `keyword` must be safe or escaped, nor the security implications.\",\n      \"suggestion\": \"Update the docstring to note that `keyword` is inserted directly into the SQL statement and must not contain characters that could break the query (e.g., single quotes) or be used for injection, or revert to a parameterized query and adjust documentation accordingly.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 30,\n          \"line_end\": 34\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.2,
+  "http_requests": 1
+}

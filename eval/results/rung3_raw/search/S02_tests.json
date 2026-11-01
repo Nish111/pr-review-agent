@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "b14afe350dfc4996",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"missing-test\",\n      \"summary\": \"Constant-time token comparison removed but no test verifies timing behavior\",\n      \"file_path\": \"notes_svc/auth.py\",\n      \"line_start\": 3,\n      \"line_end\": 11,\n      \"confidence\": 0.95,\n      \"rationale\": \"The diff deletes the import of `hmac` (line 3) and replaces `hmac.compare_digest` with a plain equality check (line 11). This changes the security property of `check_token` from constant‑time comparison to a potentially timing‑leaky comparison. No tests in the repository assert or measure constant‑time behavior, so the regression is untested.\",\n      \"suggestion\": \"Add a test that ensures `check_token` uses a constant‑time comparison (e.g., by mocking `hmac.compare_digest` or measuring timing differences) or retain the original implementation if constant‑time behavior is required.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/auth.py\",\n          \"line_start\": 3,\n          \"line_end\": 3\n        },\n        {\n          \"file_path\": \"notes_svc/auth.py\",\n          \"line_start\": 11,\n          \"line_end\": 11\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.42,
+  "http_requests": 1
+}

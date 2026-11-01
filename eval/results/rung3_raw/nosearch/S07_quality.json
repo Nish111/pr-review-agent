@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "a7f5f6dbeec75d7e",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"logic-bug\",\n      \"summary\": \"Duplicate archiving can raise an IntegrityError instead of returning False\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 20,\n      \"line_end\": 25,\n      \"confidence\": 0.78,\n      \"rationale\": \"The function inserts a row into the tags table without checking whether an 'archived' tag already exists for the note. If the tags table enforces a UNIQUE constraint on (note_id, tag), a second call to archive_note for the same note will cause sqlite3.IntegrityError, breaking the service instead of returning False.\",\n      \"suggestion\": \"Check for existing 'archived' tag before inserting, or use INSERT OR IGNORE, and adjust the return value accordingly.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 21,\n          \"line_end\": 24\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.83,
+  "http_requests": 1
+}

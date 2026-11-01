@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "e1a58c0e14eb972d",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"test-coverage-reduced\",\n      \"summary\": \"search test no longer asserts expected results\",\n      \"file_path\": \"tests/test_notes.py\",\n      \"line_start\": 24,\n      \"line_end\": 28,\n      \"confidence\": 0.95,\n      \"rationale\": \"The original assertion checking that search returns the expected titles was removed (line 28 changed from an assert to a bare function call). This weakens the test, allowing regressions in search behavior to go undetected.\",\n      \"suggestion\": \"Restore an assertion that verifies the search results, e.g., `assert {n[\\\"title\\\"] for n in search(conn, 1, \\\"milk\\\")} == {\\\"groceries\\\", \\\"work\\\"}`.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"tests/test_notes.py\",\n          \"line_start\": 24,\n          \"line_end\": 28\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.45,
+  "http_requests": 1
+}

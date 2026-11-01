@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "f0165fe318816fba",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"untested-behaviour\",\n      \"summary\": \"search() now interpolates user_id and keyword directly into SQL, introducing SQL injection risk that is not covered by any test\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 31,\n      \"line_end\": 34,\n      \"confidence\": 0.9,\n      \"rationale\": \"The diff replaces the safe parameterised query with an f‑string that embeds `user_id` and `keyword` (lines 31‑34). This changes behaviour: special characters in `keyword` (e.g., quotes, % or _) can alter the query semantics or cause syntax errors. No test in the suite exercises search() with such inputs, so the new vulnerability is untested.\",\n      \"suggestion\": \"Revert to a parameterised query or add tests that verify search() correctly handles keywords containing quotes, percent signs, underscores, or malicious input, and ensure the implementation uses bound parameters to prevent injection.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 31,\n          \"line_end\": 34\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.44,
+  "http_requests": 1
+}

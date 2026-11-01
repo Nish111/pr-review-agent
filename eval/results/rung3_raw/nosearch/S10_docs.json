@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "ec8b0973af07791c",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"docstring-mismatch\",\n      \"summary\": \"CLI subcommand help text still mentions only .txt files despite added JSON format\",\n      \"file_path\": \"notes_svc/cli.py\",\n      \"line_start\": 12,\n      \"line_end\": 12,\n      \"confidence\": 0.98,\n      \"rationale\": \"The subparser is created with help=\\\"export a user's notes to exports/<file>.txt\\\" (line 12) but the PR adds a \\\"--format\\\" option allowing JSON output, making the help text inaccurate.\",\n      \"suggestion\": \"Update the help string to reflect both supported formats, e.g., \\\"export a user's notes to exports/<file>.<format> (txt or json)\\\".\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/cli.py\",\n          \"line_start\": 12,\n          \"line_end\": 12\n        }\n      ]\n    },\n    {\n      \"severity\": \"medium\",\n      \"category\": \"docstring-mismatch\",\n      \"summary\": \"export_notes docstring still references only .txt output\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 13,\n      \"line_end\": 13,\n      \"confidence\": 0.97,\n      \"rationale\": \"The function docstring says \\\"Write the user's notes to exports/<name>.txt and return the path.\\\" (line 13) but the function now accepts a fmt argument and can write .json files, so the docstring is outdated.\",\n      \"suggestion\": \"Revise the docstring to mention the fmt parameter and that the file extension matches the chosen format, e.g., \\\"Write the user's notes to exports/<name>.<fmt> and return the path.\\\"\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 13,\n          \"line_end\": 13\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.12,
+  "http_requests": 1
+}

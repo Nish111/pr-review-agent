@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "6fcb1e28243602b1",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"performance\",\n      \"summary\": \"Introduces N+1 query pattern causing many database round‑trips\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 32,\n      \"line_end\": 36,\n      \"confidence\": 0.95,\n      \"rationale\": \"list_notes_with_tags calls list_notes to fetch a page of notes, then iterates over each note and executes a separate SELECT query for its tags (lines 33‑35). For N notes this results in N+1 queries, which can degrade performance especially with larger pages.\",\n      \"suggestion\": \"Fetch tags for all notes in a single query (e.g., using IN clause) and map them to notes, or reuse the existing get_tags helper to batch‑load tags.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 32,\n          \"line_end\": 36\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.1,
+  "http_requests": 1
+}

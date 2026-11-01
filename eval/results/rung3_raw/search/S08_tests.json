@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "8fe9ec4472813ae9",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"test-weakening\",\n      \"summary\": \"test_search_matches_title_or_body no longer asserts search results\",\n      \"file_path\": \"tests/test_notes.py\",\n      \"line_start\": 28,\n      \"line_end\": 28,\n      \"confidence\": 0.95,\n      \"rationale\": \"The original test asserted that searching for \\\"milk\\\" returned the titles \\\"groceries\\\" and \\\"work\\\" (line with assert). The change replaces the assertion with a bare call to search, removing any verification of behavior, so the test can pass even if search is broken.\",\n      \"suggestion\": \"Restore an assertion that checks the returned notes, e.g., `assert {n[\\\"title\\\"] for n in search(conn, 1, \\\"milk\\\")} == {\\\"groceries\\\", \\\"work\\\"}`.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"tests/test_notes.py\",\n          \"line_start\": 28,\n          \"line_end\": 28\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.58,
+  "http_requests": 1
+}

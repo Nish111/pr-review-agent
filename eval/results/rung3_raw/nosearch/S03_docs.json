@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "b1b3dee03bd76e5d",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"docstring-mismatch\",\n      \"summary\": \"Docstring still states that the function adds a .txt extension, but the code now expects the full filename including extension\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 10,\n      \"line_end\": 10,\n      \"confidence\": 0.98,\n      \"rationale\": \"The docstring on line 10 says \\\"Write the user's notes to exports/<name>.txt and return the path.\\\", yet the implementation on line 15 builds the path as `EXPORT_DIR / name` without appending \\\".txt\\\". This mismatch can mislead users about the required `name` argument.\",\n      \"suggestion\": \"Update the docstring to reflect that `name` should include the desired filename and extension, e.g., \\\"Write the user's notes to exports/<name> and return the path. The caller must include the desired file extension (e.g., .txt).\\\"\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 10,\n          \"line_end\": 10\n        },\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 15,\n          \"line_end\": 15\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.52,
+  "http_requests": 1
+}

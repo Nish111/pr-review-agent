@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "f4e28b5fd11f8e10",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"docstring-missing-parameter\",\n      \"summary\": \"The docstring for export_notes does not document the new fmt parameter\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 12,\n      \"line_end\": 13,\n      \"confidence\": 0.95,\n      \"rationale\": \"The function signature now includes a fmt argument (line 12) with a default of \\\"json\\\", but the docstring (line 13) only mentions writing to exports/<name>.<fmt> without describing the purpose, accepted values, or default behavior of fmt, leaving the documentation incomplete for users.\",\n      \"suggestion\": \"Update the docstring to describe the fmt parameter, its accepted values (e.g., \\\"json\\\" and \\\"txt\\\"), and note that the default is \\\"json\\\".\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 12,\n          \"line_end\": 13\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.49,
+  "http_requests": 1
+}

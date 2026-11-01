@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "00861adb884bfce8",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-test\",\n      \"summary\": \"New function create_note_with_tags is not exercised by any test\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 18,\n      \"line_end\": 25,\n      \"confidence\": 0.9,\n      \"rationale\": \"The diff introduces create_note_with_tags (lines 18-25) which adds new behavior for creating a note together with its tags, but the test suite does not import or call this function, leaving the new functionality untested.\",\n      \"suggestion\": \"Add tests that call create_note_with_tags, verify that the returned note id corresponds to a note in the database, and that the associated tags are correctly stored and retrievable via get_tags.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 18,\n          \"line_end\": 25\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.65,
+  "http_requests": 1
+}

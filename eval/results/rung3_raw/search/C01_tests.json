@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "5437a1e094b2e20c",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-test\",\n      \"summary\": \"No test covers the new tags.get_tags public API\",\n      \"file_path\": \"notes_svc/tags.py\",\n      \"line_start\": 1,\n      \"line_end\": 15,\n      \"confidence\": 0.9,\n      \"rationale\": \"The PR introduces a new module `notes_svc.tags` exposing `get_tags` (lines 1‑15). The function is re‑exported in `notes_svc.notes` (line 6), but the test suite only imports `get_tags` from `notes_svc.notes` (see tests/test_notes.py line 2). There is no test that imports `get_tags` directly from the new module, so the new public entry point is untested.\",\n      \"suggestion\": \"Add a test that imports `get_tags` from `notes_svc.tags` and verifies its behavior, e.g., similar to `test_get_tags` but using `from notes_svc.tags import get_tags`.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/tags.py\",\n          \"line_start\": 1,\n          \"line_end\": 15\n        },\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 6,\n          \"line_end\": 6\n        },\n        {\n          \"file_path\": \"tests/test_notes.py\",\n          \"line_start\": 1,\n          \"line_end\": 2\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.92,
+  "http_requests": 1
+}

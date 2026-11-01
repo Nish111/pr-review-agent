@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "24f43cee022dfe07",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"missing-escape-warning\",\n      \"summary\": \"Docstring does not warn that `keyword` is interpolated directly into SQL and must be escaped\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 30,\n      \"line_end\": 34,\n      \"confidence\": 0.93,\n      \"rationale\": \"The function `search` now builds the SQL query with f‑string interpolation (lines 31‑34) inserting `keyword` directly into the query, which can cause syntax errors or SQL injection if the keyword contains quotes or special characters. The existing docstring (line 30) only states that notes containing `keyword` are returned and does not mention any required escaping or safety considerations.\",\n      \"suggestion\": \"Update the docstring to note that `keyword` must be safe for direct inclusion in SQL (e.g., no single quotes) or revert to using parameterized queries to handle escaping automatically.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 30,\n          \"line_end\": 34\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.9,
+  "http_requests": 1
+}

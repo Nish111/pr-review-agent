@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "4d3f655bf045c05b",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-test\",\n      \"summary\": \"New function `todays_notes` is not exercised by any test\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 30,\n      \"line_end\": 37,\n      \"confidence\": 0.9,\n      \"rationale\": \"The diff introduces `todays_notes` (lines 30‑37) which provides a new public API for retrieving notes created today, but the test suite contains no test that calls or validates this function.\",\n      \"suggestion\": \"Add unit tests that create notes with known `created_at` timestamps (including today and other days) and verify that `todays_notes` returns only the notes from the current date.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 30,\n          \"line_end\": 37\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.58,
+  "http_requests": 1
+}

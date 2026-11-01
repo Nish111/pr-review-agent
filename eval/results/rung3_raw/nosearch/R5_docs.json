@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "d48d1966c39b",
+  "input_sha": "a5d34797b21777c7",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"documentation-missing-behavior\",\n      \"summary\": \"CliRunner.invoke docstring does not mention that original file descriptors are preserved and may return -1\",\n      \"file_path\": \"src/click/testing.py\",\n      \"line_start\": 328,\n      \"line_end\": 345,\n      \"confidence\": 0.97,\n      \"rationale\": \"The docstring for `CliRunner.invoke` (lines 328‑345) describes parameters and version changes but does not document the new behavior introduced in this PR where the original stdout/stderr file descriptors are captured and passed to `_NamedTextIOWrapper` (lines 358‑401). Users are not informed that the wrappers preserve the original fd and that `fileno()` may return -1 when the original stream lacks a file descriptor.\",\n      \"suggestion\": \"Update the `CliRunner.invoke` docstring to include a note about the preservation of original file descriptors, the new `original_fd` handling, and the fallback to -1 when the original stream does not provide a fileno.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/testing.py\",\n          \"line_start\": 328,\n          \"line_end\": 345\n        },\n        {\n          \"file_path\": \"src/click/testing.py\",\n          \"line_start\": 358,\n          \"line_end\": 401\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.76,
+  "http_requests": 1
+}

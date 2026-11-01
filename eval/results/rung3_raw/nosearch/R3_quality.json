@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "6182838ac2bb",
+  "input_sha": "488512096d773bd2",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"logic-bug\",\n      \"summary\": \"Fish completion script incorrectly iterates over formatted completions because each completion now contains internal newlines\",\n      \"file_path\": \"src/click/shell_completion.py\",\n      \"line_start\": 182,\n      \"line_end\": 186,\n      \"confidence\": 0.93,\n      \"rationale\": \"The `format_completion` method now returns a string with newline characters separating type, value, and help (lines 433-436). The fish script builds `$response` as a list of these strings separated by newlines and then iterates with `for completion in $response;` (line 182). In fish, the `for` loop splits its input on whitespace, which includes newlines, so each internal newline inside a single completion causes the loop to treat the type, value, and help as separate `$completion` items. Consequently, the subsequent `string split \\\\n $completion` (line 183) receives only a fragment (e.g., the type) and fails to produce the expected three‑element `metadata` array, breaking completion handling.\",\n      \"suggestion\": \"Change the way completions are passed to the fish script, e.g., join them with a null character and iterate with `for completion in (string split -z \\\\0 $response)` or modify the Python side to encode each completion as a single line (e.g., using a different delimiter) while preserving internal newlines, ensuring the `for` loop receives whole completions.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"src/click/shell_completion.py\",\n          \"line_start\": 182,\n          \"line_end\": 186\n        },\n        {\n          \"file_path\": \"src/click/shell_completion.py\",\n          \"line_start\": 433,\n          \"line_end\": 436\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 4.36,
+  "http_requests": 1
+}

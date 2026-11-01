@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "705404f6723ceed3",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"missing-test\",\n      \"summary\": \"JSON export format added but not covered by any test\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 12,\n      \"line_end\": 24,\n      \"confidence\": 0.9,\n      \"rationale\": \"The diff introduces a new `fmt` parameter with a \\\"json\\\" choice and implements JSON serialization (lines 12-24). No existing tests exercise this new format, leaving the behavior untested.\",\n      \"suggestion\": \"Add tests that call `export_notes` with `fmt=\\\"json\\\"` and verify that a .json file is created and contains valid JSON representing the notes.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 12,\n          \"line_end\": 24\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.16,
+  "http_requests": 1
+}

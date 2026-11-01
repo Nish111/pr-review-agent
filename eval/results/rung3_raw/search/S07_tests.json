@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "0ae66c3fb18c4c11",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"missing-test\",\n      \"summary\": \"New archive_note function is not exercised by any test\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 18,\n      \"line_end\": 25,\n      \"confidence\": 0.9,\n      \"rationale\": \"Lines 18‑25 introduce archive_note, a new behavior that should hide notes from list_notes, but the test suite contains no reference to archive_note, so this functionality is untested.\",\n      \"suggestion\": \"Add tests that verify archive_note returns True for owned notes, returns False for others, and that archived notes are excluded from list_notes results.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 18,\n          \"line_end\": 25\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.24,
+  "http_requests": 1
+}

@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "97f82a1e3926",
+  "input_sha": "d8887869a790b95e",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"sql-injection\",\n      \"summary\": \"User-supplied keyword is interpolated directly into SQL query\",\n      \"file_path\": \"notes_svc/notes.py\",\n      \"line_start\": 31,\n      \"line_end\": 34,\n      \"confidence\": 0.98,\n      \"rationale\": \"The search function builds the SQL statement using f-strings with the `keyword` parameter (lines 32-33). This allows an attacker to inject arbitrary SQL via a crafted keyword, bypassing intended filtering and potentially exposing or modifying data.\",\n      \"suggestion\": \"Use a parameterized query for the keyword and user_id, e.g., `conn.execute(\\\"SELECT ... WHERE user_id = ? AND (title LIKE ? OR body LIKE ?)\\\", (user_id, f\\\"%{keyword}%\\\", f\\\"%{keyword}%\\\"))`.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/notes.py\",\n          \"line_start\": 31,\n          \"line_end\": 34\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 1.63,
+  "http_requests": 1
+}

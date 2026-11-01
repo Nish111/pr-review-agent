@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "search",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "fea689b4e642d449",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"missing-test\",\n      \"summary\": \"Default JSON export format is not exercised by any test\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 12,\n      \"line_end\": 22,\n      \"confidence\": 0.95,\n      \"rationale\": \"The function export_notes now defaults to fmt=\\\"json\\\" and includes JSON serialization logic (lines 12-22). However, the test suite only calls export_notes with fmt=\\\"txt\\\" (see tests/test_export.py line 14) and does not verify the default JSON behavior, leaving the new functionality untested.\",\n      \"suggestion\": \"Add a test that calls export_notes without specifying fmt and asserts that the output file has a .json suffix and contains valid JSON representing the notes.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 12,\n          \"line_end\": 22\n        },\n        {\n          \"file_path\": \"tests/test_export.py\",\n          \"line_start\": 13,\n          \"line_end\": 15\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.94,
+  "http_requests": 1
+}

@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "7cc756bcfe698e7d",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"category\": \"missing-test\",\n      \"summary\": \"JSON export format is added but no test verifies its behavior\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 21,\n      \"line_end\": 24,\n      \"confidence\": 0.95,\n      \"rationale\": \"The diff introduces a new `--format json` option (cli.py line 16) and implements JSON serialization in `export_notes` (export.py lines 21‑24). No existing tests are shown that exercise this new format, so the new behavior is untested.\",\n      \"suggestion\": \"Add tests that invoke the CLI with `--format json` and call `export_notes` with `fmt=\\\"json\\\"`, then verify that the output file has a `.json` extension and contains valid JSON representing the notes.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/cli.py\",\n          \"line_start\": 16,\n          \"line_end\": 18\n        },\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 21,\n          \"line_end\": 24\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 2.05,
+  "http_requests": 1
+}

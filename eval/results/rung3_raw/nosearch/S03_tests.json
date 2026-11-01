@@ -1,0 +1,12 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "arm": "nosearch",
+  "prompt_sha": "193fad60fc04",
+  "input_sha": "87870a05ef3a0406",
+  "ok": true,
+  "raw": "{\n  \"findings\": [\n    {\n      \"severity\": \"high\",\n      \"category\": \"missing-test\",\n      \"summary\": \"No test ensures unsafe export names are rejected after validation was removed\",\n      \"file_path\": \"notes_svc/export.py\",\n      \"line_start\": 15,\n      \"line_end\": 15,\n      \"confidence\": 0.95,\n      \"rationale\": \"The function now directly uses the provided name to construct the export path (line 15) without any safety checks, but the test suite no longer includes the \\\"test_export_rejects_unsafe_names\\\" test that previously verified that unsafe names raise ValueError. This leaves a potential path‑traversal vulnerability untested.\",\n      \"suggestion\": \"Add a test that passes unsafe names (e.g., \\\"../secret\\\", \\\"a/b\\\", \\\"\\\", overly long strings, names with spaces) to export_notes and asserts that a ValueError or appropriate error is raised, or re‑introduce validation in the implementation.\",\n      \"evidence\": [\n        {\n          \"file_path\": \"notes_svc/export.py\",\n          \"line_start\": 15,\n          \"line_end\": 15\n        },\n        {\n          \"file_path\": \"tests/test_export.py\",\n          \"line_start\": 15,\n          \"line_end\": 19\n        }\n      ]\n    }\n  ]\n}",
+  "error": "",
+  "latency_s": 3.27,
+  "http_requests": 1
+}
