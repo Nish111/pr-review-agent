@@ -57,7 +57,40 @@ def main(argv: list[str] | None = None) -> int:
     se.add_argument("--db", default=".pr_review/index.db")
     ic = sub.add_parser("index-compare", help="before/after index numbers: html design vs ours (Y1, X2-X4)")
     ic.add_argument("--tree", required=True, help="a repo folder, e.g. eval/workdir/click-c69643b")
+    r4 = sub.add_parser("rung4", help="aggregator + calibrated threshold on rung 3's saved findings (no model calls)")
+    r4.add_argument("--on", choices=["3", "3n"], default="3", help="3 = rung 3 with search (official), 3n = without")
+    qu = sub.add_parser("queue", help="list comments waiting for human approval")
+    qu.add_argument("--db", default=".pr_review/store.db")
     args = parser.parse_args(argv)
+
+    if args.cmd == "rung4":
+        from pr_review.evaluation.run_rung4 import rung4
+        res = rung4(ROOT, args.on)
+        a, b = res["A_leave_one_pr_out"], res["B_in_sample"]
+        print(f"rung 4 on rung {args.on}: {res['groups_seeded']} grouped comments on the seeded set")
+        print(f"  A leave-one-PR-out (official): posted {a['posted']}, right {a['right_posted']}, "
+              f"precision {a['precision']}, folds with no threshold {a['folds_without_threshold']}/{len(a['folds'])}")
+        print(f"  B in-sample (optimistic): threshold {b['threshold']}, posted {b['posted']}, "
+              f"precision {b['precision']}")
+        for c in res["C_real_per_pr"]:
+            print(f"  C {c['pr']}: score {c['score']} posted={c['posted']} right={c['right']}")
+        out = ROOT / "eval" / "results" / f"rung4{'' if args.on == '3' else 'n'}.json"
+        out.write_text(json.dumps(res, indent=2) + "\n", encoding="utf-8", newline="\n")
+        print(f"saved {out.relative_to(ROOT).as_posix()}")
+        return 0
+
+    if args.cmd == "queue":
+        import sqlite3
+
+        from pr_review.hitl import ApprovalQueue
+        db = ROOT / args.db
+        db.parent.mkdir(parents=True, exist_ok=True)
+        items = ApprovalQueue(sqlite3.connect(db, isolation_level=None)).pending()
+        print(f"{len(items)} comment(s) waiting for approval" + ("" if items else " (nothing has been queued yet)"))
+        for it in items:
+            print(f"  #{it['id']} {it['work_key']} {it['where']} score={it['score']} age={it['age_h']}h"
+                  f"{' STALE' if it['stale'] else ''}: {it['text'][:80]}")
+        return 0
 
     if args.cmd in ("index", "search"):
         import sqlite3

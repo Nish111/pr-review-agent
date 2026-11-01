@@ -24,8 +24,9 @@ Because there are no model calls, rung 4 costs no quota, and it runs on **both**
 | Input | rung 3's saved findings: `rung3.json` (official) and `rung3n.json` | no new calls |
 | Truth for "right" | your final (round 2) right-reason answers for matched findings, plus D2 for unmatched ones | rung 3 hand check |
 | Grouping | same file, overlapping lines (±3, the scoring tolerance), any category | matrix 05, G1 |
-| Kinds | **primary** (names a bug) vs **restated** (category or summary is "missing test/doc/coverage" and the group also has a primary comment) | matrix 05, G2 |
-| Score features (few, because 14 PRs is little data) | specialist; primary vs restated; how many specialists are in the group (1 or ≥2); model confidence band (<0.8, ≥0.8) | matrix 05, G3-G4 |
+| Kinds | a comment is **test/doc kind** if its category or summary is about tests or documentation (missing test, coverage, docstring, README, help text); otherwise **bug kind**. In a group, the posted **lead** is the most confident bug-kind comment; test/doc comments become supporting lines, and lead only when the group has nothing else | matrix 05, G2; rule in `aggregator/aggregate.py` |
+| What counts as right for a group | the group is right if its **lead** is right (the lead is the text that gets posted) | the posted comment is what a developer reads |
+| Score features (few, because 14 PRs is little data) | the lead's specialist; bug vs test/doc kind; how many specialists are in the group (1 or ≥2); model confidence band (<0.8, ≥0.8) | matrix 05, G3-G4 |
 | Score | observed right-rate of comments with the same features, smoothed toward the overall rate so a group of 1-2 comments can't score 100% | standard small-sample practice (add-one smoothing) |
 | Target | precision ≥ 0.90 on posted comments | G0 DONE.html §1 |
 | Outcome if no threshold reaches the target | `threshold = None`: everything goes to the approval queue, and that is the reported result | invariant `bot_never_approves_or_merges` |
@@ -39,7 +40,10 @@ Because there are no model calls, rung 4 costs no quota, and it runs on **both**
 | **C · choose on the seeded PRs, test on the 5 real click PRs** | Tests on genuinely unseen code, but 5 PRs and 6 bugs is too few to say anything about 90%. Reported per PR, as decision A on the real set says. Can be added on top of A. |
 | **If you don't decide** | A, with C reported alongside as an extra, per-PR view. |
 
-**Your answer:**
+**Your answer (Nishant, 1 Nov 2026):** A, B and C, all three reported.
+- **Official:** A (leave one PR out). The 0.90 target is judged on this number only.
+- **Also reported, labelled as optimistic:** B (chosen and tested on all 14), so the gap between A and B shows how much the small data flatters an in-sample number.
+- **Also reported, per PR:** C (threshold chosen on the 14 seeded PRs, applied to the 4 reviewed click PRs; R2 has no findings).
 
 ## ★ D2 · What about findings that match no known bug?
 
@@ -54,7 +58,8 @@ findings turned out to be **real** docs problems, so "unmatched" doesn't always 
 | **C · every unmatched finding counts as wrong** | No work, and it's conservative: the threshold comes out stricter, so fewer comments post. But it punishes real-but-unplanted findings (rung 2's two docs issues would count as errors). |
 | **If you don't decide** | A. |
 
-**Your answer:**
+**Your answer (Nishant, 1 Nov 2026):** A. Claude labels each unmatched finding with a one-line reason; Nishant checks a random 10
+(drawn by a fixed seed, so the sample is reproducible); 3 or more disagreements → he checks them all.
 
 ## Prediction (written before running)
 
@@ -64,6 +69,11 @@ findings turned out to be **real** docs problems, so "unmatched" doesn't always 
 - The calibration will rank "primary comment, ≥2 specialists agree" highest and "docs reviewer, alone" lowest.
 - The approval queue for a typical seeded PR holds 2-4 comments after grouping.
 
-## How to run
+## How to run (only after round 2 is final and this file is committed)
 
-Added when the code is ready, after round 2, before anything is scored.
+No API keys needed; no model calls.
+1. `PYTHONPATH=src python -m pr_review rung4 --on 3` (official, rung 3 with search) → `eval/results/rung4.json`
+2. `PYTHONPATH=src python -m pr_review rung4 --on 3n` (rung 3 without search) → `eval/results/rung4n.json`
+
+Labels it reads: the hand-check files (final round) and `eval/UNMATCHED_RUNG3.md` / `UNMATCHED_RUNG3n.md` (Claude's verdicts, after
+your sample check in `eval/UNMATCHED_SAMPLE_CHECK.md`). It refuses to run while any posted comment has no label.
