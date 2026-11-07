@@ -8,6 +8,7 @@ from pr_review.llm_client.provider import (
     SpikeError,
     call_openai,
     http_attempts,
+    last_usage,
     pick_provider,
 )
 
@@ -23,4 +24,5 @@ def complete(provider: str, model: str, prompt: str) -> str:
     return fn(model, prompt, key) if name != "gemini" else fn(model, prompt, key, base)
 
 
-__all__ = ["pick_provider", "LLMError", "ProviderUnavailable", "QuotaExhausted", "complete", "http_attempts"]
+__all__ = ["LLMError", "ProviderUnavailable", "QuotaExhausted", "complete", "http_attempts", "last_usage",
+           "pick_provider"]

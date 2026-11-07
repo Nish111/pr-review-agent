@@ -18,6 +18,7 @@ from pr_review.specialists.single import MAX_PROMPT_TOKENS, WINDOW, build_contex
 SPECIALISTS = (AgentType.SECURITY, AgentType.QUALITY, AgentType.TESTS, AgentType.DOCS)
 OUTPUT_RESERVE = 1500          # tokens kept free per call for the answer (it counts towards the per-minute limit)
 NO_CONTEXT = "(none)"
+REVIEW_BUDGET = 20_000         # matrix 06, E-F3: estimated tokens (prompt + answer reserve) per review
 
 
 @dataclass
@@ -81,7 +82,8 @@ Ask = Callable[[AgentType, str], dict]      # (specialist, prompt) -> {"ok", "ra
 
 
 def review_pr(pr: dict, diff: str, tree: Path, changed: dict[str, set[int]], hits: list,
-              templates: dict[AgentType, str], ask: Ask, bucket: TokenBucket) -> dict:
+              templates: dict[AgentType, str], ask: Ask, bucket: TokenBucket,
+              budget: int | None = None) -> dict:
     """All four specialists on one PR, in parallel within the shared budget. Never raises for one specialist's
     failure (W1); re-raises QuotaExhausted after the others finish, so the run can stop cleanly (W3)."""
     related, related_spans = related_block(hits)
@@ -113,8 +115,20 @@ def review_pr(pr: dict, diff: str, tree: Path, changed: dict[str, set[int]], hit
         r.parse_error, r.dropped = parsed.parse_error, parsed.dropped
         r.findings, r.ok = parsed.findings, not parsed.parse_error
 
+    # BudgetGuard (E-F3): specialists in priority order until the review budget is spent; the rest are skipped.
+    allowed, spent = [], 0
+    for agent in SPECIALISTS:
+        try:
+            est = estimate_tokens(build_prompt(templates[agent], pr, diff, tree, changed, related)[0]) + OUTPUT_RESERVE
+        except ValueError:
+            est = 0                                       # doesn't fit at all: `one` records why
+        if budget is not None and spent + est > budget:
+            results[agent].error = f"skipped: review budget {budget} tokens would be exceeded (BudgetGuard)"
+            continue
+        spent += est
+        allowed.append(agent)
     with ThreadPoolExecutor(max_workers=len(SPECIALISTS)) as pool:
-        list(pool.map(one, SPECIALISTS))
+        list(pool.map(one, allowed))
     if quota:
         raise quota[0]
     merged, merges = merge_duplicates([f for r in results.values() for f in r.findings])

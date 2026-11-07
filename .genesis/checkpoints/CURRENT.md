@@ -1,10 +1,10 @@
 # CURRENT
 - active_loop: NONE
-- target: M8 (traces, cost report, audit trail, group 6)
+- target: M9 (live PR -> review demo on a real GitHub App, ADRs, write-up)
 - iteration: 0
 - last_gate: —
-- last_action: 7 Nov 2026 — M7 done: rung 4 with search no threshold (all to queue); without search 8/8 right at leave-one-PR-out, threshold 0.84. Decision S6: default = no search + threshold 0.84 (config.py). eval/findings_rung4.md.
-- next_action: commit M7; then M8: failure matrix 06 (data, proof & economics), trace + cost report from the saved runs (no model calls).
+- last_action: 7 Nov 2026 — M8 done: FAILURE_MATRIX_06_TRACE_COST.md; `trace <PR>` (prompt fingerprint check proves what the model saw), `report` -> reports/report.html (quality, cost if paid, latency, audit trail); measured token usage saved from now on; BudgetGuard 20k per review. 120 tests.
+- next_action: commit M8; then M9 plan: what the live demo needs (GitHub App, tunnel, which repo), with Nishant's decisions.
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000

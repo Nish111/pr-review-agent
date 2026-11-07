@@ -37,6 +37,9 @@ def _ask(cache: Path, key: dict, prompt: str, provider: str, model: str, complet
     rec = dict(key)
     try:
         rec.update(ok=True, raw=complete(provider, model, prompt), error="")
+        from pr_review.llm_client import last_usage
+        if complete is real_complete and last_usage():
+            rec["usage"] = {**last_usage(), "measured": True}       # matrix 06, E-F1
     except QuotaExhausted:
         raise
     except Exception as e:  # noqa: BLE001 - recorded per PR, never turned into an empty success

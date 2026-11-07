@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -274,6 +275,18 @@ def call_anthropic(model: str, prompt: str, api_key: str) -> str:
     return "".join(parts)
 
 
+_USAGE = threading.local()
+
+
+def last_usage() -> dict:
+    """Token usage the provider reported for the last call on THIS thread (matrix 06, E-F1). {} if none."""
+    return dict(getattr(_USAGE, "value", {}) or {})
+
+
+def _set_usage(**kw: int | None) -> None:
+    _USAGE.value = {k: int(v) for k, v in kw.items() if v is not None}
+
+
 def call_openai(model: str, prompt: str, api_key: str,
                 base_url: str = "https://api.openai.com/v1") -> str:
     """OpenAI Chat Completions, or anything that speaks the same shape.
@@ -291,6 +304,9 @@ def call_openai(model: str, prompt: str, api_key: str,
             "messages": [{"role": "user", "content": prompt}],
         },
     )
+    u = data.get("usage") or {}
+    _set_usage(input_tokens=u.get("prompt_tokens"), output_tokens=u.get("completion_tokens"),
+               reasoning_tokens=(u.get("completion_tokens_details") or {}).get("reasoning_tokens"))
     return data["choices"][0]["message"]["content"]
 
 
@@ -329,6 +345,9 @@ def call_gemini(model: str, prompt: str, api_key: str, base_url: str = "") -> st
     except (KeyError, IndexError) as e:
         raise SpikeError(f"unexpected Gemini response shape: {json.dumps(data)[:500]}") from e
 
+    u = data.get("usageMetadata") or {}
+    _set_usage(input_tokens=u.get("promptTokenCount"), output_tokens=u.get("candidatesTokenCount"),
+               reasoning_tokens=u.get("thoughtsTokenCount"))
     reason = candidate.get("finishReason", "")
     parts = candidate.get("content", {}).get("parts", [])
 

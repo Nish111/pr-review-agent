@@ -59,6 +59,11 @@ def main(argv: list[str] | None = None) -> int:
     ic.add_argument("--tree", required=True, help="a repo folder, e.g. eval/workdir/click-c69643b")
     r4 = sub.add_parser("rung4", help="aggregator + calibrated threshold on rung 3's saved findings (no model calls)")
     r4.add_argument("--on", choices=["3", "3n"], default="3", help="3 = rung 3 with search (official), 3n = without")
+    tc = sub.add_parser("trace", help="one review, step by step, rebuilt from the saved runs (no model calls)")
+    tc.add_argument("pr", help="golden PR id, e.g. S01 or R4")
+    tc.add_argument("--arm", choices=["nosearch", "search"], default="nosearch",
+                    help="default = decision S6 (no search)")
+    sub.add_parser("report", help="static HTML report: quality, cost, latency, audit trail -> reports/report.html")
     qu = sub.add_parser("queue", help="list comments waiting for human approval")
     qu.add_argument("--db", default=".pr_review/store.db")
     args = parser.parse_args(argv)
@@ -77,6 +82,16 @@ def main(argv: list[str] | None = None) -> int:
         out = ROOT / "eval" / "results" / f"rung4{'' if args.on == '3' else 'n'}.json"
         out.write_text(json.dumps(res, indent=2) + "\n", encoding="utf-8", newline="\n")
         print(f"saved {out.relative_to(ROOT).as_posix()}")
+        return 0
+
+    if args.cmd == "trace":
+        from pr_review.trace import build_trace, render
+        print(render(build_trace(ROOT, args.pr, args.arm)))
+        return 0
+
+    if args.cmd == "report":
+        from pr_review.reports import build_report
+        print(f"wrote {build_report(ROOT).relative_to(ROOT).as_posix()}")
         return 0
 
     if args.cmd == "queue":
