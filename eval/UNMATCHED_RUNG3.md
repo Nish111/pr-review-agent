@@ -20,7 +20,7 @@ changelog entry not written, an internal detail not documented), or the problem 
 ## U3 · PR S03 · `README.md:9-9` · docs
 
 - **Summary:** README example still shows a fixed .txt extension
-- **Verdict:** real — README says `--file mynotes` writes exports/mynotes.txt; after this PR it writes exports/mynotes (no extension), so the README is now wrong
+- **Verdict:** not real — Nishant's sample check (1 Nov 2026) disagreed with Claude's 'real'; his verdict replaces Claude's. (Claude's reason was: README says `--file mynotes` writes exports/mynotes.txt; after this PR it writes exports/mynotes (no extension), so the README is now wrong)
 
 ## U4 · PR S03 · `notes_svc/cli.py:14-14` · docs
 

@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 
 from pr_review.aggregator import Calibration, choose_threshold, features, group_findings, leave_one_pr_out
-from pr_review.evaluation.right_reason import matched_items, read_handcheck
+from pr_review.evaluation.right_reason import matched_items, read_final
 
 _UM = re.compile(r"^## (U\d+) · PR (\S+) · `([^`]+):(\d+)-(\d+)`.*?\*\*Summary:\*\* (.*?)\n"
                  r".*?\*\*Verdict:\*\*[ \t]*([^\n]*)", re.MULTILINE | re.DOTALL)
@@ -23,7 +23,7 @@ def _key(pr: str, file: str, lines, message: str) -> tuple:
 
 def truth(root: Path, rung: str) -> dict[tuple, bool | None]:
     out: dict[tuple, bool | None] = {}
-    hand = read_handcheck(root, rung)
+    hand = read_final(root, rung)
     for it in matched_items(root, rung):
         out[_key(it["pr"], it["file"], it["lines"], it["summary"])] = hand.get(it["id"])
     path = root / f"eval/UNMATCHED_RUNG{rung}.md"

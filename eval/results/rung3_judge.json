@@ -1,0 +1,171 @@
+{
+  "rung": "3",
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "prompt_sha": "971537b18244",
+  "verdicts": [
+    {
+      "id": "M1",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment identify the SQL injection/syntax error issue caused by interpolating the unescaped `keyword` directly into the SQL string instead of using parameterized queries.",
+      "key": "S01|notes_svc/notes.py|29-34|Docstring does not warn that `keyword` is interpolated directly into SQL, leading to potential injection or syntax errors"
+    },
+    {
+      "id": "M2",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment describe a SQL injection vulnerability caused by directly interpolating the user-supplied keyword parameter into the SQL query text.",
+      "key": "S01|notes_svc/notes.py|31-34|User-supplied keyword is interpolated directly into SQL query"
+    },
+    {
+      "id": "M3",
+      "same_bug": true,
+      "reason": "Both the known bug and the comment describe the exact same underlying vulnerability: unescaped user input (keyword) being directly interpolated into a SQL string, allowing quotes to alter the query structure.",
+      "key": "S01|notes_svc/notes.py|31-34|search() now interpolates user_id and keyword directly into SQL, introducing SQL injection risk that is not covered by any test"
+    },
+    {
+      "id": "M4",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment describe the security vulnerability of replacing constant-time `hmac.compare_digest` with a timing-leaky `==` equality check on a secret token.",
+      "key": "S02|notes_svc/auth.py|3-11|Constant-time token comparison removed but no test verifies timing behavior"
+    },
+    {
+      "id": "M5",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer comment identify the security vulnerability of using plain equality (==) instead of a constant-time comparison like hmac.compare_digest, which leaks timing information during secret comparisons.",
+      "key": "S02|notes_svc/auth.py|6-11|Plain equality check leaks timing information for token comparison"
+    },
+    {
+      "id": "M6",
+      "same_bug": false,
+      "reason": "The known bug is a path traversal security vulnerability, whereas the reviewer's comment addresses a missing directory creation that causes a FileNotFoundError.",
+      "key": "S03|notes_svc/export.py|14-15|Export fails when `name` contains a subdirectory because the subdirectory is not created"
+    },
+    {
+      "id": "M7",
+      "same_bug": false,
+      "reason": "The known bug concerns a path traversal vulnerability allowing file writes outside the intended export directory, whereas the reviewer's comment concerns an empty string input causing an IsADirectoryError.",
+      "key": "S03|notes_svc/export.py|15-15|Empty `name` results in attempting to write to a directory, causing `IsADirectoryError`"
+    },
+    {
+      "id": "M8",
+      "same_bug": true,
+      "reason": "Both the reviewer's comment and the known bug describe a path traversal vulnerability where an unvalidated user-controlled filename is joined to EXPORT_DIR, allowing files to be written outside the intended exports directory.",
+      "key": "S03|notes_svc/export.py|15-15|User-controlled filename is written to the filesystem without validation, allowing path traversal"
+    },
+    {
+      "id": "M9",
+      "same_bug": false,
+      "reason": "The reviewer's comment addresses a lack of test coverage for a new function, whereas the known bug concerns a transaction atomicity issue when inserting notes and tags.",
+      "key": "S04|notes_svc/notes.py|18-25|New function create_note_with_tags is not exercised by any test"
+    },
+    {
+      "id": "M10",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment describe the exact same issue where separate transactions cause notes to be saved without tags if tag insertion fails.",
+      "key": "S04|notes_svc/notes.py|21-24|Note may be saved without its tags if tag insertion fails"
+    },
+    {
+      "id": "M11",
+      "same_bug": false,
+      "reason": "The reviewer's comment concerns missing unit test coverage, whereas the known bug describes an N+1 database query performance issue.",
+      "key": "S05|notes_svc/notes.py|29-36|New function `list_notes_with_tags` is not covered by any test"
+    },
+    {
+      "id": "M12",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment describe the N+1 query issue caused by fetching tags individually for each note inside a loop.",
+      "key": "S05|notes_svc/notes.py|32-36|Introduces N+1 query pattern causing many database round‑trips"
+    },
+    {
+      "id": "M13",
+      "same_bug": false,
+      "reason": "The reviewer's comment is about missing test coverage for the new function, whereas the known bug is a timezone mismatch logic error.",
+      "key": "S06|notes_svc/notes.py|30-37|New function `todays_notes` is not exercised by any test"
+    },
+    {
+      "id": "M14",
+      "same_bug": true,
+      "reason": "Both the known bug and the comment describe the mismatch caused by comparing the server's local date from `date.today()` against UTC timestamps in `created_at`, resulting in missed notes due to timezone differences.",
+      "key": "S06|notes_svc/notes.py|30-37|Using local date for filtering UTC timestamps can miss notes created today in UTC"
+    },
+    {
+      "id": "M15",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment describe the lack of test coverage for a newly added public function.",
+      "key": "S07|notes_svc/notes.py|18-25|New archive_note function is not exercised by any test"
+    },
+    {
+      "id": "M16",
+      "same_bug": false,
+      "reason": "The reviewer's comment describes a missing uniqueness check allowing duplicate tag insertions, whereas the known bug concerns missing test coverage for a new public function.",
+      "key": "S07|notes_svc/notes.py|21-24|archive_note can insert duplicate 'archived' tags for the same note"
+    },
+    {
+      "id": "M17",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment describe the exact same issue: the removal of assertions from the test, leaving it unable to fail or verify function output.",
+      "key": "S08|tests/test_notes.py|28-28|Test no longer verifies search results, allowing regressions to go unnoticed"
+    },
+    {
+      "id": "M18",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment state that the test's assertions were removed, leaving it unable to fail or verify behavior.",
+      "key": "S08|tests/test_notes.py|28-28|test_search_matches_title_or_body no longer asserts search results"
+    },
+    {
+      "id": "M19",
+      "same_bug": false,
+      "reason": "The reviewer's comment addresses missing docstring details for the new fmt parameter, whereas the known bug concerns outdated README/CHANGELOG documentation regarding default output format changes that break existing scripts.",
+      "key": "S09|notes_svc/export.py|12-13|The docstring for export_notes does not document the new fmt parameter"
+    },
+    {
+      "id": "M20",
+      "same_bug": false,
+      "reason": "The known bug concerns outdated documentation and broken external scripts due to the changed default format, whereas the reviewer's comment focuses on missing test coverage for the new default behavior.",
+      "key": "S09|notes_svc/export.py|12-22|Default JSON export format is not exercised by any test"
+    },
+    {
+      "id": "M21",
+      "same_bug": false,
+      "reason": "The reviewer's comment describes a directory traversal vulnerability, whereas the known bug concerns an uncoordinated default file extension change from .txt to .json.",
+      "key": "S09|notes_svc/export.py|12-24|Unvalidated `fmt` parameter can be used to traverse directories and write files outside the intended export directory"
+    },
+    {
+      "id": "M22",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment describe the exact same fault: changing the default export format from .txt to .json causes a regression where expected .txt files are instead created as .json.",
+      "key": "S09|notes_svc/export.py|12-13|Default export format changed to JSON breaks CLI expectation of .txt files"
+    },
+    {
+      "id": "M23",
+      "same_bug": true,
+      "reason": "Both the known bug and the reviewer's comment specifically identify that the newly added `--format` argument lacks a help text description.",
+      "key": "S10|notes_svc/cli.py|16-16|New \"--format\" argument lacks a help description"
+    },
+    {
+      "id": "M24",
+      "same_bug": false,
+      "reason": "The reviewer comment addresses missing test coverage for stdout-to-stderr redirection, whereas the known bug concerns unstripped ANSI color codes being shown on plain terminals.",
+      "key": "R1|src/click/termui.py|62-79|The new err handling path in _readline_prompt (redirecting stdout to stderr) is not exercised by existing tests"
+    },
+    {
+      "id": "M25",
+      "same_bug": false,
+      "reason": "The reviewer's comment is concerned with an incomplete docstring for a format change, whereas the known bug is a functional failure in fish completion caused by the format change itself.",
+      "key": "R3|src/click/shell_completion.py|423-436|Docstring for FishComplete.format_completion does not document the changed output format (now newline‑separated fields)"
+    },
+    {
+      "id": "M26",
+      "same_bug": false,
+      "reason": "The reviewer asks for tests to verify that EOFError is raised on stream exhaustion, whereas the known bug is that raising EOFError in __next__ is itself an unintended defect that breaks standard iteration.",
+      "key": "R4|src/click/testing.py|119-124|New EOFError on end of input in _NamedTextIOWrapper is not exercised by any test"
+    },
+    {
+      "id": "M27",
+      "same_bug": false,
+      "reason": "The reviewer comment points out missing test coverage for a new method, whereas the known bug describes a functional issue where returning the real terminal's file descriptor breaks output capture.",
+      "key": "R5|src/click/testing.py|139-152|New fileno() method on _NamedTextIOWrapper is not exercised by any test"
+    }
+  ],
+  "asked": 5
+}

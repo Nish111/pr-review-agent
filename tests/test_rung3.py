@@ -223,3 +223,23 @@ def test_handcheck_blank_answers_do_not_swallow_entries(tmp_path):
                    enumerate(["", "yes", "", "no, other bug"], 1))
     (tmp_path / "eval" / "HANDCHECK_RUNGx.md").write_text(body)
     assert read_handcheck(tmp_path, "x") == {"M1": None, "M2": True, "M3": None, "M4": False}
+
+
+def test_round2_overrides_round1(tmp_path):
+    from pr_review.evaluation.right_reason import read_final
+    (tmp_path / "eval").mkdir()
+    (tmp_path / "eval" / "HANDCHECK_RUNGx.md").write_text(
+        "## M1 · PR S01 · `a.py:1`\n\n- **Your answer:** no\n\n## M2 · PR S02 · `a.py:1`\n\n- **Your answer:** yes\n")
+    (tmp_path / "eval" / "HANDCHECK_RUNGx_ROUND2.md").write_text(
+        "## x · M1 · PR S01 · `a.py:1`\n\n- **Round-2 answer:** yes, names the cause\n\n"
+        "## xn · M2 · PR S02 · `a.py:1`\n\n- **Round-2 answer:** no\n\n## x · M2 · PR S02\n\n- **Round-2 answer:** \n")
+    assert read_final(tmp_path, "x") == {"M1": True, "M2": True}
+
+
+def test_round2b_pair_answer_applies_to_both_runs(tmp_path):
+    from pr_review.evaluation.right_reason import read_round2
+    (tmp_path / "eval").mkdir()
+    (tmp_path / "eval" / "HANDCHECK_RUNG7_ROUND2.md").write_text(
+        "## 7 · M1 · PR S01\n\n- **Round-2 answer:** no\n\n"
+        "## pair · 7 M1 + 7n M4 · PR S01\n\n- **Answer for both:** yes\n")
+    assert read_round2(tmp_path, "7") == {"M1": True} and read_round2(tmp_path, "7n") == {"M4": True}

@@ -1,7 +1,7 @@
 # Pre-registration: rung 4 (aggregator + calibrated confidence + approval queue)
 
-**Draft, 1 Nov 2026.** Written before any rung 4 code is run on the golden set. It becomes final, and gets committed,
-after rung 3's round 2 is done, because rung 4 learns from rung 3's final hand-checked labels.
+**Final, 7 Nov 2026** (drafted 1 Nov). Committed before rung 4 is run on the golden set. It learns from rung 3's final labels:
+round 2 hand-check answers (round 2b pairs were left open, so both answers stand) and the sample-checked unmatched verdicts.
 
 > **What you need to do in this file:** two decisions, marked ★ (D1 and D2). Write your answer under each. You can answer
 > now; nothing runs until round 2 is finished.

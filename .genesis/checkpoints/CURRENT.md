@@ -1,10 +1,10 @@
 # CURRENT
 - active_loop: NONE
-- target: M6 (rung 3: 4 grounded specialists in parallel, group 4)
+- target: M7 (rung 4: aggregator + approval queue + calibration, group 5)
 - iteration: 0
 - last_gate: —
-- last_action: 27 Oct 2026 — M6 built, not run: FAILURE_MATRIX_04_SPECIALISTS.md; 4 specialist prompts; orchestrator (shared 8k TPM token bucket, partial reviews, exact-duplicate merge, per-specialist cache); eval --rung 3 --arm search|nosearch; real labels carry plain descriptions; 101 tests. eval/PREREG_RUNG3.md has D1 (two arms) and D2 (hand-check both) for Nishant.
-- next_action: Nishant answers D1/D2 in PREREG_RUNG3.md, commits the prereg + code, then runs rung 3 (≈3 quota days if D1 = A).
+- last_action: 7 Nov 2026 — M6 done: rung 3 with search rr recall 1.00, rr precision 0.30, 6 clean false alarms, real 0/6; without search 0.90 / 0.55 / 2 / 4; rung 2 0.50 / 0.50. Judge independent agreement 18/27. eval/findings_rung3.md. M7 code built (aggregator, calibration, queue), PREREG_RUNG4 answered (D1 A+B+C, D2 A), unmatched labels sample-checked (9/10).
+- next_action: Nishant commits; then rung4 --on 3 and --on 3n (no model calls); write findings_rung4; round 2b pairs optional.
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000

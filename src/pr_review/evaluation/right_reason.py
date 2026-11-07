@@ -107,6 +107,34 @@ def write_handcheck(root: Path, rung: int) -> Path:
     return path
 
 
+def read_round2(root: Path, rung: str) -> dict[str, bool]:
+    """Round-2 answers for this rung from eval/HANDCHECK_RUNG<major>_ROUND2.md (entries headed '## <rung> · M<n>')."""
+    path = root / f"eval/HANDCHECK_RUNG{str(rung).rstrip('n')}_ROUND2.md"
+    out: dict[str, bool] = {}
+    if path.is_file():
+        pattern = r"^## (\w+) · (M\d+) .*?\*\*Round-2 answer:\*\*[ \t]*([^\n]*)"
+        for m in re.finditer(pattern, path.read_text(encoding="utf-8"), re.MULTILINE | re.DOTALL):
+            words = m.group(3).split()
+            ans = words[0].lower().strip(".,;:") if words else ""
+            if m.group(1) == str(rung) and ans[:1] in ("y", "n"):
+                out[m.group(2)] = ans.startswith("y")
+        # round 2b: one answer for a pair of identical comments, applied to both runs (3 Nov 2026)
+        pair = r"^## pair · (\w+) (M\d+) \+ (\w+) (M\d+) .*?\*\*Answer for both:\*\*[ \t]*([^\n]*)"
+        for m in re.finditer(pair, path.read_text(encoding="utf-8"), re.MULTILINE | re.DOTALL):
+            words = m.group(5).split()
+            ans = words[0].lower().strip(".,;:") if words else ""
+            if ans[:1] in ("y", "n"):
+                for r, mid in ((m.group(1), m.group(2)), (m.group(3), m.group(4))):
+                    if r == str(rung):
+                        out[mid] = ans.startswith("y")
+    return out
+
+
+def read_final(root: Path, rung: str) -> dict[str, bool | None]:
+    """Official answers: round 1, overridden by round 2 where round 2 has an answer."""
+    return {**read_handcheck(root, rung), **read_round2(root, rung)}
+
+
 def read_handcheck(root: Path, rung: int) -> dict[str, bool | None]:
     text = (root / f"eval/HANDCHECK_RUNG{rung}.md").read_text(encoding="utf-8")
     out = {}

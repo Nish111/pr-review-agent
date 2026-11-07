@@ -4,7 +4,9 @@
 OSPREY chat: **the PR Review Agent only** (W8 deliverable). The memory project continues under
 KESTREL; LinkedIn, SBL and outreach are separate chats.
 
-> **STATUS 27 Oct 2026 (read this first).** M0–M5 done. M5: code index + hybrid search, real model bge-small (S2 amended: jina fails with transformers 5). Next: M6 (rung 3 specialists). Live pointer: `.genesis/checkpoints/CURRENT.md`.
+> **STATUS 7 Nov 2026 (read this first).** M0–M6 done (rung 3 in `eval/findings_rung3.md`). M7 code built; `eval/PREREG_RUNG4.md` answered; next: run rung 4 (no model calls). Live pointer: `.genesis/checkpoints/CURRENT.md`.
+>
+> **Earlier status, 27 Oct 2026.** M0–M5 done. M5: code index + hybrid search, real model bge-small (S2 amended: jina fails with transformers 5). Next: M6 (rung 3 specialists). Live pointer: `.genesis/checkpoints/CURRENT.md`.
 >
 > **STATUS 25 Oct 2026 (read this first).** M0–M4 done. M4 = ingress & queue on SQLite (`src/pr_review/webhook_receiver`, `store`, `job_queue`), tests T1–T16 in `tests/ingress`, before/after numbers in `FAILURE_MATRIX_01_INGRESS.md` §6 (v4). Next: M5 index & search. Live pointer: `.genesis/checkpoints/CURRENT.md`.
 >

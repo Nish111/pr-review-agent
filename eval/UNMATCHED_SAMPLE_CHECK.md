@@ -78,3 +78,7 @@ documented), or the problem existed before the PR. Disagree with the rule itself
 - **Claude's verdict:** not real
 - **Claude's reason:** an omission; the docstring isn't wrong
 - **Your answer:** agree
+
+## Outcome (1 Nov 2026)
+
+1 of 10 disagreements (U3 in `UNMATCHED_RUNG3.md`), below the 3 that would require checking all. Claude's other verdicts stand; U3 is changed to `not real` in `eval/UNMATCHED_RUNG3.md`, as the rule says.
