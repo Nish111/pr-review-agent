@@ -1,10 +1,10 @@
 # CURRENT
 - active_loop: NONE
-- target: M7 (rung 4: aggregator + approval queue + calibration, group 5)
+- target: M8 (traces, cost report, audit trail, group 6)
 - iteration: 0
 - last_gate: —
-- last_action: 7 Nov 2026 — M6 done: rung 3 with search rr recall 1.00, rr precision 0.30, 6 clean false alarms, real 0/6; without search 0.90 / 0.55 / 2 / 4; rung 2 0.50 / 0.50. Judge independent agreement 18/27. eval/findings_rung3.md. M7 code built (aggregator, calibration, queue), PREREG_RUNG4 answered (D1 A+B+C, D2 A), unmatched labels sample-checked (9/10).
-- next_action: Nishant commits; then rung4 --on 3 and --on 3n (no model calls); write findings_rung4; round 2b pairs optional.
+- last_action: 7 Nov 2026 — M7 done: rung 4 with search no threshold (all to queue); without search 8/8 right at leave-one-PR-out, threshold 0.84. Decision S6: default = no search + threshold 0.84 (config.py). eval/findings_rung4.md.
+- next_action: commit M7; then M8: failure matrix 06 (data, proof & economics), trace + cost report from the saved runs (no model calls).
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000

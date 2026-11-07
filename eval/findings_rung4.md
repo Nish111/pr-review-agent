@@ -68,4 +68,4 @@ See ★ below. It decides what the live demo (M9) runs.
 | **C · with search, but drop "docs reviewer alone" comments before calibrating** | Might rescue search, but it's a new rule chosen after seeing the data: it would need a new pre-registration and a fresh golden set to test honestly. |
 | **If you don't decide** | A, written up as "chosen from rung 4's results", with B's outcome reported next to it. |
 
-**Your answer:** A
+**Your answer (Nishant, 7 Nov 2026):** A. The default is rung 3 **without** code search, with the calibrated threshold 0.84 (chosen on all 14 seeded PRs, `rung4n.json`). Code search stays in the code, switched off. Recorded as decision S6 (`.genesis/decisions/S6-default-configuration.md`).

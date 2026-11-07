@@ -65,3 +65,4 @@ Nishant: "better to start, go slowly and make a real difference than do rework."
 - A3: the demo can run on replayed webhooks; a live GitHub App is needed only for the final recording (ingress matrix, open TODO)
 - A4: sequencing follows the sprint plan: the outreach week (4–10 Nov) is not displaced by this project
 - A5: free-tier rate limits are the real capacity ceiling, so the budget guard and pacing from the memory project are needed from M1
+- **S6 (7 Nov 2026):** default configuration: four specialists, no code search, calibrated threshold 0.84 (`decisions/S6-default-configuration.md`).

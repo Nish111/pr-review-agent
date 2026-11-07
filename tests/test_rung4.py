@@ -82,3 +82,16 @@ def test_k7_no_approve_or_merge_calls():
     src = "\n".join(p.read_text(encoding="utf-8") for p in (ROOT / "src").rglob("*.py"))
     for banned in ('"APPROVE"', "'APPROVE'", "/merge", "REQUEST_CHANGES"):
         assert banned not in src, banned
+
+
+def test_default_configuration_matches_decision_s6():
+    from pr_review import config
+    assert config.SEARCH is False
+    th = config.threshold()
+    assert th is None or 0.8 < th < 0.9                           # 0.84 when rung4n.json is present
+
+
+def test_missing_calibration_means_everything_to_the_queue(monkeypatch, tmp_path):
+    from pr_review import config
+    monkeypatch.setattr(config, "CALIBRATION", tmp_path / "missing.json")
+    assert config.threshold() is None

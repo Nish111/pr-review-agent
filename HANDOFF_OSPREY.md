@@ -4,7 +4,7 @@
 OSPREY chat: **the PR Review Agent only** (W8 deliverable). The memory project continues under
 KESTREL; LinkedIn, SBL and outreach are separate chats.
 
-> **STATUS 7 Nov 2026 (read this first).** M0–M6 done (rung 3 in `eval/findings_rung3.md`). M7 code built; `eval/PREREG_RUNG4.md` answered; next: run rung 4 (no model calls). Live pointer: `.genesis/checkpoints/CURRENT.md`.
+> **STATUS 7 Nov 2026 (read this first).** M0–M7 done. Rung 3: `eval/findings_rung3.md`; rung 4: `eval/findings_rung4.md`; default configuration decision S6 (no code search, threshold 0.84). Next: M8 (traces, cost report). Live pointer: `.genesis/checkpoints/CURRENT.md`.
 >
 > **Earlier status, 27 Oct 2026.** M0–M5 done. M5: code index + hybrid search, real model bge-small (S2 amended: jina fails with transformers 5). Next: M6 (rung 3 specialists). Live pointer: `.genesis/checkpoints/CURRENT.md`.
 >
