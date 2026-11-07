@@ -1,0 +1,288 @@
+{
+  "rung": "4 (on rung 3)",
+  "groups_seeded": 33,
+  "comments": [
+    {
+      "pr": "S01",
+      "part": "seeded",
+      "comments_before": 3,
+      "comments_after": 1
+    },
+    {
+      "pr": "S02",
+      "part": "seeded",
+      "comments_before": 3,
+      "comments_after": 1
+    },
+    {
+      "pr": "S03",
+      "part": "seeded",
+      "comments_before": 7,
+      "comments_after": 5
+    },
+    {
+      "pr": "S04",
+      "part": "seeded",
+      "comments_before": 4,
+      "comments_after": 3
+    },
+    {
+      "pr": "S05",
+      "part": "seeded",
+      "comments_before": 4,
+      "comments_after": 3
+    },
+    {
+      "pr": "S06",
+      "part": "seeded",
+      "comments_before": 5,
+      "comments_after": 4
+    },
+    {
+      "pr": "S07",
+      "part": "seeded",
+      "comments_before": 4,
+      "comments_after": 3
+    },
+    {
+      "pr": "S08",
+      "part": "seeded",
+      "comments_before": 2,
+      "comments_after": 1
+    },
+    {
+      "pr": "S09",
+      "part": "seeded",
+      "comments_before": 5,
+      "comments_after": 1
+    },
+    {
+      "pr": "S10",
+      "part": "seeded",
+      "comments_before": 7,
+      "comments_after": 5
+    },
+    {
+      "pr": "C01",
+      "part": "seeded",
+      "comments_before": 2,
+      "comments_after": 2
+    },
+    {
+      "pr": "C02",
+      "part": "seeded",
+      "comments_before": 0,
+      "comments_after": 0
+    },
+    {
+      "pr": "C03",
+      "part": "seeded",
+      "comments_before": 4,
+      "comments_after": 4
+    },
+    {
+      "pr": "C04",
+      "part": "seeded",
+      "comments_before": 0,
+      "comments_after": 0
+    },
+    {
+      "pr": "R1",
+      "part": "real",
+      "comments_before": 2,
+      "comments_after": 2
+    },
+    {
+      "pr": "R2",
+      "part": "real",
+      "comments_before": 0,
+      "comments_after": 0
+    },
+    {
+      "pr": "R3",
+      "part": "real",
+      "comments_before": 1,
+      "comments_after": 1
+    },
+    {
+      "pr": "R4",
+      "part": "real",
+      "comments_before": 1,
+      "comments_after": 1
+    },
+    {
+      "pr": "R5",
+      "part": "real",
+      "comments_before": 1,
+      "comments_after": 1
+    }
+  ],
+  "A_leave_one_pr_out": {
+    "posted": 2,
+    "right_posted": 0,
+    "precision": 0.0,
+    "folds": [
+      {
+        "pr": "C01",
+        "threshold": null,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 2
+      },
+      {
+        "pr": "C03",
+        "threshold": null,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 4
+      },
+      {
+        "pr": "S01",
+        "threshold": null,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 1
+      },
+      {
+        "pr": "S02",
+        "threshold": null,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 1
+      },
+      {
+        "pr": "S03",
+        "threshold": null,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 5
+      },
+      {
+        "pr": "S04",
+        "threshold": null,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 3
+      },
+      {
+        "pr": "S05",
+        "threshold": null,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 3
+      },
+      {
+        "pr": "S06",
+        "threshold": null,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 4
+      },
+      {
+        "pr": "S07",
+        "threshold": 0.6,
+        "posted": 1,
+        "right_posted": 0,
+        "groups": 3
+      },
+      {
+        "pr": "S08",
+        "threshold": null,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 1
+      },
+      {
+        "pr": "S09",
+        "threshold": 0.5833,
+        "posted": 1,
+        "right_posted": 0,
+        "groups": 1
+      },
+      {
+        "pr": "S10",
+        "threshold": null,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 5
+      }
+    ],
+    "folds_without_threshold": 10
+  },
+  "B_in_sample": {
+    "threshold": null,
+    "posted": 0,
+    "right_posted": 0,
+    "precision": null
+  },
+  "C_real_per_pr": [
+    {
+      "pr": "R1",
+      "score": 0.3636,
+      "posted": false,
+      "right": false
+    },
+    {
+      "pr": "R1",
+      "score": 0.3636,
+      "posted": false,
+      "right": false
+    },
+    {
+      "pr": "R3",
+      "score": 0.1299,
+      "posted": false,
+      "right": false
+    },
+    {
+      "pr": "R4",
+      "score": 0.2424,
+      "posted": false,
+      "right": false
+    },
+    {
+      "pr": "R5",
+      "score": 0.2424,
+      "posted": false,
+      "right": false
+    }
+  ],
+  "calibration_table": {
+    "docs / bug / alone / high": {
+      "right": 2,
+      "total": 2,
+      "score": 0.6818
+    },
+    "docs / restated / alone / high": {
+      "right": 2,
+      "total": 19,
+      "score": 0.1299
+    },
+    "quality / bug / agree / high": {
+      "right": 3,
+      "total": 4,
+      "score": 0.6212
+    },
+    "quality / bug / alone / high": {
+      "right": 0,
+      "total": 1,
+      "score": 0.2424
+    },
+    "security / bug / agree / high": {
+      "right": 4,
+      "total": 5,
+      "score": 0.6753
+    },
+    "tests / bug / agree / high": {
+      "right": 1,
+      "total": 1,
+      "score": 0.5758
+    },
+    "tests / restated / alone / high": {
+      "right": 0,
+      "total": 1,
+      "score": 0.2424
+    }
+  },
+  "threshold_for_demo": null
+}
