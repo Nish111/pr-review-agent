@@ -1,0 +1,130 @@
+{
+  "sources": {
+    "golden": 17
+  },
+  "leave_one_out": {
+    "posted": 8,
+    "right_posted": 8,
+    "precision": 1.0,
+    "folds": [
+      {
+        "pr": "C03",
+        "threshold": 0.9111,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 2
+      },
+      {
+        "pr": "S01",
+        "threshold": 0.8333,
+        "posted": 1,
+        "right_posted": 1,
+        "groups": 1
+      },
+      {
+        "pr": "S02",
+        "threshold": 0.8333,
+        "posted": 1,
+        "right_posted": 1,
+        "groups": 1
+      },
+      {
+        "pr": "S03",
+        "threshold": 0.8222,
+        "posted": 1,
+        "right_posted": 1,
+        "groups": 2
+      },
+      {
+        "pr": "S04",
+        "threshold": 0.8667,
+        "posted": 1,
+        "right_posted": 1,
+        "groups": 2
+      },
+      {
+        "pr": "S05",
+        "threshold": 0.8333,
+        "posted": 1,
+        "right_posted": 1,
+        "groups": 1
+      },
+      {
+        "pr": "S06",
+        "threshold": 0.8333,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 1
+      },
+      {
+        "pr": "S07",
+        "threshold": 0.8667,
+        "posted": 1,
+        "right_posted": 1,
+        "groups": 2
+      },
+      {
+        "pr": "S08",
+        "threshold": 0.8333,
+        "posted": 0,
+        "right_posted": 0,
+        "groups": 1
+      },
+      {
+        "pr": "S09",
+        "threshold": 0.8333,
+        "posted": 1,
+        "right_posted": 1,
+        "groups": 1
+      },
+      {
+        "pr": "S10",
+        "threshold": 0.4762,
+        "posted": 1,
+        "right_posted": 1,
+        "groups": 3
+      }
+    ],
+    "folds_without_threshold": 0
+  },
+  "threshold_if_applied": 0.8431,
+  "table": {
+    "docs / restated / alone / high": {
+      "right": 3,
+      "total": 6,
+      "score": 0.5662
+    },
+    "quality / bug / agree / high": {
+      "right": 2,
+      "total": 2,
+      "score": 0.8824
+    },
+    "quality / bug / alone / high": {
+      "right": 0,
+      "total": 1,
+      "score": 0.5098
+    },
+    "quality / bug / alone / low": {
+      "right": 1,
+      "total": 1,
+      "score": 0.8431
+    },
+    "security / bug / agree / high": {
+      "right": 5,
+      "total": 5,
+      "score": 0.9328
+    },
+    "tests / restated / agree / high": {
+      "right": 1,
+      "total": 1,
+      "score": 0.8431
+    },
+    "tests / restated / alone / high": {
+      "right": 1,
+      "total": 1,
+      "score": 0.8431
+    }
+  },
+  "applied": false,
+  "note": "report only: changing the live threshold is a human decision (like S6)"
+}

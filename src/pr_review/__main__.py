@@ -64,12 +64,17 @@ def main(argv: list[str] | None = None) -> int:
     tc.add_argument("--arm", choices=["nosearch", "search"], default="nosearch",
                     help="default = decision S6 (no search)")
     sub.add_parser("report", help="static HTML report: quality, cost, latency, audit trail -> reports/report.html")
+    gt = sub.add_parser("gate", help="regression gate: candidate results vs the committed baseline (matrix 07)")
+    gt.add_argument("candidate", help="a results file in the rung 3 format, e.g. eval/results/rung3n_new.json")
+    gt.add_argument("--baseline", default="eval/results/rung3n.json")
+    rc = sub.add_parser("recalibrate", help="report a new calibration from golden + queue labels; never applies it")
+    rc.add_argument("--db", default=".pr_review/store.db")
     sv = sub.add_parser("serve", help="live demo: webhook receiver + review worker (M9_SETUP.md)")
     sv.add_argument("--port", type=int, default=8787)
     sv.add_argument("--db", default=".pr_review/store.db")
     qu = sub.add_parser("queue", help="list comments waiting for human approval")
     qu.add_argument("--db", default=".pr_review/store.db")
-    qu.add_argument("action", nargs="?", choices=["list", "approve", "reject"], default="list")
+    qu.add_argument("action", nargs="?", choices=["list", "approve", "reject", "dispute"], default="list")
     qu.add_argument("item", nargs="?", type=int, help="queue item number (#id from the list)")
     qu.add_argument("--note", default="")
     args = parser.parse_args(argv)
@@ -87,6 +92,29 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  C {c['pr']}: score {c['score']} posted={c['posted']} right={c['right']}")
         out = ROOT / "eval" / "results" / f"rung4{'' if args.on == '3' else 'n'}.json"
         out.write_text(json.dumps(res, indent=2) + "\n", encoding="utf-8", newline="\n")
+        print(f"saved {out.relative_to(ROOT).as_posix()}")
+        return 0
+
+    if args.cmd == "gate":
+        from pr_review.evaluation.gate import gate
+        r = gate(ROOT, json.loads((ROOT / args.baseline).read_text(encoding="utf-8")),
+                 json.loads((ROOT / args.candidate).read_text(encoding="utf-8")))
+        print(f"gate: {r['verdict'].upper()}  baseline {r['baseline']}  candidate {r['candidate']}")
+        for x in r["reasons"]:
+            print(f"  FAIL: {x}")
+        for x in r["unlabelled_matched"][:20]:
+            print(f"  needs a right-reason label: {x}")
+        return 0 if r["verdict"] == "pass" else 1
+
+    if args.cmd == "recalibrate":
+        from pr_review.evaluation.gate import recalibrate
+        r = recalibrate(ROOT, ROOT / args.db)
+        out = ROOT / "eval/results/recalibration_report.json"
+        out.write_text(json.dumps(r, indent=2) + "\n", encoding="utf-8", newline="\n")
+        a = r["leave_one_out"]
+        print(f"labels by source: {r['sources']}")
+        print(f"leave-one-out: posted {a['posted']}, right {a['right_posted']}, precision {a['precision']}; "
+              f"threshold if applied: {r['threshold_if_applied']} (NOT applied: {r['note']})")
         print(f"saved {out.relative_to(ROOT).as_posix()}")
         return 0
 
@@ -120,6 +148,10 @@ def main(argv: list[str] | None = None) -> int:
             row = q.conn.execute("SELECT work_key, text FROM approvals WHERE id=?", (args.item,)).fetchone()
             if row is None:
                 parser.error(f"no queue item #{args.item}")
+            if args.action == "dispute":
+                q.dispute(args.item, "nishant", args.note or "disputed")
+                print(f"#{args.item} disputed (stored as a 'wrong' label for the next calibration)")
+                return 0
             if args.action == "reject":
                 q.reject(args.item, "nishant", args.note)
                 print(f"#{args.item} rejected (stored as a 'wrong' label for the next calibration)")

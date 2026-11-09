@@ -91,6 +91,9 @@ def process(conn: sqlite3.Connection, job: sqlite3.Row, gh, complete, now: float
         if thr is not None and score is not None and score >= thr and not rv["partial"] and not critical:
             posted.append((g, score))
             conn.execute("INSERT OR IGNORE INTO posted VALUES (?, ?, ?)", (fp, key, now))
+            note = f"[{lead['severity']}] {lead['message']} ({lead['specialist']}, posted by the bot)"
+            queue.record_posted(key, lead["file"], lead["lines"][0], lead["lines"][1], note, score,
+                                " / ".join(features(g)))
         else:
             text = f"[{lead['severity']}] {lead['message']} ({lead['specialist']}) — {lead['rationale']}"
             queued += queue.enqueue(key, lead["file"], lead["lines"][0], lead["lines"][1], text, score,

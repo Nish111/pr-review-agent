@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS approvals (
     id INTEGER PRIMARY KEY, fingerprint TEXT NOT NULL UNIQUE, work_key TEXT NOT NULL, file TEXT NOT NULL,
     line_start INTEGER NOT NULL, line_end INTEGER NOT NULL, text TEXT NOT NULL, score REAL,
     state TEXT NOT NULL DEFAULT 'pending' CHECK (state IN ('pending','approved','rejected','disputed')),
-    created_at REAL NOT NULL, decided_at REAL, decided_by TEXT, note TEXT);
+    created_at REAL NOT NULL, decided_at REAL, decided_by TEXT, note TEXT, features TEXT);
 CREATE TABLE IF NOT EXISTS calibration_labels (
     fingerprint TEXT PRIMARY KEY, right INTEGER NOT NULL, source TEXT NOT NULL, created_at REAL NOT NULL);
 """
@@ -30,6 +30,9 @@ class ApprovalQueue:
     def __init__(self, conn: sqlite3.Connection, clock: Callable[[], float] = time.time):
         self.conn, self.clock = conn, clock
         conn.executescript(SCHEMA)
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(approvals)")}
+        if "features" not in cols:                                 # older store files (before 9 Nov)
+            conn.execute("ALTER TABLE approvals ADD COLUMN features TEXT")
 
     def enqueue(self, work_key: str, file: str, line_start: int, line_end: int, text: str, score: float | None,
                 category_group: str) -> bool:
@@ -37,11 +40,22 @@ class ApprovalQueue:
         fp = fingerprint(work_key, file, line_start, line_end, category_group)
         try:
             self.conn.execute("INSERT INTO approvals (fingerprint, work_key, file, line_start, line_end, text, score, "
-                              "created_at) VALUES (?,?,?,?,?,?,?,?)",
-                              (fp, work_key, file, line_start, line_end, text, score, self.clock()))
+                              "created_at, features) VALUES (?,?,?,?,?,?,?,?,?)",
+                              (fp, work_key, file, line_start, line_end, text, score, self.clock(), category_group))
             return True
         except sqlite3.IntegrityError:
             return False
+
+    def record_posted(self, work_key: str, file: str, line_start: int, line_end: int, text: str, score: float | None,
+                      category_group: str) -> int | None:
+        """A comment the bot posted by itself (score >= threshold). Kept as 'approved by bot' so a person can dispute it
+        later (G9). A bot approval is not a human label, so nothing goes to calibration_labels unless it's disputed."""
+        if not self.enqueue(work_key, file, line_start, line_end, text, score, category_group):
+            return None
+        fp = fingerprint(work_key, file, line_start, line_end, category_group)
+        self.conn.execute("UPDATE approvals SET state='approved', decided_at=?, decided_by='bot' WHERE fingerprint=?",
+                          (self.clock(), fp))
+        return self.conn.execute("SELECT id FROM approvals WHERE fingerprint=?", (fp,)).fetchone()[0]
 
     def pending(self) -> list[dict]:
         """G8: oldest first, with age in hours and a stale flag."""
