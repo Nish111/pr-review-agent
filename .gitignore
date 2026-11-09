@@ -28,3 +28,7 @@ eval/workdir/
 
 # the local code index (rebuilt with `python -m pr_review index`)
 .pr_review/
+
+# GitHub App private keys and local secrets: never committed (M9)
+*.pem
+.secrets/

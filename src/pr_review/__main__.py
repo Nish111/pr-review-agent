@@ -64,8 +64,14 @@ def main(argv: list[str] | None = None) -> int:
     tc.add_argument("--arm", choices=["nosearch", "search"], default="nosearch",
                     help="default = decision S6 (no search)")
     sub.add_parser("report", help="static HTML report: quality, cost, latency, audit trail -> reports/report.html")
+    sv = sub.add_parser("serve", help="live demo: webhook receiver + review worker (M9_SETUP.md)")
+    sv.add_argument("--port", type=int, default=8787)
+    sv.add_argument("--db", default=".pr_review/store.db")
     qu = sub.add_parser("queue", help="list comments waiting for human approval")
     qu.add_argument("--db", default=".pr_review/store.db")
+    qu.add_argument("action", nargs="?", choices=["list", "approve", "reject"], default="list")
+    qu.add_argument("item", nargs="?", type=int, help="queue item number (#id from the list)")
+    qu.add_argument("--note", default="")
     args = parser.parse_args(argv)
 
     if args.cmd == "rung4":
@@ -84,6 +90,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"saved {out.relative_to(ROOT).as_posix()}")
         return 0
 
+    if args.cmd == "serve":
+        from pr_review.live.server import run
+        db = ROOT / args.db
+        db.parent.mkdir(parents=True, exist_ok=True)
+        run(db, db.with_name("inbox.jsonl"), args.port)
+        return 0
+
     if args.cmd == "trace":
         from pr_review.trace import build_trace, render
         print(render(build_trace(ROOT, args.pr, args.arm)))
@@ -100,7 +113,28 @@ def main(argv: list[str] | None = None) -> int:
         from pr_review.hitl import ApprovalQueue
         db = ROOT / args.db
         db.parent.mkdir(parents=True, exist_ok=True)
-        items = ApprovalQueue(sqlite3.connect(db, isolation_level=None)).pending()
+        q = ApprovalQueue(sqlite3.connect(db, isolation_level=None))
+        if args.action in ("approve", "reject"):
+            if args.item is None:
+                parser.error("give the item number, e.g. `queue approve 3`")
+            row = q.conn.execute("SELECT work_key, text FROM approvals WHERE id=?", (args.item,)).fetchone()
+            if row is None:
+                parser.error(f"no queue item #{args.item}")
+            if args.action == "reject":
+                q.reject(args.item, "nishant", args.note)
+                print(f"#{args.item} rejected (stored as a 'wrong' label for the next calibration)")
+                return 0
+            import os
+
+            from pr_review.github_client import GitHub
+            repo, rest = row[0].split("#", 1)
+            number = int(rest.split("@", 1)[0])
+            GitHub(os.environ["GITHUB_APP_ID"], os.environ["GITHUB_APP_KEY_PATH"]).comment(
+                repo, number, "**PR review bot** · approved by a human reviewer\n\n- " + row[1])
+            q.approve(args.item, "nishant", args.note)
+            print(f"#{args.item} approved and posted to {repo}#{number}")
+            return 0
+        items = q.pending()
         print(f"{len(items)} comment(s) waiting for approval" + ("" if items else " (nothing has been queued yet)"))
         for it in items:
             print(f"  #{it['id']} {it['work_key']} {it['where']} score={it['score']} age={it['age_h']}h"
