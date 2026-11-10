@@ -1,10 +1,10 @@
 # CURRENT
 - active_loop: NONE
-- target: M9 (live PR -> review demo on a real GitHub App, ADRs, write-up)
+- target: none (M0–M9 done)
 - iteration: 0
 - last_gate: —
 - last_action: 10 Nov 2026 — M9 live demo done (eval/M9_DEMO_LOG.md); FAILURE_MATRIX_07, docs/ARCHITECTURE.md, ADR-0001…0010 written; README.md drafted; stale TODOs in COMPONENT_LIST/STEP3 resolved.
-- next_action: Nishant reviews + commits docs/ and README.md (never M9_SETUP.md); then mark M9 done in DONE.html. Optional: aggregator grouping fix (post-hoc), demo B, round 2b pairs.
+- next_action: M9 done 10 Nov (README, architecture, ADRs committed). Project closing in the same chat: optional extras only (see HANDOFF_OSPREY.md STATUS).
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000
