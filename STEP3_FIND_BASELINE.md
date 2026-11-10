@@ -44,7 +44,7 @@ implement" means ingesting the html + brief into Genesis. Paste this in #questio
 > + module map) the baseline, and we build the single-LLM reviewer ourselves as step 1 of the improvement story?
 
 ## What I found
-<!-- TODO (Nishant): list the folder contents here -->
+<!-- Resolved 19 Oct 2026: see the Outcome section (no baseline code; baseline = the html design + videos). -->
 Added a doc "PR Agent doc" which covers the first video, also added screenshots and notes in my words
 
 ## Outcome (Claude, 19 Oct)

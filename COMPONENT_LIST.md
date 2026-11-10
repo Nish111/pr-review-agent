@@ -32,7 +32,7 @@ suggestion, confidence, rationale`.
 
 ## Things the html assumes that clash with your rules (not decided yet — flag only)
 
-<!-- TODO (Nishant): no action today. These become decisions when we reach group 2/3. -->
+**Resolved (9 Nov 2026):** paid embeddings → local bge-small (ADR-0003); Tiger Cloud → one SQLite file (ADR-0004); GitHub App → a real App via smee.io for the demo (`M9_START.md`).
 - **Paid embedding model:** the html uses OpenAI `text-embedding-3-large`. Your rule is zero cost /
   free tiers. Likely direction: a local open embedding model (e.g. via sentence-transformers) behind
   the same `embedder` interface.
@@ -43,5 +43,5 @@ suggestion, confidence, rationale`.
 
 ## Next
 
-- Group 1 (ingress) matrix drafted: `FAILURE_MATRIX_01_INGRESS.md`. It has 4 TODOs for Nishant.
+- All seven matrices are written (`FAILURE_MATRIX_01` … `07`); this list is kept for history.
 - Group 2 (ingestion & index) is next, after Nishant's notes on video 2 confirm or change the matrix format.

@@ -4,7 +4,12 @@
 OSPREY chat: **the PR Review Agent only** (W8 deliverable). The memory project continues under
 KESTREL; LinkedIn, SBL and outreach are separate chats.
 
-> **STATUS 7 Nov 2026, later (read this first).** M0–M8 done; report at `reports/report.html`; next M9 (live demo).
+> **STATUS 10 Nov 2026 (read this first; trigger word OSPREY).** M0–M8 done; M9 live demo done on `Nish111/notes-svc-demo#1`
+> and `Nish111/ScalerBeginner#2` (`eval/M9_DEMO_LOG.md`). All 7 failure matrices, `docs/ARCHITECTURE.md`, ADR-0001…0010 and a draft
+> `README.md` exist. **Open:** Nishant's review + commit of the architecture/ADRs and README; mark M9 done; optional: demo B (click fork),
+> the aggregator grouping fix (post-hoc re-run), round 2b pairs, S5 video notes. **`M9_SETUP.md` holds a secret: never commit it.**
+>
+> **Earlier, 7 Nov 2026.** M0–M8 done; report at `reports/report.html`.
 >
 > **Earlier, 7 Nov 2026.** M0–M7 done. Rung 3: `eval/findings_rung3.md`; rung 4: `eval/findings_rung4.md`; default configuration decision S6 (no code search, threshold 0.84). Next: M8 (traces, cost report). Live pointer: `.genesis/checkpoints/CURRENT.md`.
 >

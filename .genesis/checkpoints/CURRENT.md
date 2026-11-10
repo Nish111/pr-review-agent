@@ -3,8 +3,8 @@
 - target: M9 (live PR -> review demo on a real GitHub App, ADRs, write-up)
 - iteration: 0
 - last_gate: —
-- last_action: 7 Nov 2026 — M8 done: FAILURE_MATRIX_06_TRACE_COST.md; `trace <PR>` (prompt fingerprint check proves what the model saw), `report` -> reports/report.html (quality, cost if paid, latency, audit trail); measured token usage saved from now on; BudgetGuard 20k per review. 120 tests.
-- next_action: commit M8; then M9 plan: what the live demo needs (GitHub App, tunnel, which repo), with Nishant's decisions.
+- last_action: 10 Nov 2026 — M9 live demo done (eval/M9_DEMO_LOG.md); FAILURE_MATRIX_07, docs/ARCHITECTURE.md, ADR-0001…0010 written; README.md drafted; stale TODOs in COMPONENT_LIST/STEP3 resolved.
+- next_action: Nishant reviews + commits docs/ and README.md (never M9_SETUP.md); then mark M9 done in DONE.html. Optional: aggregator grouping fix (post-hoc), demo B, round 2b pairs.
 - model: claude-haiku-4-5
 - tokens_used: 0
 - tokens_budget: 50000
