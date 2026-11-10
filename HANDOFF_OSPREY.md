@@ -4,6 +4,8 @@
 OSPREY chat: **the PR Review Agent only** (W8 deliverable). The memory project continues under
 KESTREL; LinkedIn, SBL and outreach are separate chats.
 
+> **PROJECT CLOSED 10 Nov 2026.** M0–M9 done and committed. Optional extras (aggregator grouping fix, demo B, round 2b) were not done by choice; the weak spot is documented in README and eval/M9_DEMO_LOG.md. Nishant closes the 2 demo PRs unmerged and removes the secret from M9_SETUP.md.
+>
 > **STATUS 10 Nov 2026 (read this first; trigger word OSPREY).** M0–M8 done; M9 live demo done on `Nish111/notes-svc-demo#1`
 > and `Nish111/ScalerBeginner#2` (`eval/M9_DEMO_LOG.md`). All 7 failure matrices, `docs/ARCHITECTURE.md`, ADR-0001…0010 and a draft
 > `README.md` exist. **Open:** Nishant's review + commit of the architecture/ADRs and README; mark M9 done; optional: demo B (click fork),
