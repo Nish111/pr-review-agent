@@ -17,7 +17,7 @@ Written 18 Oct 2026. This is the one thing you need to do before step 4 (compone
 
 In the Saturday 18 Jul lecture chat (`Antern\Session15-16\chatSat18-7-2026.txt`, 19:13:41) Ayush posted:
 
-    https://drive.google.com/drive/folders/1Oa8mPXuI9SI7DeBqnfMySjb0eJy8XkfN?usp=sharing
+    [cohort Google Drive folder: link removed 11 Nov 2026 because the repo is now public]
 
 On Discord (#daily-progress, 25 Jul) it was re-shared as the answer to "were the AI PR review system
 designs Ayush presented uploaded?". The folder's title is **AI-PR-REVIEW-AGENT-RECORDINGS** — so it is
